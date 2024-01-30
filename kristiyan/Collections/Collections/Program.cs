@@ -23,10 +23,17 @@ class Program
         str.Remove("tedikis");
 
 
-        str.Sort(); 
-        
+        str.Sort();
 
-        foreach(string s in str) {
+        List<string> newstr = str.FindAll(x => x.Length > 5);
+
+        PrintList(newstr);
+        
+    }
+    static void PrintList(List<string> list) 
+    {
+        foreach (string s in list)
+        {
             Console.WriteLine(s);
         }
     }
