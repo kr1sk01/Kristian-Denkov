@@ -13,7 +13,7 @@ class Program
 
         foreach(Product p in products)
         {
-            p.print();
+            p.print
         }
     }
     static void PrintList(List<string> list) 
