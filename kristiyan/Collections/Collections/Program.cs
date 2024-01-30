@@ -1,12 +1,6 @@
 ﻿namespace MyProject;
 class Program
 {
-
-
-
-    
-
-
     static void Main(string[] args)
     {
         string[] collect = { "Kisi pisi", "tedikis", "zevscheto" };
@@ -25,14 +19,8 @@ class Program
 
         str.Sort();
 
-        List<string> newstr = str.FindAll(x => x.Length > 5);
 
-        PrintList(newstr);
-        
-    }
-    static void PrintList(List<string> list) 
-    {
-        foreach (string s in list)
+        foreach (string s in str)
         {
             Console.WriteLine(s);
         }
