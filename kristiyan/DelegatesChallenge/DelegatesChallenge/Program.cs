@@ -1,22 +1,18 @@
-﻿internal class Program
+﻿using DelegatesChallenge;
+
+internal class Program
 {
     public delegate double taxDel(double a);
     static void Main(string[] args)
     {
+        ShippingFeesDelegate theDel;
         Console.WriteLine("Enter price: ");
 
         double price;
         price = double.Parse(Console.ReadLine());
 
         taxDel td = zone1;
-        Console.WriteLine(td(price));
-
-        td = zone2;
-        Console.WriteLine(td(price));
-        td = zone3;
-        Console.WriteLine(td(price));
-        td = zone4;
-        Console.WriteLine(td(price));
+        
     }
     static double zone1(double a) 
     {
