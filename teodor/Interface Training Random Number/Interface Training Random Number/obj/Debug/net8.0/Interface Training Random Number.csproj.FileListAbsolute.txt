@@ -1,0 +1,14 @@
+C:\Users\a1bg535413\source\repos\interns\teodor\Interface Training Random Number\Interface Training Random Number\bin\Debug\net8.0\Interface Training Random Number.exe
+C:\Users\a1bg535413\source\repos\interns\teodor\Interface Training Random Number\Interface Training Random Number\bin\Debug\net8.0\Interface Training Random Number.deps.json
+C:\Users\a1bg535413\source\repos\interns\teodor\Interface Training Random Number\Interface Training Random Number\bin\Debug\net8.0\Interface Training Random Number.runtimeconfig.json
+C:\Users\a1bg535413\source\repos\interns\teodor\Interface Training Random Number\Interface Training Random Number\bin\Debug\net8.0\Interface Training Random Number.dll
+C:\Users\a1bg535413\source\repos\interns\teodor\Interface Training Random Number\Interface Training Random Number\bin\Debug\net8.0\Interface Training Random Number.pdb
+C:\Users\a1bg535413\source\repos\interns\teodor\Interface Training Random Number\Interface Training Random Number\obj\Debug\net8.0\Interface Training Random Number.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\a1bg535413\source\repos\interns\teodor\Interface Training Random Number\Interface Training Random Number\obj\Debug\net8.0\Interface Training Random Number.AssemblyInfoInputs.cache
+C:\Users\a1bg535413\source\repos\interns\teodor\Interface Training Random Number\Interface Training Random Number\obj\Debug\net8.0\Interface Training Random Number.AssemblyInfo.cs
+C:\Users\a1bg535413\source\repos\interns\teodor\Interface Training Random Number\Interface Training Random Number\obj\Debug\net8.0\Interface Training Random Number.csproj.CoreCompileInputs.cache
+C:\Users\a1bg535413\source\repos\interns\teodor\Interface Training Random Number\Interface Training Random Number\obj\Debug\net8.0\Interface Training Random Number.dll
+C:\Users\a1bg535413\source\repos\interns\teodor\Interface Training Random Number\Interface Training Random Number\obj\Debug\net8.0\refint\Interface Training Random Number.dll
+C:\Users\a1bg535413\source\repos\interns\teodor\Interface Training Random Number\Interface Training Random Number\obj\Debug\net8.0\Interface Training Random Number.pdb
+C:\Users\a1bg535413\source\repos\interns\teodor\Interface Training Random Number\Interface Training Random Number\obj\Debug\net8.0\Interface Training Random Number.genruntimeconfig.cache
+C:\Users\a1bg535413\source\repos\interns\teodor\Interface Training Random Number\Interface Training Random Number\obj\Debug\net8.0\ref\Interface Training Random Number.dll

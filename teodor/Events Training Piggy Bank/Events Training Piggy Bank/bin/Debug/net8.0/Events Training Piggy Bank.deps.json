@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v8.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v8.0": {
+      "Events Training Piggy Bank/1.0.0": {
+        "runtime": {
+          "Events Training Piggy Bank.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Events Training Piggy Bank/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

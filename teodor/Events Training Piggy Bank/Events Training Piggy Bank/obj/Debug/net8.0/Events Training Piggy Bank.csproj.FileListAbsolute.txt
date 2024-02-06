@@ -1,0 +1,14 @@
+C:\Users\a1bg535413\source\repos\interns\teodor\Events Training Piggy Bank\Events Training Piggy Bank\bin\Debug\net8.0\Events Training Piggy Bank.exe
+C:\Users\a1bg535413\source\repos\interns\teodor\Events Training Piggy Bank\Events Training Piggy Bank\bin\Debug\net8.0\Events Training Piggy Bank.deps.json
+C:\Users\a1bg535413\source\repos\interns\teodor\Events Training Piggy Bank\Events Training Piggy Bank\bin\Debug\net8.0\Events Training Piggy Bank.runtimeconfig.json
+C:\Users\a1bg535413\source\repos\interns\teodor\Events Training Piggy Bank\Events Training Piggy Bank\bin\Debug\net8.0\Events Training Piggy Bank.dll
+C:\Users\a1bg535413\source\repos\interns\teodor\Events Training Piggy Bank\Events Training Piggy Bank\bin\Debug\net8.0\Events Training Piggy Bank.pdb
+C:\Users\a1bg535413\source\repos\interns\teodor\Events Training Piggy Bank\Events Training Piggy Bank\obj\Debug\net8.0\Events Training Piggy Bank.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\a1bg535413\source\repos\interns\teodor\Events Training Piggy Bank\Events Training Piggy Bank\obj\Debug\net8.0\Events Training Piggy Bank.AssemblyInfoInputs.cache
+C:\Users\a1bg535413\source\repos\interns\teodor\Events Training Piggy Bank\Events Training Piggy Bank\obj\Debug\net8.0\Events Training Piggy Bank.AssemblyInfo.cs
+C:\Users\a1bg535413\source\repos\interns\teodor\Events Training Piggy Bank\Events Training Piggy Bank\obj\Debug\net8.0\Events Training Piggy Bank.csproj.CoreCompileInputs.cache
+C:\Users\a1bg535413\source\repos\interns\teodor\Events Training Piggy Bank\Events Training Piggy Bank\obj\Debug\net8.0\Events Training Piggy Bank.dll
+C:\Users\a1bg535413\source\repos\interns\teodor\Events Training Piggy Bank\Events Training Piggy Bank\obj\Debug\net8.0\refint\Events Training Piggy Bank.dll
+C:\Users\a1bg535413\source\repos\interns\teodor\Events Training Piggy Bank\Events Training Piggy Bank\obj\Debug\net8.0\Events Training Piggy Bank.pdb
+C:\Users\a1bg535413\source\repos\interns\teodor\Events Training Piggy Bank\Events Training Piggy Bank\obj\Debug\net8.0\Events Training Piggy Bank.genruntimeconfig.cache
+C:\Users\a1bg535413\source\repos\interns\teodor\Events Training Piggy Bank\Events Training Piggy Bank\obj\Debug\net8.0\ref\Events Training Piggy Bank.dll

@@ -1,0 +1,14 @@
+C:\Users\a1bg535413\source\repos\interns\teodor\Thread Synchronization Practice\Thread Synchronization Practice\bin\Debug\net8.0\Thread Synchronization Practice.exe
+C:\Users\a1bg535413\source\repos\interns\teodor\Thread Synchronization Practice\Thread Synchronization Practice\bin\Debug\net8.0\Thread Synchronization Practice.deps.json
+C:\Users\a1bg535413\source\repos\interns\teodor\Thread Synchronization Practice\Thread Synchronization Practice\bin\Debug\net8.0\Thread Synchronization Practice.runtimeconfig.json
+C:\Users\a1bg535413\source\repos\interns\teodor\Thread Synchronization Practice\Thread Synchronization Practice\bin\Debug\net8.0\Thread Synchronization Practice.dll
+C:\Users\a1bg535413\source\repos\interns\teodor\Thread Synchronization Practice\Thread Synchronization Practice\bin\Debug\net8.0\Thread Synchronization Practice.pdb
+C:\Users\a1bg535413\source\repos\interns\teodor\Thread Synchronization Practice\Thread Synchronization Practice\obj\Debug\net8.0\Thread Synchronization Practice.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\a1bg535413\source\repos\interns\teodor\Thread Synchronization Practice\Thread Synchronization Practice\obj\Debug\net8.0\Thread Synchronization Practice.AssemblyInfoInputs.cache
+C:\Users\a1bg535413\source\repos\interns\teodor\Thread Synchronization Practice\Thread Synchronization Practice\obj\Debug\net8.0\Thread Synchronization Practice.AssemblyInfo.cs
+C:\Users\a1bg535413\source\repos\interns\teodor\Thread Synchronization Practice\Thread Synchronization Practice\obj\Debug\net8.0\Thread Synchronization Practice.csproj.CoreCompileInputs.cache
+C:\Users\a1bg535413\source\repos\interns\teodor\Thread Synchronization Practice\Thread Synchronization Practice\obj\Debug\net8.0\Thread Synchronization Practice.dll
+C:\Users\a1bg535413\source\repos\interns\teodor\Thread Synchronization Practice\Thread Synchronization Practice\obj\Debug\net8.0\refint\Thread Synchronization Practice.dll
+C:\Users\a1bg535413\source\repos\interns\teodor\Thread Synchronization Practice\Thread Synchronization Practice\obj\Debug\net8.0\Thread Synchronization Practice.pdb
+C:\Users\a1bg535413\source\repos\interns\teodor\Thread Synchronization Practice\Thread Synchronization Practice\obj\Debug\net8.0\Thread Synchronization Practice.genruntimeconfig.cache
+C:\Users\a1bg535413\source\repos\interns\teodor\Thread Synchronization Practice\Thread Synchronization Practice\obj\Debug\net8.0\ref\Thread Synchronization Practice.dll

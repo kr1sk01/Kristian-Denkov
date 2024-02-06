@@ -1,0 +1,14 @@
+C:\Users\a1bg535413\source\repos\interns\teodor\Collections Training Shopping LIst\Collections Training Shopping LIst\bin\Debug\net8.0\Collections Training Shopping LIst.exe
+C:\Users\a1bg535413\source\repos\interns\teodor\Collections Training Shopping LIst\Collections Training Shopping LIst\bin\Debug\net8.0\Collections Training Shopping LIst.deps.json
+C:\Users\a1bg535413\source\repos\interns\teodor\Collections Training Shopping LIst\Collections Training Shopping LIst\bin\Debug\net8.0\Collections Training Shopping LIst.runtimeconfig.json
+C:\Users\a1bg535413\source\repos\interns\teodor\Collections Training Shopping LIst\Collections Training Shopping LIst\bin\Debug\net8.0\Collections Training Shopping LIst.dll
+C:\Users\a1bg535413\source\repos\interns\teodor\Collections Training Shopping LIst\Collections Training Shopping LIst\bin\Debug\net8.0\Collections Training Shopping LIst.pdb
+C:\Users\a1bg535413\source\repos\interns\teodor\Collections Training Shopping LIst\Collections Training Shopping LIst\obj\Debug\net8.0\Collections Training Shopping LIst.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\a1bg535413\source\repos\interns\teodor\Collections Training Shopping LIst\Collections Training Shopping LIst\obj\Debug\net8.0\Collections Training Shopping LIst.AssemblyInfoInputs.cache
+C:\Users\a1bg535413\source\repos\interns\teodor\Collections Training Shopping LIst\Collections Training Shopping LIst\obj\Debug\net8.0\Collections Training Shopping LIst.AssemblyInfo.cs
+C:\Users\a1bg535413\source\repos\interns\teodor\Collections Training Shopping LIst\Collections Training Shopping LIst\obj\Debug\net8.0\Collections Training Shopping LIst.csproj.CoreCompileInputs.cache
+C:\Users\a1bg535413\source\repos\interns\teodor\Collections Training Shopping LIst\Collections Training Shopping LIst\obj\Debug\net8.0\Collections Training Shopping LIst.dll
+C:\Users\a1bg535413\source\repos\interns\teodor\Collections Training Shopping LIst\Collections Training Shopping LIst\obj\Debug\net8.0\refint\Collections Training Shopping LIst.dll
+C:\Users\a1bg535413\source\repos\interns\teodor\Collections Training Shopping LIst\Collections Training Shopping LIst\obj\Debug\net8.0\Collections Training Shopping LIst.pdb
+C:\Users\a1bg535413\source\repos\interns\teodor\Collections Training Shopping LIst\Collections Training Shopping LIst\obj\Debug\net8.0\Collections Training Shopping LIst.genruntimeconfig.cache
+C:\Users\a1bg535413\source\repos\interns\teodor\Collections Training Shopping LIst\Collections Training Shopping LIst\obj\Debug\net8.0\ref\Collections Training Shopping LIst.dll
