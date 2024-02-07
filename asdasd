@@ -1,0 +1,35 @@
+[33mcommit 5809985f1a468f00a164238c4bcf1790b87a48a8[m[33m ([m[1;36mHEAD[m[33m)[m
+Author: Teodor Teodorov Georgiev <teodor.t.georgiev@stemo.bg>
+Date:   Thu Jan 25 15:10:35 2024 +0200
+
+    added 5 and 6
+
+[33mcommit 9c6ab7bf30dbaae64642ebfb27a7be9d739bd25b[m
+Author: Teodor T. Georgiev (A1 BG) <Teodor.T.Georgiev@a1.bg>
+Date:   Thu Jan 25 15:03:57 2024 +0200
+
+    modified line 2 | added line 4
+
+[33mcommit 3b81975a3c1f42444a44ae47cf34a717e0a8893b[m
+Author: Teodor T. Georgiev (A1 BG) <Teodor.T.Georgiev@a1.bg>
+Date:   Thu Jan 25 14:44:11 2024 +0200
+
+    added bruh 3
+
+[33mcommit 545f3faa83a54dc49370229899cf82ac61da76b9[m
+Author: Bozhidar Stanoev <bojidar_stanoev@stemo.bg>
+Date:   Thu Jan 18 14:29:42 2024 +0000
+
+    Added readme
+
+[33mcommit b6a6b9d2b73d2c7ed1b22f655b3212c244e97eab[m
+Author: Bozhidar Stanoev <bojidar_stanoev@stemo.bg>
+Date:   Thu Jan 18 14:29:27 2024 +0000
+
+    Added readme
+
+[33mcommit 763b504a6090f2e9e7ab6d808a388318fe1e2198[m
+Author: Bozhidar Stanoev <bojidar_stanoev@stemo.bg>
+Date:   Thu Jan 18 14:23:07 2024 +0000
+
+    Added README.md, .gitignore (VisualStudio) files
