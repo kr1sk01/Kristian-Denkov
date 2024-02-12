@@ -6,9 +6,11 @@ namespace ormDemo
     {
         static void Main(string[] args)
         {
+            //Getting DB Context to be able to manipulate the DB
             var db = new ApplicationDbContext();
+            //Creating the DB if it doesn't currently exist
             db.Database.EnsureCreated();
-            
+            //Adding some data to the DB
             db.Categories.Add(new Category {
                 Title = "Sport",
                 News = new List<News>
@@ -25,6 +27,7 @@ namespace ormDemo
                     }
                 }
             }) ;
+            //Saving all the changes we've done from tracker to the actual DB 
             db.SaveChanges();
         }
     }

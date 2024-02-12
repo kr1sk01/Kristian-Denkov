@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace ormDemo.Models
 {
+    //News Db table class
     public class News
     {
         public News() 
