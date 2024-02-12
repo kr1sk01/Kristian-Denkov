@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace ormDemo.Models
 {
+    //Comment Db table class
     public class Comment
     {
         public int Id { get; set; }

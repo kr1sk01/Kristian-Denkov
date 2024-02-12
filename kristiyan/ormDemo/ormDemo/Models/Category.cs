@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace ormDemo.Models
 {
+    //Category Db table class
     public class Category
     {
         public Category()
