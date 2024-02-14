@@ -14,6 +14,8 @@ namespace EF_Training_Student_Enrollment
             StudentServices.PrintInfo(db, 10);
             Console.WriteLine("-------");
             CourseServices.PrintInfo(db, 3);
+            Console.WriteLine("-------");
+            CourseServices.BusiestCourses(db);
         }
 
         //Function for generating some starter data
