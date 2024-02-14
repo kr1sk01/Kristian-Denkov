@@ -72,5 +72,23 @@ namespace EF_Training_Student_Enrollment.Services
                     Console.WriteLine("No students enrolled.");
             }
         }
+
+        //Sorting the courses by how many students have enrolled in them
+        public static void BusiestCourses(ApplicationDbContext db)
+        {
+            //Step 1 - Order courses by the amount of students in them
+            //Step 2 - Project the title of the course and the amount of students in it
+            //Step 3 - materialize the query
+            var busiestCourses = db.Courses.
+                OrderByDescending(x => x.students.Count()).
+                Select(x => new { x.Title, StudentsAmount = x.students.Count() }).
+                ToList();
+
+            //Print the list of courses we got from the query
+            foreach (var course in busiestCourses)
+            {
+                Console.WriteLine($"{course.Title} - {course.StudentsAmount}");
+            }
+        }
     }
 }
