@@ -1,0 +1,122 @@
+[
+	{
+		"Name": "Id",
+		"Value": "f761258d-7780-ed11-90fc-005056af62d5"
+	},
+	{
+		"Name": "Building",
+		"Value": ""
+	},
+	{
+		"Name": "City",
+		"Value": "София"
+	},
+	{
+		"Name": "Entrance",
+		"Value": "1"
+	},
+	{
+		"Name": "HeatingScheduleId",
+		"Value": null
+	},
+	{
+		"Name": "HighwayNumber",
+		"Value": 12
+	},
+	{
+		"Name": "HighwayRegion",
+		"Value": 113
+	},
+	{
+		"Name": "IpAddress",
+		"Value": "10.7.1.586"
+	},
+	{
+		"Name": "IsActive",
+		"Value": false
+	},
+	{
+		"Name": "Latitude",
+		"Value": null
+	},
+	{
+		"Name": "LogicalHeatmeterNumber",
+		"Value": 2218
+	},
+	{
+		"Name": "Longitude",
+		"Value": null
+	},
+	{
+		"Name": "NMnemoSchemeId",
+		"Value": "2a3e0613-2805-416e-9c02-adff7a133a86"
+	},
+	{
+		"Name": "NStationId",
+		"Value": "1055ad88-906a-423b-8c40-73dcc311cedf"
+	},
+	{
+		"Name": "NThermalDistrictId",
+		"Value": "dc52800b-2619-42d8-b438-db5f6dfb9693"
+	},
+	{
+		"Name": "Name",
+		"Value": "ул. ВАСИЛ ЛЕВСКИ ЦЕНТЪР ЗА БЪРЗА МЕД.ПОМОЩ  129 1"
+	},
+	{
+		"Name": "NeighborhoodId",
+		"Value": null
+	},
+	{
+		"Name": "Note",
+		"Value": "Separate new group"
+	},
+	{
+		"Name": "ResponsibleUser",
+		"Value": ""
+	},
+	{
+		"Name": "StationConfigurationId",
+		"Value": "7f7c66e6-1628-447b-b07a-6364341ac0da"
+	},
+	{
+		"Name": "StationConfigurationName",
+		"Value": "Смесена схема на присъединяване за БГВ - Siemens RVD145 + Multical C66"
+	},
+	{
+		"Name": "StationNumber",
+		"Value": 17
+	},
+	{
+		"Name": "Street",
+		"Value": "ул. ВАСИЛ ЛЕВСКИ ЦЕНТЪР ЗА БЪРЗА МЕД.ПОМОЩ"
+	},
+	{
+		"Name": "StreetNumber",
+		"Value": "129"
+	},
+	{
+		"Name": "SummerComputationalDebit",
+		"Value": 1011.00
+	},
+	{
+		"Name": "SummerNominalDebit",
+		"Value": 1011.00
+	},
+	{
+		"Name": "ThermalSource",
+		"Value": 10
+	},
+	{
+		"Name": "WaterScheduleId",
+		"Value": null
+	},
+	{
+		"Name": "WinterComputationalDebit",
+		"Value": 4076.00
+	},
+	{
+		"Name": "WinterNominalDebit",
+		"Value": 4911.00
+	}
+]
