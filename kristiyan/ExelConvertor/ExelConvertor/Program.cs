@@ -14,8 +14,8 @@ namespace ExelConvertor
 {
     public class Tuple
     {
-        public string Name { get; set; }
-        public object Value { get; set; }
+        public string? Name { get; set; }
+        public object? Value { get; set; }
     }
     public class Odit
     {
@@ -99,6 +99,7 @@ namespace ExelConvertor
                     string json = worksheet.Cells[row, 6].Value.ToString();
 
                     jsonList = JsonSerializer.Deserialize<List<Tuple>>(json);
+
                     odits.Add(new Odit
                     {
                         DateTimeString = worksheet.Cells[row, 1].Value.ToString(),
@@ -131,11 +132,11 @@ namespace ExelConvertor
                     worksheet.Cells[row, 3].Value = o.ActionType; // Writing to column C
                     worksheet.Cells[row, 4].Value = o.Object; // Writing to column D
                     worksheet.Cells[row, 5].Value = o.Identificator; // Writing to column E
-                    worksheet.Cells[row, 6].Value = o.Tuples.FirstOrDefault((x) => x.Name == "Name").Value.ToString();
-                    worksheet.Cells[row, 7].Value = o.Tuples.FirstOrDefault((x) => x.Name == "IpAddress").Value.ToString();
-                    worksheet.Cells[row, 8].Value = o.Tuples.FirstOrDefault((x) => x.Name == "StationConfigurationName").Value.ToString();
-                    worksheet.Cells[row, 9].Value = o.Tuples.FirstOrDefault((x) => x.Name == "StationNumber").Value;
-                    worksheet.Cells[row, 10].Value = o.Tuples.FirstOrDefault((x) => x.Name == "LogicalHeatmeterNumber").Value;
+                    worksheet.Cells[row, 6].Value = long.Parse(o.Tuples.FirstOrDefault((x) => x.Name == "Name").Value.ToString());
+                    worksheet.Cells[row, 7].Value = long.Parse(o.Tuples.FirstOrDefault((x) => x.Name == "IpAddress").Value.ToString());
+                    worksheet.Cells[row, 8].Value = long.Parse(o.Tuples.FirstOrDefault((x) => x.Name == "StationConfigurationName").Value.ToString());
+                    worksheet.Cells[row, 9].Value = long.Parse(o.Tuples.FirstOrDefault((x) => x.Name == "StationNumber").Value.ToString());
+                    worksheet.Cells[row, 10].Value = long.Parse(o.Tuples.FirstOrDefault((x) => x.Name == "LogicalHeatmeterNumber").Value.ToString());
                     row++;
                 }
                 package.Save();
@@ -153,7 +154,6 @@ namespace ExelConvertor
                 writer.WriteLine($"StackTrace: {ex.StackTrace}");
                 writer.WriteLine();
             }
-
             Console.WriteLine("Exception logged to error.log file.");
         }
     }
