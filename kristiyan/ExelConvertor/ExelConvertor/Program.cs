@@ -7,6 +7,8 @@ using System;
 using OfficeOpenXml.Drawing.Slicer.Style;
 using static OfficeOpenXml.ExcelErrorValue;
 using System.Diagnostics;
+using System.Collections.Generic;
+using System.Collections;
 
 namespace ExelConvertor
 {
@@ -22,27 +24,64 @@ namespace ExelConvertor
         public string? ActionType { get; set; }
         public string? Object { get; set; }
         public string? Identificator { get; set; }
-        public List<Tuple>? Tuples { get; set; }    
+        public List<Tuple>? Tuples { get; set; }
     }
 
     public class Program
     {
+
         static void Main(string[] args)
         {
-            Stopwatch stopwatch = new Stopwatch();
+            //Column names ( will be displayed in the output excel file ) 
+            string[] ColLabels = new string[]{ "Дата",
+                "Потребител",
+                "Тип",
+                "Обект",
+                "Идентификатор",
+                "Абонатна станция",
+                "IP адрес",
+                "Мнемосхема",
+                "Номер на станция",
+                "Логически номер на топломер"};
 
-            // Start the stopwatch
+            Stopwatch stopwatch = new Stopwatch(); //Creating Timer
+
+            List<Odit> odits = new List<Odit>(); //Creating list of objects that represent each row
+
+            string basePath = Directory.GetCurrentDirectory(); // Getting current folder (where.exe is)
+
+
+            string fileName = "Input.xlsx"; //Name of the input file ( should be witin the same folder )
+
+            string fileToRead = basePath + "\\" + fileName; //Full path to the file
+
+            string fileOutPath = basePath + "\\" + DateTime.Now.ToShortDateString() + ".xlsx"; //Output file path + filename
+
+            //Timer start
             stopwatch.Start();
-            List<Odit> odits = new List<Odit>();
 
+            try
+            {
+                // Open the file for reading using a StreamReader
+                ReadExcelFile(fileToRead, ref odits);
+                // Create a new Excel package
+                WriteExcelFile(fileOutPath, ColLabels, odits);
+            }
+            catch (Exception ex)
+            {
+                LogException(ex);
+                Console.WriteLine(ex.Message);
+            }
+
+            //Timer stop
+            stopwatch.Stop();
+            // Output elapsed time
+            Console.WriteLine($"Elapsed Time: {stopwatch.Elapsed}");
+
+        }
+        public static void ReadExcelFile(string fileToRead, ref List<Odit> odits)
+        {
             List<Tuple> jsonList = new List<Tuple>();
-            
-            string basePath = "C:\\Users\\a1bg535412\\source\\repos\\interns\\kristiyan\\ExelConvertor\\ExelConvertor";
-            // Specify the file path
-            string filePath = "Input1.xlsx";
-            string fileToRead = basePath + "\\" + filePath;
-            string fileToWrite = basePath + "\\" + "Output.txt";
-            // Open the file for reading using a StreamReader
             using (ExcelPackage package = new ExcelPackage(new System.IO.FileInfo(fileToRead)))
             {
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -72,27 +111,19 @@ namespace ExelConvertor
                 }
 
             }
-
-            //Creating new Excel file 
-            string fileOutPath = basePath + "\\" + "Output2.xlsx";
-
-            // Create a new Excel package
+        }
+        public static void WriteExcelFile(string fileOutPath, string[] ColLabels, List<Odit> odits)
+        {
             using (var package = new ExcelPackage(new FileInfo(fileOutPath)))
             {
                 // Add a new worksheet to the Excel package
                 ExcelWorksheet worksheet = package.Workbook.Worksheets.Add(DateTime.Now.ToString());
                 int row = 2;
-                worksheet.Cells[1, 1].Value = "Дата"; // Writing to column A
-                worksheet.Cells[1, 2].Value = "Потребител"; // Writing to column B
-                worksheet.Cells[1, 3].Value = "Тип"; // Writing to column C
-                worksheet.Cells[1, 4].Value = "Обект"; // Writing to column D
-                worksheet.Cells[1, 5].Value = "Идентификатор"; // Writing to column E
-                worksheet.Cells[1, 6].Value = "Абонатна станция";
-                worksheet.Cells[1, 7].Value = "IP адрес";
-                worksheet.Cells[1, 8].Value = "Мнемосхема";
-                worksheet.Cells[1, 9].Value = "Номер на станция";
-                worksheet.Cells[1, 10].Value = "Логически номер на топломер";
-                Console.WriteLine("Odits count: " + odits.Count());
+                for (int i = 0; i < ColLabels.Length; i++)
+                {
+                    worksheet.Cells[1, i + 1].Value = "\r\n" + ColLabels[i];
+                }
+
                 foreach (Odit o in odits)
                 {
                     worksheet.Cells[row, 1].Value = o.DateTimeString; // Writing to column A
@@ -100,7 +131,7 @@ namespace ExelConvertor
                     worksheet.Cells[row, 3].Value = o.ActionType; // Writing to column C
                     worksheet.Cells[row, 4].Value = o.Object; // Writing to column D
                     worksheet.Cells[row, 5].Value = o.Identificator; // Writing to column E
-                    worksheet.Cells[row, 6].Value = o.Tuples.FirstOrDefault((x)=> x.Name == "Name").Value.ToString();
+                    worksheet.Cells[row, 6].Value = o.Tuples.FirstOrDefault((x) => x.Name == "Name").Value.ToString();
                     worksheet.Cells[row, 7].Value = o.Tuples.FirstOrDefault((x) => x.Name == "IpAddress").Value.ToString();
                     worksheet.Cells[row, 8].Value = o.Tuples.FirstOrDefault((x) => x.Name == "StationConfigurationName").Value.ToString();
                     worksheet.Cells[row, 9].Value = o.Tuples.FirstOrDefault((x) => x.Name == "StationNumber").Value;
@@ -108,14 +139,23 @@ namespace ExelConvertor
                     row++;
                 }
                 package.Save();
-                stopwatch.Stop(); // Stop the stopwatch
 
-                // Output elapsed time
-                Console.WriteLine($"Elapsed Time: {stopwatch.Elapsed}");
+            }
+        }
+        static void LogException(Exception ex)
+        {
+            string logFilePath = "error.log";
+
+            // Write the exception details to a log file
+            using (StreamWriter writer = new StreamWriter(logFilePath, append: true))
+            {
+                writer.WriteLine($"[{DateTime.Now}] Exception: {ex.Message}");
+                writer.WriteLine($"StackTrace: {ex.StackTrace}");
+                writer.WriteLine();
             }
 
+            Console.WriteLine("Exception logged to error.log file.");
         }
-
     }
 }
 
