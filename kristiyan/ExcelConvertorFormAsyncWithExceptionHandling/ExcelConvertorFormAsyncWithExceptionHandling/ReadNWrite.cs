@@ -38,7 +38,7 @@ namespace WinFormsApp1
 
             try
             {
-                throw new Exception();
+                
                 // Open the file for reading using a StreamReader
                 odits = await ReadExcelFile(file);
                 // Create a new Excel package
