@@ -63,7 +63,7 @@ namespace WinFormsApp1
             List<Odit>? odits = new List<Odit>();
             List<Tuple>? jsonList = new List<Tuple>();
 
-            using (var package = await Task.Run(() => new ExcelPackage(new System.IO.FileInfo(fileToRead))))
+            using (ExcelPackage package = new ExcelPackage(new System.IO.FileInfo(fileToRead)))
             {
                 ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
                 // Get the first worksheet in the Excel file
@@ -98,7 +98,7 @@ namespace WinFormsApp1
         public async Task WriteExcelFile(string fileOutPath, string[] ColLabels, List<Odit> odits)
         {
 
-            using (var package = await Task.Run(() => new ExcelPackage(new FileInfo(fileOutPath))))
+            using (var package = new ExcelPackage(new FileInfo(fileOutPath)))
             {
                 // Add a new worksheet to the Excel package
                 ExcelWorksheet worksheet = package.Workbook.Worksheets.Add(DateTime.Now.ToString());
