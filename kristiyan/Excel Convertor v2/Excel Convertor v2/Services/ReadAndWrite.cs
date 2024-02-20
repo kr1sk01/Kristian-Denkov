@@ -9,10 +9,14 @@ using static OfficeOpenXml.ExcelErrorValue;
 #pragma warning disable CS8601,CS8604
 namespace Excel_Convertor_v2
 {
-    class ReadAndWrite : Form
+    partial class ReadAndWrite : Form1
     {
-
-
+        private static TextBox _logger;
+        public ReadAndWrite()
+        {
+            _logger = base.textBoxLogger;
+        }
+        
         public async Task<string> Main(string file)
         {
             //Column names ( will be displayed in the output excel file ) 
@@ -60,59 +64,65 @@ namespace Excel_Convertor_v2
         public async Task<HashSet<string>> ReadColTitles(string fileToRead)
         {
             ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
-
+            
             List<Odit>? odits = new List<Odit>();
             List<Object>? jsonList = new List<Object>();
 
             HashSet<string> uniqueNames = new HashSet<string>();
-
-            using (ExcelPackage package = new ExcelPackage(new System.IO.FileInfo(fileToRead)))
+            try
             {
-
-                // Get the first worksheet in the Excel file
-                ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
-
-                // Determine the number of rows and columns in the worksheet
-                int rows = worksheet.Dimension.Rows;
-                int cols = worksheet.Dimension.Columns;
-                int initialRow = FindStartRowIndex(package.Workbook.Worksheets[0]);
-
-                if(initialRow == -1)//Check if program can't find row with data
+                throw new Exception(); 
+                using (ExcelPackage package = new ExcelPackage(new System.IO.FileInfo(fileToRead)))
                 {
-                    LogException(new Exception("Couldn't fine row with data!"));
-                }
-                for (int row = initialRow; row <= rows; row++)
-                {
-                    string jsonString = worksheet.Cells[row, 6].Value?.ToString();
 
-                    if (!string.IsNullOrEmpty(jsonString))
+                    // Get the first worksheet in the Excel file
+                    ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
+
+                    // Determine the number of rows and columns in the worksheet
+                    int rows = worksheet.Dimension.Rows;
+                    int cols = worksheet.Dimension.Columns;
+                    int initialRow = FindStartRowIndex(package.Workbook.Worksheets[0]);
+                    if (initialRow == -1)//Check if program can't find row with data
                     {
-                        // Determine if the JSON represents an object or an array
-                        JsonDocument doc = JsonDocument.Parse(jsonString);
-                        if (doc.RootElement.ValueKind == JsonValueKind.Array)
+                        LogException(new Exception("Couldn't find row with data!"));
+                    }
+                    for (int row = initialRow; row <= rows; row++)
+                    {
+                        string jsonString = worksheet.Cells[row, 6].Value?.ToString();
+
+                        if (!string.IsNullOrEmpty(jsonString))
                         {
-                            // If it's an array, iterate over each element
-                            foreach (var element in doc.RootElement.EnumerateArray())
+                            // Determine if the JSON represents an object or an array
+                            JsonDocument doc = JsonDocument.Parse(jsonString);
+                            if (doc.RootElement.ValueKind == JsonValueKind.Array)
                             {
-                                if (element.TryGetProperty("Name", out var nameProperty))
+                                // If it's an array, iterate over each element
+                                foreach (var element in doc.RootElement.EnumerateArray())
+                                {
+                                    if (element.TryGetProperty("Name", out var nameProperty))
+                                    {
+                                        string nameValue = nameProperty.GetString();
+                                        uniqueNames.Add(nameValue);
+                                    }
+                                }
+                            }
+                            else if (doc.RootElement.ValueKind == JsonValueKind.Object)
+                            {
+                                // If it's an object, extract "Name" property directly
+                                if (doc.RootElement.TryGetProperty("Name", out var nameProperty))
                                 {
                                     string nameValue = nameProperty.GetString();
                                     uniqueNames.Add(nameValue);
                                 }
                             }
                         }
-                        else if (doc.RootElement.ValueKind == JsonValueKind.Object)
-                        {
-                            // If it's an object, extract "Name" property directly
-                            if (doc.RootElement.TryGetProperty("Name", out var nameProperty))
-                            {
-                                string nameValue = nameProperty.GetString();
-                                uniqueNames.Add(nameValue);
-                            }
-                        }
                     }
                 }
+            }catch(Exception e)
+            {
+                LogException(e);
             }
+            
             return uniqueNames;
         }
         public void AddCheckBoxes(HashSet<string> names)
@@ -186,6 +196,7 @@ namespace Excel_Convertor_v2
                 writer.WriteLine();
             }
             Console.WriteLine("Exception logged to error.log file.");
+            
         }
         public int FindStartRowIndex(ExcelWorksheet worksheet)
         {

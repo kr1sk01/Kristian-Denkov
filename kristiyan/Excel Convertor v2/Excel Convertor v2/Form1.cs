@@ -14,12 +14,11 @@ namespace Excel_Convertor_v2
 
         private Button selectButton;
         private TextBox textBox1;
-        ReadAndWrite rww = new ReadAndWrite();
+        
         public Form1()
         {
-
             InitializeComponent();
-            LoggerLabel.Text = "";
+
         }
         private void SetText(string text)
         {
@@ -75,6 +74,11 @@ namespace Excel_Convertor_v2
 
                 }
             }
+        }
+
+        private void textBoxLogger_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
