@@ -11,12 +11,13 @@ namespace Excel_Convertor_v2
 {
     public partial class Form1 : Form
     {
-
+        public List<CheckBox> checkBoxList { get; set; }
         private Button selectButton;
         private TextBox textBox1;
-        
+
         public Form1()
         {
+            checkBoxList = new List<CheckBox>();
             InitializeComponent();
 
         }
@@ -35,16 +36,21 @@ namespace Excel_Convertor_v2
             panel.Width = 500;
 
             // Add checkboxes to the Panel
+            
 
             foreach (string name in checkboxNames)
             {
+
                 CheckBox checkBox = new CheckBox();
                 checkBox.Name = name;
                 checkBox.Text = name;
                 checkBox.AutoSize = true;
                 checkBox.Location = new System.Drawing.Point(20, 20 + (checkBox.Height + 5) * panel.Controls.Count);
                 panel.Controls.Add(checkBox);
+                checkBoxList.Add(checkBox);
             }
+            //panel.Controls.AddRange(checkBoxList.ToArray());
+            
 
             // Add Panel to the form
             Controls.Add(panel);
@@ -79,6 +85,18 @@ namespace Excel_Convertor_v2
         private void textBoxLogger_TextChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            var test = checkBoxList.Where((x) => x.CheckState == CheckState.Checked).Select((x)=>x.Text).ToList();//testa sudurja vsichki checknati boxove
+            if (test.Count == 0)
+            {
+                MessageBox.Show("Izberete koi poleta iskate da dobavite");
+                return;
+            }
+            
+                ;
         }
     }
 }
