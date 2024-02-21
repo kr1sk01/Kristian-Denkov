@@ -4,6 +4,7 @@ using OfficeOpenXml;
 using System.CodeDom;
 using System.Diagnostics;
 using System.Net.Http.Json;
+using System.Reflection;
 using System.Text.Json;
 using static OfficeOpenXml.ExcelErrorValue;
 #pragma warning disable CS8601,CS8604
@@ -12,9 +13,12 @@ namespace Excel_Convertor_v2
     partial class ReadAndWrite : Form1
     {
         private static TextBox _logger;
+
+        List<Odit>? odits = new List<Odit>();
+
         public ReadAndWrite()
         {
-            _logger = base.textBoxLogger;
+            
         }
         
         public async Task<string> Main(string file)
@@ -64,14 +68,13 @@ namespace Excel_Convertor_v2
         public async Task<HashSet<string>> ReadColTitles(string fileToRead)
         {
             ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
-            
-            List<Odit>? odits = new List<Odit>();
+
             List<Object>? jsonList = new List<Object>();
 
             HashSet<string> uniqueNames = new HashSet<string>();
             try
             {
-                throw new Exception(); 
+                
                 using (ExcelPackage package = new ExcelPackage(new System.IO.FileInfo(fileToRead)))
                 {
 
@@ -86,36 +89,48 @@ namespace Excel_Convertor_v2
                     {
                         LogException(new Exception("Couldn't find row with data!"));
                     }
+
+                    List<string> someStr = new List<string> { "CurrentValue", "OriginalValue" };
+
                     for (int row = initialRow; row <= rows; row++)
                     {
-                        string jsonString = worksheet.Cells[row, 6].Value?.ToString();
 
-                        if (!string.IsNullOrEmpty(jsonString))
+                        var test = JsonConvert.DeserializeObject<Object>(worksheet.Cells[row, 6].Value?.ToString());
+                        var props = test?.GetType().GetProperties();
+                        var test1 = props.Where(x => someStr.Contains(x.Name)).ToList();
+                        foreach (var item in test1)
                         {
-                            // Determine if the JSON represents an object or an array
-                            JsonDocument doc = JsonDocument.Parse(jsonString);
-                            if (doc.RootElement.ValueKind == JsonValueKind.Array)
-                            {
-                                // If it's an array, iterate over each element
-                                foreach (var element in doc.RootElement.EnumerateArray())
-                                {
-                                    if (element.TryGetProperty("Name", out var nameProperty))
-                                    {
-                                        string nameValue = nameProperty.GetString();
-                                        uniqueNames.Add(nameValue);
-                                    }
-                                }
-                            }
-                            else if (doc.RootElement.ValueKind == JsonValueKind.Object)
-                            {
-                                // If it's an object, extract "Name" property directly
-                                if (doc.RootElement.TryGetProperty("Name", out var nameProperty))
-                                {
-                                    string nameValue = nameProperty.GetString();
-                                    uniqueNames.Add(nameValue);
-                                }
-                            }
+                            var value = item.GetValue(test, null);
                         }
+                        //var test2 = test1.GetValue(test, null);
+                        string jsonString = worksheet.Cells[row, 6].Value?.ToString();
+                        ;
+                        //if (!string.IsNullOrEmpty(jsonString))
+                        //{
+                        //    // Determine if the JSON represents an object or an array
+                        //    JsonDocument doc = JsonDocument.Parse(jsonString);
+                        //    if (doc.RootElement.ValueKind == JsonValueKind.Array)
+                        //    {
+                        //        // If it's an array, iterate over each element
+                        //        foreach (var element in doc.RootElement.EnumerateArray())
+                        //        {
+                        //            if (element.TryGetProperty("Name", out var nameProperty))
+                        //            {
+                        //                string nameValue = nameProperty.GetString();
+                        //                uniqueNames.Add(nameValue);
+                        //            }
+                        //        }
+                        //    }
+                        //    else if (doc.RootElement.ValueKind == JsonValueKind.Object)
+                        //    {
+                        //        // If it's an object, extract "Name" property directly
+                        //        if (doc.RootElement.TryGetProperty("Name", out var nameProperty))
+                        //        {
+                        //            string nameValue = nameProperty.GetString();
+                        //            uniqueNames.Add(nameValue);
+                        //        }
+                        //    }
+                        //}
                     }
                 }
             }catch(Exception e)
@@ -140,39 +155,7 @@ namespace Excel_Convertor_v2
         }
         public async Task WriteExcelFile(string fileOutPath, string[] ColLabels, List<Odit> odits)
         {
-            object? res;
-            using (var package = new ExcelPackage(new FileInfo(fileOutPath)))
-            {
-                // Add a new worksheet to the Excel package
-                ExcelWorksheet worksheet = package.Workbook.Worksheets.Add(DateTime.Now.ToString());
-                int row = 2;
-                for (int i = 0; i < ColLabels.Length; i++)
-                {
-                    worksheet.Cells[1, i + 1].Value = "\r\n" + ColLabels[i];
-                }
-
-                foreach (Odit o in odits)
-                {
-                    int col = 1;
-                    //Writing up the col titles
-                    {
-                        worksheet.Cells[row, 1].Value = o.DateTimeString; // Writing to column A
-                        worksheet.Cells[row, 2].Value = o.UserType; // Writing to column B
-                        worksheet.Cells[row, 3].Value = o.ActionType; // Writing to column C
-                        worksheet.Cells[row, 4].Value = o.Object; // Writing to column D
-                        worksheet.Cells[row, 5].Value = o.Identificator; // Writing to column E
-                    }
-                    if (o.Objects != null)
-                        foreach (Object Jo in o.Objects)
-                        {
-                            worksheet.Cells[row, col].Value = Jo.ToString();
-                            col++;
-                        }
-
-                    row++;
-                }
-                await package.SaveAsync();
-            }
+           
         }
         private static void LogExecutionTime(Stopwatch sWatch)
         {
