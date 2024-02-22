@@ -10,7 +10,7 @@ using static OfficeOpenXml.ExcelErrorValue;
 namespace Excel_Convertor_v2
 {
     public class ReadAndWrite
-    {    
+    {
         public async Task<string> Main(string file)
         {
             //Column names ( will be displayed in the output excel file ) 
@@ -54,6 +54,7 @@ namespace Excel_Convertor_v2
             // Output elapsed time in a log file
             LogExecutionTime(stopwatch);
             return "1";
+
         }//Ne se polzva
         public async Task<HashSet<string>> ReadColTitles(string fileToRead)
         {
@@ -64,7 +65,7 @@ namespace Excel_Convertor_v2
             HashSet<string> uniqueNames = new HashSet<string>();
             try
             {
-                
+
                 using (ExcelPackage package = new ExcelPackage(new System.IO.FileInfo(fileToRead)))
                 {
 
@@ -84,7 +85,6 @@ namespace Excel_Convertor_v2
                     uniqueNames.Add(worksheet.Cells[initialRow - 1, 3].Value?.ToString());
                     uniqueNames.Add(worksheet.Cells[initialRow - 1, 4].Value?.ToString());
                     uniqueNames.Add(worksheet.Cells[initialRow - 1, 5].Value?.ToString());
-                    List<string> someStr = new List<string> { "CurrentValue", "OriginalValue" };
 
                     for (int row = initialRow; row <= rows; row++)
                     {
@@ -127,16 +127,17 @@ namespace Excel_Convertor_v2
                         }
                     }
                 }
-            }catch(Exception e)
+            }
+            catch (Exception e)
             {
                 LogException(e);
             }
-            
+
             return uniqueNames;
         }
         public async Task<List<Odit>> ReadData(string filePath, List<string> checkBoxChecked)
         {
-            
+
             List<Odit> odits = new List<Odit>();
 
             Renew renew;
@@ -234,12 +235,16 @@ namespace Excel_Convertor_v2
             {
                 Console.WriteLine(o.ToString());
             }
+
+
+            var obj = odits.Where(x => x.col1 == "20.02.2024 10:59").Select(x => new { Name = x.col2, });
+
             return odits;
         }
-        public async Task WriteExcelFile(string fileOutPath, string[] ColLabels, List<Odit> odits)
+        public async Task WriteExcelFile(string fileOutPath, List<Odit> odits)
         {
-           
-        }
+
+        }//TODO
         private static void LogExecutionTime(Stopwatch sWatch)
         {
             string logFilePath = "executionTimeLog.log";
@@ -262,7 +267,7 @@ namespace Excel_Convertor_v2
                 writer.WriteLine();
             }
             Console.WriteLine("Exception logged to error.log file.");
-            
+
         }
         public int FindStartRowIndex(ExcelWorksheet worksheet)
         {
