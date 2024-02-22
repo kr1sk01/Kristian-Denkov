@@ -235,6 +235,10 @@ namespace Excel_Convertor_v2
             {
                 Console.WriteLine(o.ToString());
             }
+
+
+            var obj = odits.Where(x => x.col1 == "20.02.2024 10:59").Select(x => new { Name = x.col2, });
+
             return odits;
         }
         public async Task WriteExcelFile(string fileOutPath, List<Odit> odits)
