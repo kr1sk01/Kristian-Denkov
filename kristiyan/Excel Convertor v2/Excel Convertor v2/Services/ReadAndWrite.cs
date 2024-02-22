@@ -11,50 +11,13 @@ namespace Excel_Convertor_v2
 {
     public class ReadAndWrite
     {
-        public async Task<string> Main(string file)
+        public async Task<List<Dictionary<string, string>>> ReadStaticCols(string fileToRead)
         {
-            //Column names ( will be displayed in the output excel file ) 
-            string[] ColLabels = new string[]{ "Дата",
-                "Потребител",
-                "Тип",
-                "Обект",
-                "Идентификатор",
-                "Абонатна станция",
-                "IP адрес",
-                "Мнемосхема",
-                "Номер на станция",
-                "Логически номер на топломер"};
+            List<Dictionary<string, string>> staticCols = new List<Dictionary<string, string>>();
 
-            Stopwatch stopwatch = new Stopwatch(); //Creating Timer
 
-            List<Odit> odits = new List<Odit>(); //Creating list of objects that represent each row
 
-            string basePath = Directory.GetCurrentDirectory(); // Getting current folder (where.exe is)
-            string fileOutPath = basePath + "\\" + DateTime.Now.ToShortDateString() + ".xlsx"; //Output file path + filename
-
-            //Timer start
-            stopwatch.Start();
-
-            try
-            {
-                // Open the file for reading using a StreamReader
-                //odits = await ReadExcelFile(file);
-                // Create a new Excel package
-                //await WriteExcelFile(fileOutPath, ColLabels, odits);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Имаше проблем при конвертирането. Свържете се с администратор!", "Неуспешно конвертиране!", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                LogException(ex);
-                return "0";
-            }
-
-            //Timer stop
-            stopwatch.Stop();
-            // Output elapsed time in a log file
-            LogExecutionTime(stopwatch);
-            return "1";
-
+            return staticCols;
         }//Ne se polzva
         public async Task<HashSet<string>> ReadColTitles(string fileToRead)
         {
@@ -235,9 +198,6 @@ namespace Excel_Convertor_v2
             {
                 Console.WriteLine(o.ToString());
             }
-
-
-            var obj = odits.Where(x => x.col1 == "20.02.2024 10:59").Select(x => new { Name = x.col2, });
 
             return odits;
         }
