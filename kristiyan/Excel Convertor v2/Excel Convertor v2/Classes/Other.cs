@@ -5,11 +5,11 @@ namespace Excel_Convertor_v2.Classes
 {
     public class Other : Odit
     {
-        public Other(List<Dictionary<string, string>> cols, Dictionary<string, string> data) : base(cols)
+        public Other(Dictionary<string, string> cols, Dictionary<string, object> data) : base(cols)
         {
             this.data = data;
         }
-        Dictionary<string, string> data = new Dictionary<string, string>();
+        public Dictionary<string, object> data = new Dictionary<string, object>();
 
         
     }
