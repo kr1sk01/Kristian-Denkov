@@ -14,7 +14,8 @@ namespace Excel_Convertor_v2
         public List<CheckBox> checkBoxList { get; set; }
         private Button selectButton;
         private TextBox textBox1;
-
+        ReadAndWrite rw = new ReadAndWrite();
+        string fileName = "";
         public Form1()
         {
             checkBoxList = new List<CheckBox>();
@@ -62,16 +63,21 @@ namespace Excel_Convertor_v2
         {
 
         }
+        
+
+        private void textBoxLogger_TextChanged(object sender, EventArgs e)
+        {
+
+        }
         private void button1_Click(object sender, EventArgs e)
         {
             OpenFileDialog openFileDialog1 = new OpenFileDialog();
             openFileDialog1.Filter = "xlsx files (*.xlsx)|*.xlsx";
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                string fileName = openFileDialog1.FileName;
+                fileName = openFileDialog1.FileName;
                 try
-                {
-                    ReadAndWrite rw = new ReadAndWrite();
+                {                   
                     AddCheckBoxes(rw.ReadColTitles(fileName).Result);
                 }
                 catch (Exception ex)
@@ -80,12 +86,6 @@ namespace Excel_Convertor_v2
                 }
             }
         }
-
-        private void textBoxLogger_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
         private void button2_Click(object sender, EventArgs e)
         {
             var checkBoxChecked = checkBoxList.Where((x) => x.CheckState == CheckState.Checked).Select((x) => x.Text).ToList();//testa sudurja vsichki checknati boxove
@@ -95,7 +95,7 @@ namespace Excel_Convertor_v2
                 MessageBox.Show("Изберете кои колони искате да добавите!", "Не сте избрали поле", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-
+            rw.ReadData(fileName, checkBoxChecked);
                 ;
         }
     }

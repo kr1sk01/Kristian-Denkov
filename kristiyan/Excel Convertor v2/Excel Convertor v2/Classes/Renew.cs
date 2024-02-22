@@ -3,7 +3,7 @@ namespace Excel_Convertor_v2.Classes
 {
     public class Renew : Odit
     {
-        public Renew(List<Dictionary<string, string>> cols, RenewJSON? rJson) : base(cols)
+        public Renew(Dictionary<string, string> cols, RenewJSON? rJson) : base(cols)
         {          
             this.rJson = rJson;
         }

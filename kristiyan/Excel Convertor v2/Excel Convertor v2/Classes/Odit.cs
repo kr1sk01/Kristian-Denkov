@@ -3,12 +3,12 @@ namespace Excel_Convertor_v2.Classes
 {
     public class Odit
     {
-        public Odit(List<Dictionary<string, string>> cols)
+        public Odit(Dictionary<string, string> cols)
         {
             this.cols = cols;
         }
 
-        List<Dictionary<string, string>> cols { get; set;}
+        public Dictionary<string, string> cols { get; set;}
 
     }
 }
