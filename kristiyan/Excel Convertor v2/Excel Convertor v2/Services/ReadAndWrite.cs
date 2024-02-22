@@ -1,5 +1,4 @@
 ﻿using Excel_Convertor_v2;
-using Newtonsoft.Json;
 using OfficeOpenXml;
 using System.CodeDom;
 using System.Diagnostics;
@@ -10,7 +9,7 @@ using static OfficeOpenXml.ExcelErrorValue;
 #pragma warning disable CS8601,CS8604
 namespace Excel_Convertor_v2
 {
-    partial class ReadAndWrite : Form1
+    public class ReadAndWrite : Form1
     {
         private static TextBox _logger;
 
@@ -89,48 +88,52 @@ namespace Excel_Convertor_v2
                     {
                         LogException(new Exception("Couldn't find row with data!"));
                     }
-
+                    uniqueNames.Add(worksheet.Cells[initialRow - 1, 1].Value?.ToString());
+                    uniqueNames.Add(worksheet.Cells[initialRow - 1, 2].Value?.ToString());
+                    uniqueNames.Add(worksheet.Cells[initialRow - 1, 3].Value?.ToString());
+                    uniqueNames.Add(worksheet.Cells[initialRow - 1, 4].Value?.ToString());
+                    uniqueNames.Add(worksheet.Cells[initialRow - 1, 5].Value?.ToString());
                     List<string> someStr = new List<string> { "CurrentValue", "OriginalValue" };
 
                     for (int row = initialRow; row <= rows; row++)
                     {
 
-                        var test = JsonConvert.DeserializeObject<Object>(worksheet.Cells[row, 6].Value?.ToString());
-                        var props = test?.GetType().GetProperties();
-                        var test1 = props.Where(x => someStr.Contains(x.Name)).ToList();
-                        foreach (var item in test1)
-                        {
-                            var value = item.GetValue(test, null);
-                        }
-                        //var test2 = test1.GetValue(test, null);
-                        string jsonString = worksheet.Cells[row, 6].Value?.ToString();
-                        ;
-                        //if (!string.IsNullOrEmpty(jsonString))
+                        //var test = JsonConvert.DeserializeObject<Object>(worksheet.Cells[row, 6].Value?.ToString());
+                        //var props = test?.GetType().GetProperties();
+                        //var test1 = props.Where(x => someStr.Contains(x.Name)).ToList();
+                        //foreach (var item in test1)
                         //{
-                        //    // Determine if the JSON represents an object or an array
-                        //    JsonDocument doc = JsonDocument.Parse(jsonString);
-                        //    if (doc.RootElement.ValueKind == JsonValueKind.Array)
-                        //    {
-                        //        // If it's an array, iterate over each element
-                        //        foreach (var element in doc.RootElement.EnumerateArray())
-                        //        {
-                        //            if (element.TryGetProperty("Name", out var nameProperty))
-                        //            {
-                        //                string nameValue = nameProperty.GetString();
-                        //                uniqueNames.Add(nameValue);
-                        //            }
-                        //        }
-                        //    }
-                        //    else if (doc.RootElement.ValueKind == JsonValueKind.Object)
-                        //    {
-                        //        // If it's an object, extract "Name" property directly
-                        //        if (doc.RootElement.TryGetProperty("Name", out var nameProperty))
-                        //        {
-                        //            string nameValue = nameProperty.GetString();
-                        //            uniqueNames.Add(nameValue);
-                        //        }
-                        //    }
+                        //    var value = item.GetValue(test, null);
                         //}
+                        ////var test2 = test1.GetValue(test, null);
+                        string jsonString = worksheet.Cells[row, 6].Value?.ToString();
+                        //;
+                        if (!string.IsNullOrEmpty(jsonString))
+                        {
+                            // Determine if the JSON represents an object or an array
+                            JsonDocument doc = JsonDocument.Parse(jsonString);
+                            if (doc.RootElement.ValueKind == JsonValueKind.Array)
+                            {
+                                // If it's an array, iterate over each element
+                                foreach (var element in doc.RootElement.EnumerateArray())
+                                {
+                                    if (element.TryGetProperty("Name", out var nameProperty))
+                                    {
+                                        string nameValue = nameProperty.GetString();
+                                        uniqueNames.Add(nameValue);
+                                    }
+                                }
+                            }
+                            else if (doc.RootElement.ValueKind == JsonValueKind.Object)
+                            {
+                                // If it's an object, extract "Name" property directly
+                                if (doc.RootElement.TryGetProperty("Name", out var nameProperty))
+                                {
+                                    string nameValue = nameProperty.GetString();
+                                    uniqueNames.Add(nameValue);
+                                }
+                            }
+                        }
                     }
                 }
             }catch(Exception e)
@@ -140,17 +143,105 @@ namespace Excel_Convertor_v2
             
             return uniqueNames;
         }
-        public void AddCheckBoxes(HashSet<string> names)
+        public void ReadData(string filePath, List<string> checkBoxChecked)
         {
-            string[] asd = new string[] { "asdasdsa", "asdasddas", "asddasasdd" };
-            foreach (string name in asd)
+            
+            List<Odit> odits = new List<Odit>();
+
+            Renew renew;
+            RenewJSON renewJSON = new RenewJSON("", "", "");
+            Other other;
+            string[] columnStrings = new string[5];
+            using (var package = new ExcelPackage(new FileInfo(filePath)))
             {
-                CheckBox checkBox = new CheckBox();
-                checkBox.Name = name;
-                checkBox.Text = name; // You can set text as you want
-                checkBox.AutoSize = true; // Adjusts the size of the checkbox automatically
-                checkBox.Location = new System.Drawing.Point(20, 20 + (checkBox.Height + 5) * Controls.Count); // Adjust the position
-                Controls.Add(checkBox); // Add checkbox to the panel
+                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                // Get the first worksheet in the Excel file
+                ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
+
+                // Determine the number of rows and columns in the worksheet
+                int rowCount = worksheet.Dimension.Rows;
+                int colCount = worksheet.Dimension.Columns;
+                Console.WriteLine($"rowcount: {rowCount}");
+                for (int row = 1; row <= rowCount; row++)
+                {
+                    string jsonString = worksheet.Cells[row, 6].Value?.ToString();
+                    Console.WriteLine($"row {row} json string:{jsonString}");
+                }
+                for (int row = 2; row <= rowCount; row++)
+                {
+                    for (int c = 1; c <= 5; c++)
+                        columnStrings[c - 1] = worksheet.Cells[row, c].Value?.ToString();
+
+                    string jsonString = worksheet.Cells[row, 6].Value?.ToString();
+                    if (jsonString != null)
+                    {
+                        if (worksheet.Cells[row, 3].Value?.ToString() == "Обновяване")
+                        {
+
+                            JsonDocument doc = JsonDocument.Parse(jsonString);
+
+                            // Get the root element of the JSON document (assuming it's an array)
+                            JsonElement root = doc.RootElement;
+
+                            // Check if the root element is an array
+                            if (root.ValueKind == JsonValueKind.Array)
+                            {
+                                string name;
+                                string originalValue;
+                                string currentValue;
+                                foreach (JsonElement item in root.EnumerateArray())
+                                {
+                                    // Extract the properties from the JSON object
+                                    name = item.GetProperty("Name").GetString();
+                                    originalValue = item.GetProperty("OriginalValue").GetString();
+                                    currentValue = item.GetProperty("CurrentValue").GetString();
+
+                                    // Create an instance of AccessFailedCountData class and populate its properties
+                                    renewJSON = new RenewJSON(name, originalValue, currentValue);
+
+
+                                    // Print the properties of the deserialized object
+                                    Console.WriteLine($"Name: {renewJSON.Name}");
+                                    Console.WriteLine($"OriginalValue: {renewJSON.OriginalValue}");
+                                    Console.WriteLine($"CurrentValue: {renewJSON.CurrentValue}");
+
+                                }
+                                renew = new Renew(columnStrings[0],
+                                                columnStrings[1],
+                                                columnStrings[2],
+                                                columnStrings[3],
+                                                columnStrings[4],
+                                                renewJSON);
+                                odits.Add(renew);
+                            }
+
+                        }
+                        else
+                        {
+                            List<Dictionary<string, string>> deserializedList = JsonSerializer.Deserialize<List<Dictionary<string, string>>>(jsonString);
+                            Dictionary<string, string> dictToAdd = new Dictionary<string, string>();
+                            foreach (var item in deserializedList)
+                            {
+                                foreach (var kv in item)
+                                {
+                                    if (checkBoxChecked.Contains(kv.Key))
+                                        dictToAdd.Add(kv.Key, kv.Value);
+                                }
+                            }
+                            other = new Other(columnStrings[0],
+                                columnStrings[1],
+                                columnStrings[2],
+                                columnStrings[3],
+                                columnStrings[4],
+                                dictToAdd);
+                            odits.Add(other);
+                        }
+                    }
+                }
+            }
+            foreach (var o in odits)
+            {
+                Console.WriteLine(o.ToString());
             }
         }
         public async Task WriteExcelFile(string fileOutPath, string[] ColLabels, List<Odit> odits)
