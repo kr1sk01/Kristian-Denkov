@@ -1,5 +1,5 @@
 ﻿#pragma warning disable CS8601,CS8604
-namespace Excel_Convertor_v2
+namespace Excel_Convertor_v2.Classes
 {
     public class Other : Odit
     {
