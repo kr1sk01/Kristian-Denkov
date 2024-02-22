@@ -50,8 +50,6 @@ namespace Excel_Convertor_v2
                 checkBoxList.Add(checkBox);
             }
             //panel.Controls.AddRange(checkBoxList.ToArray());
-            
-
             // Add Panel to the form
             Controls.Add(panel);
         }
@@ -89,8 +87,8 @@ namespace Excel_Convertor_v2
 
         private void button2_Click(object sender, EventArgs e)
         {
-            var test = checkBoxList.Where((x) => x.CheckState == CheckState.Checked).Select((x)=>x.Text).ToList();//testa sudurja vsichki checknati boxove
-            if (test.Count == 0)
+            var checkBoxChecked = checkBoxList.Where((x) => x.CheckState == CheckState.Checked).Select((x)=>x.Text).ToList();//testa sudurja vsichki checknati boxove
+            if (checkBoxChecked.Count == 0)
             {
                 MessageBox.Show("Izberete koi poleta iskate da dobavite");
                 return;
