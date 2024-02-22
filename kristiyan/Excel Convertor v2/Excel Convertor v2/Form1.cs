@@ -36,7 +36,7 @@ namespace Excel_Convertor_v2
             panel.Width = 500;
 
             // Add checkboxes to the Panel
-            
+
 
             foreach (string name in checkboxNames)
             {
@@ -52,6 +52,7 @@ namespace Excel_Convertor_v2
             //panel.Controls.AddRange(checkBoxList.ToArray());
             // Add Panel to the form
             Controls.Add(panel);
+            label1.Text = "Моля изберете колоните които искате да включите в експорта: ";
         }
         private void label1_Click(object sender, EventArgs e)
         {
@@ -87,13 +88,14 @@ namespace Excel_Convertor_v2
 
         private void button2_Click(object sender, EventArgs e)
         {
-            var checkBoxChecked = checkBoxList.Where((x) => x.CheckState == CheckState.Checked).Select((x)=>x.Text).ToList();//testa sudurja vsichki checknati boxove
+            var checkBoxChecked = checkBoxList.Where((x) => x.CheckState == CheckState.Checked).Select((x) => x.Text).ToList();//testa sudurja vsichki checknati boxove
             if (checkBoxChecked.Count == 0)
             {
+                label1.ForeColor = Color.Red;
                 MessageBox.Show("Изберете кои колони искате да добавите!", "Не сте избрали поле", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-            
+
                 ;
         }
     }
