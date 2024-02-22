@@ -1,4 +1,4 @@
-﻿using Excel_Convertor_v2;
+﻿using Excel_Convertor_v2.Classes;
 using OfficeOpenXml;
 using System.CodeDom;
 using System.Diagnostics;
@@ -9,17 +9,8 @@ using static OfficeOpenXml.ExcelErrorValue;
 #pragma warning disable CS8601,CS8604
 namespace Excel_Convertor_v2
 {
-    public class ReadAndWrite : Form1
-    {
-        private static TextBox _logger;
-
-        List<Odit>? odits = new List<Odit>();
-
-        public ReadAndWrite()
-        {
-            
-        }
-        
+    public class ReadAndWrite
+    {    
         public async Task<string> Main(string file)
         {
             //Column names ( will be displayed in the output excel file ) 
@@ -63,7 +54,7 @@ namespace Excel_Convertor_v2
             // Output elapsed time in a log file
             LogExecutionTime(stopwatch);
             return "1";
-        }
+        }//Ne se polzva
         public async Task<HashSet<string>> ReadColTitles(string fileToRead)
         {
             ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
@@ -143,7 +134,7 @@ namespace Excel_Convertor_v2
             
             return uniqueNames;
         }
-        public void ReadData(string filePath, List<string> checkBoxChecked)
+        public async Task<List<Odit>> ReadData(string filePath, List<string> checkBoxChecked)
         {
             
             List<Odit> odits = new List<Odit>();
@@ -243,6 +234,7 @@ namespace Excel_Convertor_v2
             {
                 Console.WriteLine(o.ToString());
             }
+            return odits;
         }
         public async Task WriteExcelFile(string fileOutPath, string[] ColLabels, List<Odit> odits)
         {

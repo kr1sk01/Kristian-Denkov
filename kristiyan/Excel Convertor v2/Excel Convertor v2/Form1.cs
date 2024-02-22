@@ -90,7 +90,7 @@ namespace Excel_Convertor_v2
             var checkBoxChecked = checkBoxList.Where((x) => x.CheckState == CheckState.Checked).Select((x)=>x.Text).ToList();//testa sudurja vsichki checknati boxove
             if (checkBoxChecked.Count == 0)
             {
-                MessageBox.Show("Izberete koi poleta iskate da dobavite");
+                MessageBox.Show("Изберете кои колони искате да добавите!", "Не сте избрали поле", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
             
