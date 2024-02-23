@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Excel_Convertor_v2.Services
 {
-    public class Log
+    public static class Log
     {
         public static void LogExecutionTime(Stopwatch sWatch)
         {
