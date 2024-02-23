@@ -115,9 +115,6 @@ namespace Excel_Convertor_v2.Services
 
             List<Odit> odits = new List<Odit>();
 
-            Renew renew;
-            RenewJSON renewJSON = new RenewJSON("", "", "");
-            Other other;
             Odit tempOdit;
 
             using (var package = new ExcelPackage(new FileInfo(filePath)))
@@ -185,13 +182,12 @@ namespace Excel_Convertor_v2.Services
                                     var currentValue = item.GetProperty("CurrentValue").ToString();
 
                                     // Create an instance of AccessFailedCountData class and populate its properties
-                                    renewJSON = new RenewJSON(name, originalValue, currentValue);
 
 
                                     // Print the properties of the deserialized object
-                                    Console.WriteLine($"Name: {renewJSON.Name}");
-                                    Console.WriteLine($"OriginalValue: {renewJSON.OriginalValue}");
-                                    Console.WriteLine($"CurrentValue: {renewJSON.CurrentValue}");
+                                    //Console.WriteLine($"Name: {renewJSON.Name}");
+                                    //Console.WriteLine($"OriginalValue: {renewJSON.OriginalValue}");
+                                    //Console.WriteLine($"CurrentValue: {renewJSON.CurrentValue}");
 
                                 }
                                 var dictToAdd = ReadStaticCols(worksheet).Result;
@@ -201,8 +197,6 @@ namespace Excel_Convertor_v2.Services
                                     dictToAdd[item.Key.ToString()] = worksheet.Cells[row, tempColIndex].Value?.ToString();
                                     tempColIndex++;
                                 }
-                                renew = new Renew(dictToAdd, renewJSON);
-                                odits.Add(renew);
                             }
 
                         }
@@ -225,8 +219,8 @@ namespace Excel_Convertor_v2.Services
 
                             }
                             var dictToAdd2 = await ReadStaticCols(worksheet);
-                            other = new Other(dictToAdd2, dictToAdd);
-                            odits.Add(other);
+                            //other = new Other(dictToAdd2, dictToAdd);
+                            //odits.Add(other);
                         }
                     }
                     else
@@ -238,8 +232,7 @@ namespace Excel_Convertor_v2.Services
                             dictToAdd[item.Key.ToString()] = worksheet.Cells[row, tempColIndex].Value?.ToString();
                             tempColIndex++;
                         }
-                        tempOdit = new Odit(dictToAdd);
-                        odits.Add(tempOdit);
+                        
                     }
                 }
             }
