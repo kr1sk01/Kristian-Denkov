@@ -6,7 +6,7 @@ using System.IO;
 using System.Windows.Forms;
 using System.Text.Json;
 using System.Text.Encodings;
-
+using Excel_Convertor_v2.Services;
 namespace Excel_Convertor_v2
 {
     public partial class Form1 : Form
@@ -78,7 +78,7 @@ namespace Excel_Convertor_v2
                 fileName = openFileDialog1.FileName;
                 try
                 {                   
-                    AddCheckBoxes(rw.ReadColTitles(fileName).Result);
+                    AddCheckBoxes(Read.ReadColTitles(fileName).Result);
                 }
                 catch (Exception ex)
                 {
@@ -95,7 +95,7 @@ namespace Excel_Convertor_v2
                 MessageBox.Show("Изберете кои колони искате да добавите!", "Не сте избрали поле", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-            rw.ReadData(fileName, checkBoxChecked);
+            Read.ReadData(fileName, checkBoxChecked);
                 ;
         }
     }
