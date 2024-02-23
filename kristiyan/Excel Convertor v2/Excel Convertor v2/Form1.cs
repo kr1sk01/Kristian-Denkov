@@ -13,16 +13,14 @@ namespace Excel_Convertor_v2
 {
     public partial class Form1 : Form
     {
-        public List<CheckBox> checkBoxList { get; set; }
-        private Button selectButton;
+        List<string> chosenPropsToShowList = new List<string>();
+
         private TextBox textBox1;
 
         string fileName = "";
         public Form1()
         {
-            checkBoxList = new List<CheckBox>();
             InitializeComponent();
-
         }
         private void SetText(string text)
         {
@@ -30,17 +28,11 @@ namespace Excel_Convertor_v2
         }
         private void AddCheckBoxes(HashSet<string> checkboxNames)
         {
-
-
-
             foreach (string name in checkboxNames)
             {
 
                 ItemToChooseListBox.Items.Add(name);
             }
-            //panel.Controls.AddRange(checkBoxList.ToArray());
-            // Add Panel to the form
-
             label1.Text = "Моля изберете колоните които искате да включите в експорта: ";
         }
         private void ItemToChooseListBox_MouseDoubleClick(object sender, MouseEventArgs e)
@@ -84,12 +76,10 @@ namespace Excel_Convertor_v2
             }
             else
             {
-                List<string> chosenPropsToShowList = new List<string>();
                 foreach (object item in ChosenItemListBox.Items)
                 {
                     chosenPropsToShowList.Add(item.ToString());
                 }
-
             }
         }
         private void button3_Click(object sender, EventArgs e)//Move Right
