@@ -1,53 +1,37 @@
 ﻿using Excel_Convertor_v2.Classes;
 using OfficeOpenXml;
-using System.CodeDom;
-using System.Diagnostics;
-using Newtonsoft;
-using System.Net.Http.Json;
-using System.Reflection;
-using System.Runtime.InteropServices;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Text.Json;
-using static OfficeOpenXml.ExcelErrorValue;
-using System.Security.Principal;
-#pragma warning disable CS8601,CS8604
-namespace Excel_Convertor_v2
+using System.Threading.Tasks;
+namespace Excel_Convertor_v2.Services
 {
-
-    public class ReadAndWrite
+    public static class Read
     {
-        public async Task<int> FindJsonColumn(ExcelWorksheet worksheet)
-        {
-            var startingRow = FindStartRowIndex(worksheet).Result;
-            for (int col = 1; col <= worksheet.Dimension.End.Column; col++)
-            {
-                string? test = worksheet.Cells[startingRow - 1, col].Value?.ToString();
-                if (test == "Стойност")
-                    return col;
-            }
-            return worksheet.Dimension.End.Column;
-        }
-        public async Task<Dictionary<string, string>> ReadStaticCols(ExcelWorksheet worksheet)
+        public static async Task<Dictionary<string, string>> ReadStaticCols(ExcelWorksheet worksheet)
         {
             Dictionary<string, string> staticCols = new Dictionary<string, string>();
-            
+
             // Get the first worksheet in the Excel file    
             int rows = worksheet.Dimension.Rows;
             int cols = worksheet.Dimension.Columns;
-            int initialRow = await FindStartRowIndex(worksheet);
+            int initialRow = await Find.FindStartRowIndex(worksheet);
 
             for (int col = 1; col < cols; col++)
             {
-                
+
                 var somestaticvar = worksheet.Cells[initialRow - 1, col].Value?.ToString();
                 if (somestaticvar == null || somestaticvar.ToLower() == "стойност")
                     return staticCols;
                 staticCols.Add(worksheet.Cells[initialRow - 1, col].Value?.ToString(), "");
-                
+
             }
 
             return staticCols;
         }//Ne se polzva
-        public async Task<HashSet<string>> ReadColTitles(string fileToRead)
+        public static async Task<HashSet<string>> ReadColTitles(string fileToRead)
         {
 
 
@@ -66,10 +50,10 @@ namespace Excel_Convertor_v2
                     // Determine the number of rows and columns in the worksheet
                     int rows = worksheet.Dimension.Rows;
                     int cols = worksheet.Dimension.Columns;
-                    var initialRow = FindStartRowIndex(package.Workbook.Worksheets[0]).Result;
+                    var initialRow = Find.FindStartRowIndex(package.Workbook.Worksheets[0]).Result;
                     if (initialRow == -1)//Check if program can't find row with data
                     {
-                        LogException(new Exception("Couldn't find row with data!"));
+                        Log.LogException(new Exception("Couldn't find row with data!"));
                     }
                     uniqueNames.Add(worksheet.Cells[initialRow - 1, 1].Value?.ToString());
                     uniqueNames.Add(worksheet.Cells[initialRow - 1, 2].Value?.ToString());
@@ -121,12 +105,12 @@ namespace Excel_Convertor_v2
             }
             catch (Exception e)
             {
-                LogException(e);
+                Log.LogException(e);
             }
 
             return uniqueNames;
         }
-        public async Task<List<Odit>> ReadData(string filePath, List<string> checkBoxChecked)
+        public static async Task<List<Odit>> ReadData(string filePath, List<string> checkBoxChecked)
         {
 
             List<Odit> odits = new List<Odit>();
@@ -146,8 +130,8 @@ namespace Excel_Convertor_v2
                 int rowCount = worksheet.Dimension.Rows;
                 int colCount = worksheet.Dimension.Columns;
 
-                var jsonColIndex = await FindJsonColumn(worksheet);
-                var initialRow = await FindStartRowIndex(worksheet);
+                var jsonColIndex = await Find.FindJsonColumn(worksheet);
+                var initialRow = await Find.FindStartRowIndex(worksheet);
                 Console.WriteLine($"rowcount: {rowCount}");
                 for (int row = initialRow; row <= rowCount; row++)
                 {
@@ -212,7 +196,7 @@ namespace Excel_Convertor_v2
                                 }
                                 var dictToAdd = ReadStaticCols(worksheet).Result;
                                 int tempColIndex = 1;
-                                foreach(var item in dictToAdd)
+                                foreach (var item in dictToAdd)
                                 {
                                     dictToAdd[item.Key.ToString()] = worksheet.Cells[row, tempColIndex].Value?.ToString();
                                     tempColIndex++;
@@ -224,11 +208,11 @@ namespace Excel_Convertor_v2
                         }
                         else
                         {
-                            var deserializedList = 
+                            var deserializedList =
                                 JsonSerializer.Deserialize<List<Test>>(jsonString);
 
                             Dictionary<string, object> dictToAdd = new Dictionary<string, object>();
-                            foreach (var item in deserializedList) 
+                            foreach (var item in deserializedList)
                             {
                                 var key = item.Name;
                                 var value = item.Value?.ToString();
@@ -266,53 +250,5 @@ namespace Excel_Convertor_v2
 
             return odits;
         }
-        public async Task WriteExcelFile(string fileOutPath, List<Odit> odits)
-        {
-
-        }//TODO
-        private static void LogExecutionTime(Stopwatch sWatch)
-        {
-            string logFilePath = "executionTimeLog.log";
-
-            // Write the exception details to a log file
-            using (StreamWriter writer = new StreamWriter(logFilePath, append: true))
-            {
-                writer.WriteLine($"[{DateTime.Now}] Execution time: {sWatch.Elapsed}");
-            }
-        }
-        private static void LogException(Exception ex)
-        {
-            string logFilePath = "error.log";
-
-            // Write the exception details to a log file
-            using (StreamWriter writer = new StreamWriter(logFilePath, append: true))
-            {
-                writer.WriteLine($"[{DateTime.Now}] Exception: {ex.Message}");
-                writer.WriteLine($"StackTrace: {ex.StackTrace}");
-                writer.WriteLine();
-            }
-            Console.WriteLine("Exception logged to error.log file.");
-
-        }
-        public async Task<int> FindStartRowIndex(ExcelWorksheet worksheet)
-        {
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-            // Define the string to search for
-            string searchString = "Дата"; // Change this to your specific string
-
-            // Loop through rows and check the first column for the search string
-            for (int row = 1; row <= worksheet.Dimension.End.Row; row++)
-            {
-                var cellValue = worksheet.Cells[row, 1].Value;
-                if (cellValue != null && cellValue.ToString() == searchString)
-                {
-                    return row + 1; // Return the row index where the search string is found
-                }
-            }
-
-            // If the search string is not found, return a default value or handle accordingly
-            return -1;
-        }
     }
 }
-#pragma warning restore CS8601, CS8604
