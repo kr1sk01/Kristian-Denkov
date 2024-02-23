@@ -50,7 +50,6 @@
             label1.Size = new Size(721, 32);
             label1.TabIndex = 0;
             label1.Text = "Моля изберете екселският файл, който искате да конвертирате";
-            label1.Click += label1_Click;
             // 
             // button1
             // 
@@ -87,7 +86,6 @@
             ItemToChooseListBox.Name = "ItemToChooseListBox";
             ItemToChooseListBox.Size = new Size(284, 404);
             ItemToChooseListBox.TabIndex = 3;
-            ItemToChooseListBox.SelectedIndexChanged += ItemToChooseListBox_SelectedIndexChanged;
             // 
             // ChosenItemListBox
             // 
@@ -96,7 +94,6 @@
             ChosenItemListBox.Name = "ChosenItemListBox";
             ChosenItemListBox.Size = new Size(284, 404);
             ChosenItemListBox.TabIndex = 4;
-            ChosenItemListBox.SelectedIndexChanged += ChosenItemListBox_SelectedIndexChanged;
             // 
             // button3
             // 
