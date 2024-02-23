@@ -53,16 +53,6 @@ namespace Excel_Convertor_v2
                 MessageBox.Show($"Double clicked on item: {ItemToChooseListBox.Items[index]}");
             }
         }
-        private void label1_Click(object sender, EventArgs e)
-        {
-
-        }
-        private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-
-
         private void textBoxLogger_TextChanged(object sender, EventArgs e)
         {
 
@@ -99,23 +89,12 @@ namespace Excel_Convertor_v2
                 {
                     chosenPropsToShowList.Add(item.ToString());
                 }
-               
+
             }
         }
-
-        private void ItemToChooseListBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void ChosenItemListBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-
         private void button3_Click(object sender, EventArgs e)//Move Right
         {
-            if(ItemToChooseListBox.SelectedItem != null) 
+            if (ItemToChooseListBox.SelectedItem != null)
             {
                 ChosenItemListBox.Items.Add(ItemToChooseListBox.SelectedItem);
                 ItemToChooseListBox.Items.Remove(ItemToChooseListBox.SelectedItem);
@@ -124,23 +103,20 @@ namespace Excel_Convertor_v2
         }
         private void button4_Click(object sender, EventArgs e)
         {
-            if(ChosenItemListBox.SelectedItem != null)
+            if (ChosenItemListBox.SelectedItem != null)
             {
                 ItemToChooseListBox.Items.Add(ChosenItemListBox.SelectedItem);
                 ChosenItemListBox.Items.Remove(ChosenItemListBox.SelectedItem);
             }
         }//Move Left
-
         private void button5_Click(object sender, EventArgs e)//Move Down
         {
             MoveItem(-1);
         }
-
         private void button6_Click(object sender, EventArgs e)//Move Up
         {
             MoveItem(1);
         }
-
         private void MoveItem(int direction)
         {
             // Check if an item is selected and if it can be moved
