@@ -7,6 +7,8 @@ using System.Windows.Forms;
 using System.Text.Json;
 using System.Text.Encodings;
 using Excel_Convertor_v2.Services;
+using Microsoft.VisualBasic;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace Excel_Convertor_v2
 {
     public partial class Form1 : Form
@@ -14,7 +16,7 @@ namespace Excel_Convertor_v2
         public List<CheckBox> checkBoxList { get; set; }
         private Button selectButton;
         private TextBox textBox1;
-        ReadAndWrite rw = new ReadAndWrite();
+
         string fileName = "";
         public Form1()
         {
@@ -29,31 +31,27 @@ namespace Excel_Convertor_v2
         private void AddCheckBoxes(HashSet<string> checkboxNames)
         {
 
-            Panel panel = new Panel();
-            panel.Location = new Point(10, 100);
-            panel.Width = 350;
-            panel.Height = 450;
-            panel.AutoScroll = true;
-            panel.Width = 500;
-
-            // Add checkboxes to the Panel
 
 
             foreach (string name in checkboxNames)
             {
 
-                CheckBox checkBox = new CheckBox();
-                checkBox.Name = name;
-                checkBox.Text = name;
-                checkBox.AutoSize = true;
-                checkBox.Location = new System.Drawing.Point(20, 20 + (checkBox.Height + 5) * panel.Controls.Count);
-                panel.Controls.Add(checkBox);
-                checkBoxList.Add(checkBox);
+                ItemToChooseListBox.Items.Add(name);
             }
             //panel.Controls.AddRange(checkBoxList.ToArray());
             // Add Panel to the form
-            Controls.Add(panel);
+
             label1.Text = "Моля изберете колоните които искате да включите в експорта: ";
+        }
+        private void ItemToChooseListBox_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            // Check if the double click occurred on an item
+            int index = ItemToChooseListBox.IndexFromPoint(e.Location);
+            if (index != ListBox.NoMatches)
+            {
+                // Handle the double click event on the item
+                MessageBox.Show($"Double clicked on item: {ItemToChooseListBox.Items[index]}");
+            }
         }
         private void label1_Click(object sender, EventArgs e)
         {
@@ -63,7 +61,7 @@ namespace Excel_Convertor_v2
         {
 
         }
-        
+
 
         private void textBoxLogger_TextChanged(object sender, EventArgs e)
         {
@@ -77,7 +75,7 @@ namespace Excel_Convertor_v2
             {
                 fileName = openFileDialog1.FileName;
                 try
-                {                   
+                {
                     AddCheckBoxes(Read.ReadColTitles(fileName).Result);
                 }
                 catch (Exception ex)
@@ -86,17 +84,76 @@ namespace Excel_Convertor_v2
                 }
             }
         }
-        private void button2_Click(object sender, EventArgs e)
+        private void button2_Click(object sender, EventArgs e)//Convert button
         {
-            var checkBoxChecked = checkBoxList.Where((x) => x.CheckState == CheckState.Checked).Select((x) => x.Text).ToList();//testa sudurja vsichki checknati boxove
-            if (checkBoxChecked.Count == 0)
+            if (ChosenItemListBox.Items.Count <= 0)
             {
                 label1.ForeColor = Color.Red;
                 MessageBox.Show("Изберете кои колони искате да добавите!", "Не сте избрали поле", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-            Read.ReadData(fileName, checkBoxChecked);
-                ;
+            else
+            {
+                List<string> chosenPropsToShowList = new List<string>();
+                foreach (object item in ChosenItemListBox.Items)
+                {
+                    chosenPropsToShowList.Add(item.ToString());
+                }
+               
+            }
         }
+
+        private void ItemToChooseListBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void ChosenItemListBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button3_Click(object sender, EventArgs e)//Move Right
+        {
+            if(ItemToChooseListBox.SelectedItem != null) 
+            {
+                ChosenItemListBox.Items.Add(ItemToChooseListBox.SelectedItem);
+                ItemToChooseListBox.Items.Remove(ItemToChooseListBox.SelectedItem);
+            }
+
+        }
+        private void button4_Click(object sender, EventArgs e)
+        {
+            if(ChosenItemListBox.SelectedItem != null)
+            {
+                ItemToChooseListBox.Items.Add(ChosenItemListBox.SelectedItem);
+                ChosenItemListBox.Items.Remove(ChosenItemListBox.SelectedItem);
+            }
+        }//Move Left
+
+        private void button5_Click(object sender, EventArgs e)//Move Down
+        {
+            MoveItem(-1);
+        }
+
+        private void button6_Click(object sender, EventArgs e)//Move Up
+        {
+            MoveItem(1);
+        }
+
+        private void MoveItem(int direction)
+        {
+            // Check if an item is selected and if it can be moved
+            if (ChosenItemListBox.SelectedItem == null || ChosenItemListBox.SelectedIndex + direction < 0 ||
+                ChosenItemListBox.SelectedIndex + direction >= ChosenItemListBox.Items.Count)
+                return;
+
+            // Swap the selected item with the item above or below it
+            int newIndex = ChosenItemListBox.SelectedIndex + direction;
+            object selectedItem = ChosenItemListBox.SelectedItem;
+            ChosenItemListBox.Items.RemoveAt(ChosenItemListBox.SelectedIndex);
+            ChosenItemListBox.Items.Insert(newIndex, selectedItem);
+            ChosenItemListBox.SelectedIndex = newIndex;
+        }//Actual move void
     }
 }
