@@ -31,13 +31,13 @@ namespace Excel_Convertor_v2.Services
 
             return staticCols;
         }//Ne se polzva
-        public static async Task<HashSet<string>> ReadColTitles(string fileToRead)
+        public static async Task<SortedSet<string>> ReadColTitles(string fileToRead)
         {
 
 
             List<Object>? jsonList = new List<Object>();
 
-            HashSet<string> uniqueNames = new HashSet<string>();
+            SortedSet<string> uniqueNames = new SortedSet<string>();
             try
             {
 
@@ -55,12 +55,12 @@ namespace Excel_Convertor_v2.Services
                     {
                         Log.LogException(new Exception("Couldn't find row with data!"));
                     }
-                    uniqueNames.Add(worksheet.Cells[initialRow - 1, 1].Value?.ToString());
-                    uniqueNames.Add(worksheet.Cells[initialRow - 1, 2].Value?.ToString());
-                    uniqueNames.Add(worksheet.Cells[initialRow - 1, 3].Value?.ToString());
-                    uniqueNames.Add(worksheet.Cells[initialRow - 1, 4].Value?.ToString());
-                    uniqueNames.Add(worksheet.Cells[initialRow - 1, 5].Value?.ToString());
-
+                    uniqueNames.Add(worksheet.Cells[initialRow, 1].Value?.ToString());
+                    uniqueNames.Add(worksheet.Cells[initialRow, 2].Value?.ToString());
+                    uniqueNames.Add(worksheet.Cells[initialRow, 3].Value?.ToString());
+                    uniqueNames.Add(worksheet.Cells[initialRow, 4].Value?.ToString());
+                    uniqueNames.Add(worksheet.Cells[initialRow, 5].Value?.ToString());
+                    initialRow += 1; //Почваме от следващия ред да взимаме Prop-совете на JsonString-овете
                     for (int row = initialRow; row <= rows; row++)
                     {
 
@@ -110,145 +110,127 @@ namespace Excel_Convertor_v2.Services
 
             return uniqueNames;
         }
-        public static async Task<List<Odit>> ReadData(string filePath, List<string> checkBoxChecked)
+        public static List<TableRow> ReadData(string filePath, List<string> chosenPropsToShowList)
         {
-
-            List<Odit> odits = new List<Odit>();
-
-            Renew renew;
-            RenewJSON renewJSON = new RenewJSON("", "", "");
-            Other other;
-            Odit tempOdit;
+            var rows = new List<TableRow>();
 
             using (var package = new ExcelPackage(new FileInfo(filePath)))
             {
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-                // Get the first worksheet in the Excel file
-                ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
 
-                // Determine the number of rows and columns in the worksheet
-                int rowCount = worksheet.Dimension.Rows;
-                int colCount = worksheet.Dimension.Columns;
+                var ws = package.Workbook.Worksheets[0];
 
-                var jsonColIndex = await Find.FindJsonColumn(worksheet);
-                var initialRow = await Find.FindStartRowIndex(worksheet);
-                Console.WriteLine($"rowcount: {rowCount}");
-                for (int row = initialRow; row <= rowCount; row++)
+                var rowsCount = ws.Dimension.Rows;
+                var columnsCount = ws.Dimension.Columns;
+
+                Console.WriteLine($"rowcount: {rowsCount}");
+
+                var startingHeaderRowFirstCellText = "Дата";
+
+                var jsonColumnHeaderText = "Стойност";
+
+                var tableRowHeaderIndex = 0;
+
+                var tableHeader = new List<string>();
+
+                for (int currentRowIndex = 1; currentRowIndex <= rowsCount; currentRowIndex++)
                 {
-                    string jsonString = worksheet.Cells[row, jsonColIndex].Value?.ToString();
-                    Console.WriteLine($"row {row} json string:{jsonString}");
-                }
-                ;
-                for (int row = initialRow; row <= rowCount; row++)
-                {
-                    string jsonString = worksheet.Cells[row, jsonColIndex].Value?.ToString();
-                    if (jsonString != null)
+                    var cellValue = ws.Cells[currentRowIndex, 1].Value?.ToString();
+
+                    if (cellValue is null)
                     {
-                        var deserializedList1 =
-                               JsonSerializer.Deserialize<List<Test>>(jsonString);
+                        continue;
+                    }
 
-                        Dictionary<string, object> dictToAdd1 = new Dictionary<string, object>();
-                        foreach (var item in deserializedList1)
+                    if (!startingHeaderRowFirstCellText.Equals(cellValue, StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        continue;
+                    }
+
+                    tableRowHeaderIndex = currentRowIndex;
+
+                    
+                    tableHeader = CreateTableHeader(ws, currentRowIndex, columnsCount);
+
+                    break;
+                }
+
+                
+                var jsonColumnIndex = tableHeader.IndexOf(jsonColumnHeaderText) + 1;
+
+                var valuesStartingRow = tableRowHeaderIndex + 1;
+
+                
+                for (int currentRowIndex = valuesStartingRow; currentRowIndex <= rowsCount; currentRowIndex++)
+                {
+                    var tableRow = new TableRow();
+
+                    foreach (var chosenProp in chosenPropsToShowList)
+                    {
+                        var tableHeaderIndex = tableHeader.IndexOf(chosenProp);
+
+                        if (tableHeaderIndex == -1)
                         {
-                            var key = item.Name;
-                            var value = item.Value?.ToString();
+                            var jsonString = ws.Cells[currentRowIndex, jsonColumnIndex].Value?.ToString();
 
-                            if (checkBoxChecked.Contains(key))
-                            {
-                                dictToAdd1.Add(key, value);
-                            }
+                            var column = CreateJsonColumn(jsonString, chosenProp);
 
-
-                        }
-                        //var dictToAdd1 = await ReadStaticCols(worksheet);
-                        //other = new Other(dictToAdd1, dictToAdd);
-                        //odits.Add(other);
-
-                        if (worksheet.Cells[row, 3].Value?.ToString() == "Обновяване")
-                        {
-
-
-                            JsonDocument doc = JsonDocument.Parse(jsonString);
-
-                            // Get the root element of the JSON document (assuming it's an array)
-                            JsonElement root = doc.RootElement;
-
-                            // Check if the root element is an array
-                            if (root.ValueKind == JsonValueKind.Array)
-                            {
-
-                                foreach (JsonElement item in root.EnumerateArray())
-                                {
-                                    // Extract the properties from the JSON object
-                                    var name = item.GetProperty("Name").ToString();
-                                    var originalValue = item.GetProperty("OriginalValue").ToString();
-                                    var currentValue = item.GetProperty("CurrentValue").ToString();
-
-                                    // Create an instance of AccessFailedCountData class and populate its properties
-                                    renewJSON = new RenewJSON(name, originalValue, currentValue);
-
-
-                                    // Print the properties of the deserialized object
-                                    Console.WriteLine($"Name: {renewJSON.Name}");
-                                    Console.WriteLine($"OriginalValue: {renewJSON.OriginalValue}");
-                                    Console.WriteLine($"CurrentValue: {renewJSON.CurrentValue}");
-
-                                }
-                                var dictToAdd = ReadStaticCols(worksheet).Result;
-                                int tempColIndex = 1;
-                                foreach (var item in dictToAdd)
-                                {
-                                    dictToAdd[item.Key.ToString()] = worksheet.Cells[row, tempColIndex].Value?.ToString();
-                                    tempColIndex++;
-                                }
-                                renew = new Renew(dictToAdd, renewJSON);
-                                odits.Add(renew);
-                            }
-
+                            tableRow.Columns.Add(column);
                         }
                         else
                         {
-                            var deserializedList =
-                                JsonSerializer.Deserialize<List<Test>>(jsonString);
+                            
+                            var value = ws.Cells[currentRowIndex, tableHeaderIndex + 1].Value?.ToString() ?? string.Empty;
 
-                            Dictionary<string, object> dictToAdd = new Dictionary<string, object>();
-                            foreach (var item in deserializedList)
-                            {
-                                var key = item.Name;
-                                var value = item.Value?.ToString();
-
-                                if (checkBoxChecked.Contains(key))
-                                {
-                                    dictToAdd.Add(key, value);
-                                }
-
-
-                            }
-                            var dictToAdd2 = await ReadStaticCols(worksheet);
-                            other = new Other(dictToAdd2, dictToAdd);
-                            odits.Add(other);
+                            tableRow.Columns.Add(new TableColumn(chosenProp, value));
                         }
                     }
-                    else
-                    {
-                        var dictToAdd = await ReadStaticCols(worksheet);
-                        int tempColIndex = 1;
-                        foreach (var item in dictToAdd)
-                        {
-                            dictToAdd[item.Key.ToString()] = worksheet.Cells[row, tempColIndex].Value?.ToString();
-                            tempColIndex++;
-                        }
-                        tempOdit = new Odit(dictToAdd);
-                        odits.Add(tempOdit);
-                    }
+
+                    rows.Add(tableRow);
                 }
             }
-            foreach (var o in odits)
+
+            return rows;
+        }
+        private static List<string> CreateTableHeader(ExcelWorksheet ws, int currentRowIndex, int columnsCount)
+        {
+            var tableHeader = new List<string>();
+
+            for (int currentColumnIndex = 1; currentColumnIndex <= columnsCount; currentColumnIndex++)
             {
-                Console.WriteLine(o.ToString());
+                var cellValue = ws.Cells[currentRowIndex, currentColumnIndex].Value?.ToString() ?? string.Empty;
+
+                tableHeader.Add(cellValue);
             }
 
-            return odits;
+            return tableHeader;
+        }
+        private static TableColumn CreateJsonColumn(string? jsonString, string chosenProp)
+        {
+            var json = new List<JsonCell>();
+
+            if (jsonString != null)
+            {
+                json = JsonSerializer.Deserialize<List<JsonCell>>(jsonString);
+            }
+
+            var value = string.Empty;
+
+            var test = json?.FirstOrDefault(x => x.Name == chosenProp);
+
+            if (test != null)
+            {
+                if (chosenProp == "AccessFailedCount")
+                {
+                    value = $"{nameof(test.OriginalValue)}:{test.OriginalValue}, {nameof(test.CurrentValue)}:{test.CurrentValue}";
+                }
+                else
+                {
+                    value = test.Value?.ToString() ?? string.Empty;
+                }
+            }
+
+            return new TableColumn(chosenProp, value);
         }
     }
 }

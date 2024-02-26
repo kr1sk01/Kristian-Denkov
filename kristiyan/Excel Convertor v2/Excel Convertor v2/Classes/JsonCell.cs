@@ -1,13 +1,16 @@
-﻿#pragma warning disable CS8601,CS8604
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
 namespace Excel_Convertor_v2.Classes
 {
-    public class Test()
+    public class JsonCell
     {
         public string? Name { get; set; }
         public object? OriginalValue { get; set; }
         public object? CurrentValue { get; set; }
         public object? Value { get; set; }
-        
     }
 }
-#pragma warning restore CS8601, CS8604

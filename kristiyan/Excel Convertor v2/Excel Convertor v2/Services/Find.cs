@@ -21,7 +21,7 @@ namespace Excel_Convertor_v2.Services
                 var cellValue = worksheet.Cells[row, 1].Value;
                 if (cellValue != null && cellValue.ToString() == searchString)
                 {
-                    return row + 1; // Return the row index where the search string is found
+                    return row; // Return the row index where the search string is found
                 }
             }
 
