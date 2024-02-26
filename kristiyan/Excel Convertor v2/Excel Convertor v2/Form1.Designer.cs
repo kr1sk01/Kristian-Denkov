@@ -45,18 +45,17 @@
             // 
             label1.AutoSize = true;
             label1.Font = new Font("Segoe UI", 14F);
-            label1.Location = new Point(14, 29);
+            label1.Location = new Point(12, 22);
             label1.Name = "label1";
-            label1.Size = new Size(721, 32);
+            label1.Size = new Size(564, 25);
             label1.TabIndex = 0;
             label1.Text = "Моля изберете екселският файл, който искате да конвертирате";
             // 
             // button1
             // 
-            button1.Location = new Point(735, 16);
-            button1.Margin = new Padding(3, 4, 3, 4);
+            button1.Location = new Point(643, 12);
             button1.Name = "button1";
-            button1.Size = new Size(186, 75);
+            button1.Size = new Size(163, 56);
             button1.TabIndex = 1;
             button1.Text = "Избери файл";
             button1.UseVisualStyleBackColor = true;
@@ -64,10 +63,9 @@
             // 
             // button2
             // 
-            button2.Location = new Point(735, 644);
-            button2.Margin = new Padding(3, 4, 3, 4);
+            button2.Location = new Point(643, 483);
             button2.Name = "button2";
-            button2.Size = new Size(186, 75);
+            button2.Size = new Size(163, 56);
             button2.TabIndex = 2;
             button2.Text = "Конвертирай";
             button2.UseVisualStyleBackColor = true;
@@ -82,25 +80,30 @@
             // ItemToChooseListBox
             // 
             ItemToChooseListBox.FormattingEnabled = true;
-            ItemToChooseListBox.Location = new Point(12, 98);
+            ItemToChooseListBox.ItemHeight = 15;
+            ItemToChooseListBox.Location = new Point(10, 74);
+            ItemToChooseListBox.Margin = new Padding(3, 2, 3, 2);
             ItemToChooseListBox.Name = "ItemToChooseListBox";
-            ItemToChooseListBox.Size = new Size(284, 404);
+            ItemToChooseListBox.Size = new Size(249, 304);
             ItemToChooseListBox.TabIndex = 3;
             // 
             // ChosenItemListBox
             // 
             ChosenItemListBox.FormattingEnabled = true;
-            ChosenItemListBox.Location = new Point(361, 98);
+            ChosenItemListBox.ItemHeight = 15;
+            ChosenItemListBox.Location = new Point(316, 74);
+            ChosenItemListBox.Margin = new Padding(3, 2, 3, 2);
             ChosenItemListBox.Name = "ChosenItemListBox";
-            ChosenItemListBox.Size = new Size(284, 404);
+            ChosenItemListBox.Size = new Size(249, 304);
             ChosenItemListBox.TabIndex = 4;
             // 
             // button3
             // 
             button3.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
-            button3.Location = new Point(302, 117);
+            button3.Location = new Point(264, 88);
+            button3.Margin = new Padding(3, 2, 3, 2);
             button3.Name = "button3";
-            button3.Size = new Size(53, 48);
+            button3.Size = new Size(46, 36);
             button3.TabIndex = 5;
             button3.Text = ">>";
             button3.UseVisualStyleBackColor = true;
@@ -109,9 +112,10 @@
             // button4
             // 
             button4.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
-            button4.Location = new Point(302, 434);
+            button4.Location = new Point(264, 326);
+            button4.Margin = new Padding(3, 2, 3, 2);
             button4.Name = "button4";
-            button4.Size = new Size(53, 48);
+            button4.Size = new Size(46, 36);
             button4.TabIndex = 6;
             button4.Text = "<<";
             button4.UseVisualStyleBackColor = true;
@@ -120,9 +124,10 @@
             // button5
             // 
             button5.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
-            button5.Location = new Point(651, 117);
+            button5.Location = new Point(570, 88);
+            button5.Margin = new Padding(3, 2, 3, 2);
             button5.Name = "button5";
-            button5.Size = new Size(53, 48);
+            button5.Size = new Size(46, 36);
             button5.TabIndex = 7;
             button5.Text = "🡡";
             button5.UseVisualStyleBackColor = true;
@@ -131,9 +136,10 @@
             // button6
             // 
             button6.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
-            button6.Location = new Point(651, 434);
+            button6.Location = new Point(570, 326);
+            button6.Margin = new Padding(3, 2, 3, 2);
             button6.Name = "button6";
-            button6.Size = new Size(53, 48);
+            button6.Size = new Size(46, 36);
             button6.TabIndex = 8;
             button6.Text = "🡣";
             button6.UseVisualStyleBackColor = true;
@@ -141,9 +147,9 @@
             // 
             // Form1
             // 
-            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(935, 735);
+            ClientSize = new Size(818, 551);
             Controls.Add(button6);
             Controls.Add(button5);
             Controls.Add(button4);
@@ -153,7 +159,6 @@
             Controls.Add(button2);
             Controls.Add(button1);
             Controls.Add(label1);
-            Margin = new Padding(3, 4, 3, 4);
             Name = "Form1";
             Text = "Ексел Конвертор";
             ResumeLayout(false);

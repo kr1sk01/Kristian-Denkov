@@ -14,7 +14,7 @@ namespace Excel_Convertor_v2
     public partial class Form1 : Form
     {
         List<string> chosenPropsToShowList = new List<string>();
-
+        SortedSet<string> colNames = new SortedSet<string>();
         private TextBox textBox1;
 
         string fileName = "";
@@ -26,7 +26,7 @@ namespace Excel_Convertor_v2
         {
             textBox1.Text = text;
         }
-        private void AddCheckBoxes(HashSet<string> checkboxNames)
+        private void AddCheckBoxes(SortedSet<string> checkboxNames)
         {
             foreach (string name in checkboxNames)
             {
@@ -38,11 +38,10 @@ namespace Excel_Convertor_v2
         private void ItemToChooseListBox_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             // Check if the double click occurred on an item
-            int index = ItemToChooseListBox.IndexFromPoint(e.Location);
-            if (index != ListBox.NoMatches)
+            int? index = this.ItemToChooseListBox.IndexFromPoint(e.Location);
+            if (index!= null)
             {
-                // Handle the double click event on the item
-                MessageBox.Show($"Double clicked on item: {ItemToChooseListBox.Items[index]}");
+                MessageBox.Show(index.ToString());
             }
         }
         private void textBoxLogger_TextChanged(object sender, EventArgs e)
@@ -58,14 +57,16 @@ namespace Excel_Convertor_v2
                 fileName = openFileDialog1.FileName;
                 try
                 {
+                    colNames = Read.ReadColTitles(fileName).Result;
                     AddCheckBoxes(Read.ReadColTitles(fileName).Result);
                 }
                 catch (Exception ex)
                 {
-
+                    Log.LogException(ex);
                 }
             }
         }
+
         private void button2_Click(object sender, EventArgs e)//Convert button
         {
             if (ChosenItemListBox.Items.Count <= 0)
@@ -76,10 +77,27 @@ namespace Excel_Convertor_v2
             }
             else
             {
-                foreach (object item in ChosenItemListBox.Items)
+                try
                 {
-                    chosenPropsToShowList.Add(item.ToString());
+                    chosenPropsToShowList = new List<string>();
+                    ChosenItemListBox.Update();
+                    foreach (var item in ChosenItemListBox.Items)
+                    {
+                        // Assuming the items are strings, you may need to adjust the type accordingly
+                        chosenPropsToShowList.Add(item.ToString());
+                    }
+                    var rows = Read.ReadData(fileName,
+                       chosenPropsToShowList);
+                    if (!Directory.Exists("Outputs"))
+                    {
+                        // If not, create the directory
+                        Directory.CreateDirectory("Outputs");
+                    }
+                    Write.WriteData($"Outputs\\Output_{DateTime.Now:dd_MM_yyyy_HH_mm_ss}.xlsx", rows);
+                    //Log.LogExecutionTime()
+                    Console.Out.WriteLine("asd");
                 }
+                catch (Exception ex) { Log.LogException(ex); }
             }
         }
         private void button3_Click(object sender, EventArgs e)//Move Right
@@ -89,7 +107,6 @@ namespace Excel_Convertor_v2
                 ChosenItemListBox.Items.Add(ItemToChooseListBox.SelectedItem);
                 ItemToChooseListBox.Items.Remove(ItemToChooseListBox.SelectedItem);
             }
-
         }
         private void button4_Click(object sender, EventArgs e)
         {
@@ -97,11 +114,13 @@ namespace Excel_Convertor_v2
             {
                 ItemToChooseListBox.Items.Add(ChosenItemListBox.SelectedItem);
                 ChosenItemListBox.Items.Remove(ChosenItemListBox.SelectedItem);
+                ItemToChooseListBox.Sorted = true;
             }
         }//Move Left
         private void button5_Click(object sender, EventArgs e)//Move Down
         {
             MoveItem(-1);
+            ItemToChooseListBox.Sorted = true;
         }
         private void button6_Click(object sender, EventArgs e)//Move Up
         {
@@ -120,6 +139,8 @@ namespace Excel_Convertor_v2
             ChosenItemListBox.Items.RemoveAt(ChosenItemListBox.SelectedIndex);
             ChosenItemListBox.Items.Insert(newIndex, selectedItem);
             ChosenItemListBox.SelectedIndex = newIndex;
+
+
         }//Actual move void
     }
 }
