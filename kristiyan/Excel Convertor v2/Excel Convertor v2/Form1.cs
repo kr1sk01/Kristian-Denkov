@@ -39,7 +39,7 @@ namespace Excel_Convertor_v2
         {
             // Check if the double click occurred on an item
             int? index = this.ItemToChooseListBox.IndexFromPoint(e.Location);
-            if (index!= null)
+            if (index != null)
             {
                 MessageBox.Show(index.ToString());
             }
@@ -69,37 +69,55 @@ namespace Excel_Convertor_v2
 
         private void button2_Click(object sender, EventArgs e)//Convert button
         {
-            if (ChosenItemListBox.Items.Count <= 0)
+            if (fileName == "")
             {
-                label1.ForeColor = Color.Red;
-                MessageBox.Show("Изберете кои колони искате да добавите!", "Не сте избрали поле", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
+                button1.Focus();
+                MessageBox.Show("Моля изберете Excel файл за обработка", "Не сте избрали файл", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             else
             {
-                try
+                if (ChosenItemListBox.Items.Count <= 0)
                 {
-                    chosenPropsToShowList = new List<string>();
-                    ChosenItemListBox.Update();
-                    foreach (var item in ChosenItemListBox.Items)
-                    {
-                        // Assuming the items are strings, you may need to adjust the type accordingly
-                        chosenPropsToShowList.Add(item.ToString());
-                    }
-                    var rows = Read.ReadData(fileName,
-                       chosenPropsToShowList);
-                    if (!Directory.Exists("Outputs"))
-                    {
-                        // If not, create the directory
-                        Directory.CreateDirectory("Outputs");
-                    }
-                    Write.WriteData($"Outputs\\Output_{DateTime.Now:dd_MM_yyyy_HH_mm_ss}.xlsx", rows);
-                    //Log.LogExecutionTime()
-                    Console.Out.WriteLine("asd");
+                    button3.Focus();
+                    label1.ForeColor = Color.Red;
+                    MessageBox.Show("Изберете кои колони искате да добавите!", "Не сте избрали поле", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
                 }
-                catch (Exception ex) { Log.LogException(ex); }
+                else
+                {
+                    try
+                    {
+                        chosenPropsToShowList = new List<string>();
+                        ChosenItemListBox.Update();
+                        foreach (var item in ChosenItemListBox.Items)
+                        {
+                            // Assuming the items are strings, you may need to adjust the type accordingly
+                            chosenPropsToShowList.Add(item.ToString());
+                        }
+                        var rows = Read.ReadData(fileName,
+                           chosenPropsToShowList);
+                        if (!Directory.Exists("Outputs"))
+                        {
+                            // If not, create the directory
+                            Directory.CreateDirectory("Outputs");
+                        }
+                        Write.WriteData($"Outputs\\Output_{DateTime.Now:dd_MM_yyyy_HH_mm_ss}.xlsx", rows);
+                        //Log.LogExecutionTime()
+
+                        MessageBox.Show("Вашият обработен Excel файл е готов!", "Output Excel File", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Нещо се обърка при конвертирането!", "Възникна грешка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        Log.LogException(ex);
+                    }
+                }
             }
+
         }
+
+
+
         private void button3_Click(object sender, EventArgs e)//Move Right
         {
             if (ItemToChooseListBox.SelectedItem != null)
@@ -108,7 +126,7 @@ namespace Excel_Convertor_v2
                 ItemToChooseListBox.Items.Remove(ItemToChooseListBox.SelectedItem);
             }
         }
-        private void button4_Click(object sender, EventArgs e)
+        private void button4_Click(object sender, EventArgs e)//Move Left
         {
             if (ChosenItemListBox.SelectedItem != null)
             {
@@ -142,5 +160,48 @@ namespace Excel_Convertor_v2
 
 
         }//Actual move void
+
+        private void ItemToChoose_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            if (e.Clicks == 2)
+            {
+                // Get the ListBoxItem that was double-clicked
+                if (ItemToChooseListBox.SelectedItem != null)
+                {
+                    ChosenItemListBox.Items.Add(ItemToChooseListBox.SelectedItem);
+                    ItemToChooseListBox.Items.Remove(ItemToChooseListBox.SelectedItem);
+                }
+
+                // Do something with the double-clicked item
+                //MessageBox.Show("You double-clicked: " + item.Content.ToString());
+            }
+            else
+            {
+                ItemToChooseListBox.SelectedItem = null;
+            }
+        }
+
+        private void ChosenItemListBox_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            if (e.Clicks == 2)
+            {
+                // Get the ListBoxItem that was double-clicked
+                if (ChosenItemListBox.SelectedItem != null)
+                {
+                    ItemToChooseListBox.Items.Add(ChosenItemListBox.SelectedItem);
+                    ChosenItemListBox.Items.Remove(ChosenItemListBox.SelectedItem);
+                    ItemToChooseListBox.Sorted = true;
+                }
+                
+
+                // Do something with the double-clicked item
+                //MessageBox.Show("You double-clicked: " + item.Content.ToString());
+            }
+            else
+            {
+                ItemToChooseListBox.SelectedItem = null;
+            }
+
+        }
     }
 }
