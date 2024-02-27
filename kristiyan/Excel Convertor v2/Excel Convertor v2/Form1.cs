@@ -9,6 +9,7 @@ using System.Text.Encodings;
 using Excel_Convertor_v2.Services;
 using Microsoft.VisualBasic;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Diagnostics;
 namespace Excel_Convertor_v2
 {
     public partial class Form1 : Form
@@ -17,10 +18,24 @@ namespace Excel_Convertor_v2
         SortedSet<string> colNames = new SortedSet<string>();
         private TextBox textBox1;
 
-        string fileName = "";
+        //Default save directory (excluding outputfile name )
+        string defaultDir = Directory.GetCurrentDirectory().ToString() + "\\Outputs";
+        //FileName ( full Path including file name and its extension ) for Input file
+        string fullFileNamePath = "";
+        //Save file path ( only folder )
+        string savePathFolder = "";
+        //Save file path full path ( including file name and its extension )
+        string fullSavePath = $"{Directory.GetCurrentDirectory().ToString()}\\Output_{DateTime.Now:dd_MM_yyyy_HH_mm_ss}.xlsx";
+
+        bool openFinalPathFolder = false;
         public Form1()
         {
             InitializeComponent();
+            savePathFolder = defaultDir;
+            SavePathTextBox.BackColor = Color.White;
+            SavePathTextBox.ReadOnly = true;
+            SavePathTextBox.Multiline = true;
+            SavePathTextBox.Text = Directory.GetCurrentDirectory().ToString() + "\\Output";
         }
         private void SetText(string text)
         {
@@ -54,11 +69,11 @@ namespace Excel_Convertor_v2
             openFileDialog1.Filter = "xlsx files (*.xlsx)|*.xlsx";
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                fileName = openFileDialog1.FileName;
+                fullFileNamePath = openFileDialog1.FileName;
                 try
                 {
-                    colNames = Read.ReadColTitles(fileName).Result;
-                    AddCheckBoxes(Read.ReadColTitles(fileName).Result);
+                    colNames = Read.ReadColTitles(fullFileNamePath).Result;
+                    AddCheckBoxes(Read.ReadColTitles(fullFileNamePath).Result);
                 }
                 catch (Exception ex)
                 {
@@ -66,10 +81,9 @@ namespace Excel_Convertor_v2
                 }
             }
         }
-
         private void button2_Click(object sender, EventArgs e)//Convert button
         {
-            if (fileName == "")
+            if (fullFileNamePath == "")
             {
                 button1.Focus();
                 MessageBox.Show("Моля изберете Excel файл за обработка", "Не сте избрали файл", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -78,7 +92,7 @@ namespace Excel_Convertor_v2
             {
                 if (ChosenItemListBox.Items.Count <= 0)
                 {
-                    button3.Focus();
+                    button1.Focus();
                     label1.ForeColor = Color.Red;
                     MessageBox.Show("Изберете кои колони искате да добавите!", "Не сте избрали поле", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
@@ -87,24 +101,31 @@ namespace Excel_Convertor_v2
                 {
                     try
                     {
+                        fullSavePath = $"{savePathFolder}\\Output_{DateTime.Now:dd_MM_yyyy_HH_mm_ss}.xlsx";
                         chosenPropsToShowList = new List<string>();
-                        ChosenItemListBox.Update();
                         foreach (var item in ChosenItemListBox.Items)
                         {
                             // Assuming the items are strings, you may need to adjust the type accordingly
                             chosenPropsToShowList.Add(item.ToString());
                         }
-                        var rows = Read.ReadData(fileName,
+                        var rows = Read.ReadData(fullFileNamePath,
                            chosenPropsToShowList);
-                        if (!Directory.Exists("Outputs"))
+                        if (!Directory.Exists(defaultDir))
                         {
                             // If not, create the directory
-                            Directory.CreateDirectory("Outputs");
+                            Directory.CreateDirectory(defaultDir);
                         }
-                        Write.WriteData($"Outputs\\Output_{DateTime.Now:dd_MM_yyyy_HH_mm_ss}.xlsx", rows);
+                        Write.WriteData(fullSavePath, rows);
                         //Log.LogExecutionTime()
 
-                        MessageBox.Show("Вашият обработен Excel файл е готов!", "Output Excel File", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        //MessageBox.Show("Вашият обработен Excel файл е готов!", "Output Excel File", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                        openFinalPathFolder = autoOpenDirCheckBox.Checked;
+                        if (openFinalPathFolder)
+                        {
+                            //MessageBox.Show(savePathFolder, savePathFolder, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            Process.Start("explorer.exe", savePathFolder);
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -115,9 +136,6 @@ namespace Excel_Convertor_v2
             }
 
         }
-
-
-
         private void button3_Click(object sender, EventArgs e)//Move Right
         {
             if (ItemToChooseListBox.SelectedItem != null)
@@ -139,10 +157,14 @@ namespace Excel_Convertor_v2
         {
             MoveItem(-1);
             ItemToChooseListBox.Sorted = true;
+            timer2.Stop();
+            timer2.Start();
         }
         private void button6_Click(object sender, EventArgs e)//Move Up
         {
             MoveItem(1);
+            timer2.Stop();
+            timer2.Start();
         }
         private void MoveItem(int direction)
         {
@@ -160,9 +182,9 @@ namespace Excel_Convertor_v2
 
 
         }//Actual move void
-
         private void ItemToChoose_MouseDoubleClick(object sender, MouseEventArgs e)
         {
+
             if (e.Clicks == 2)
             {
                 // Get the ListBoxItem that was double-clicked
@@ -170,17 +192,15 @@ namespace Excel_Convertor_v2
                 {
                     ChosenItemListBox.Items.Add(ItemToChooseListBox.SelectedItem);
                     ItemToChooseListBox.Items.Remove(ItemToChooseListBox.SelectedItem);
+
                 }
 
                 // Do something with the double-clicked item
                 //MessageBox.Show("You double-clicked: " + item.Content.ToString());
             }
-            else
-            {
-                ItemToChooseListBox.SelectedItem = null;
-            }
-        }
 
+
+        }
         private void ChosenItemListBox_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             if (e.Clicks == 2)
@@ -191,17 +211,55 @@ namespace Excel_Convertor_v2
                     ItemToChooseListBox.Items.Add(ChosenItemListBox.SelectedItem);
                     ChosenItemListBox.Items.Remove(ChosenItemListBox.SelectedItem);
                     ItemToChooseListBox.Sorted = true;
-                }
-                
 
+                }
                 // Do something with the double-clicked item
                 //MessageBox.Show("You double-clicked: " + item.Content.ToString());
             }
-            else
-            {
-                ItemToChooseListBox.SelectedItem = null;
-            }
+        }
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            ItemToChooseListBox.SelectedItem = null;
+            timer1.Stop();
+        }
+        private void ItemToChooseListBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (timer1.Enabled) { timer1.Stop(); }
+            timer1.Start();
+        }
+        private void ChosenItemListBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (timer2.Enabled) { timer1.Stop(); }
+            timer2.Start();
+        }
+        private void timer2_Tick(object sender, EventArgs e)
+        {
+            ChosenItemListBox.SelectedItem = null;
+            timer2.Stop();
+        }
+        private void autoOpenDirCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
 
+        }
+        private void SaveFileDialogButtom_Click(object sender, EventArgs e)
+        {
+            FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog();
+
+            // Set the initial directory (optional)
+            // saveFileDialog.InitialDirectory = "C:\\";
+
+            // Show the save file dialog
+            var result = folderBrowserDialog.ShowDialog();
+
+            if (result == DialogResult.OK)
+            {
+                ;
+                // Return the selected directory
+                savePathFolder = folderBrowserDialog.SelectedPath.ToString();
+                ;
+                
+            }
+            SavePathTextBox.Text = savePathFolder;
         }
     }
 }
