@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             label1 = new Label();
             button1 = new Button();
             button2 = new Button();
@@ -43,69 +44,87 @@
             autoOpenDirCheckBox = new CheckBox();
             SaveFileDialogButtom = new Button();
             SavePathTextBox = new TextBox();
+            groupbox1 = new GroupBox();
+            pictureBox1 = new PictureBox();
+            splitContainer1 = new SplitContainer();
+            groupBox2 = new GroupBox();
+            panel3 = new Panel();
+            panel1 = new Panel();
+            panel2 = new Panel();
+            groupBox3 = new GroupBox();
+            groupbox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
+            splitContainer1.Panel1.SuspendLayout();
+            splitContainer1.Panel2.SuspendLayout();
+            splitContainer1.SuspendLayout();
+            groupBox2.SuspendLayout();
+            panel3.SuspendLayout();
+            panel1.SuspendLayout();
+            panel2.SuspendLayout();
+            groupBox3.SuspendLayout();
             SuspendLayout();
             // 
             // label1
             // 
             label1.AutoSize = true;
-            label1.Font = new Font("Segoe UI", 13F);
-            label1.Location = new Point(6, 26);
+            label1.Font = new Font("Segoe UI", 12F);
+            label1.Location = new Point(324, 71);
             label1.Name = "label1";
-            label1.Size = new Size(552, 25);
+            label1.Size = new Size(0, 28);
             label1.TabIndex = 0;
-            label1.Text = "Моля изберете екселският файл, който искате да конвертирате ->";
             // 
             // button1
             // 
-            button1.Location = new Point(611, 12);
+            button1.Location = new Point(30, 36);
+            button1.Margin = new Padding(3, 4, 3, 4);
             button1.Name = "button1";
-            button1.Size = new Size(195, 56);
+            button1.Size = new Size(250, 75);
             button1.TabIndex = 1;
-            button1.Text = "Избери Файл";
+            button1.Text = "Изберете входящ файл";
             button1.UseVisualStyleBackColor = true;
             button1.Click += button1_Click;
             // 
             // button2
             // 
-            button2.Location = new Point(611, 531);
+            button2.Location = new Point(30, 37);
+            button2.Margin = new Padding(3, 4, 3, 4);
             button2.Name = "button2";
-            button2.Size = new Size(195, 56);
+            button2.Size = new Size(250, 75);
             button2.TabIndex = 2;
-            button2.Text = "Конвертирай";
+            button2.Text = "Експорт";
             button2.UseVisualStyleBackColor = true;
             button2.Click += button2_Click;
             // 
             // ItemToChooseListBox
             // 
+            ItemToChooseListBox.Dock = DockStyle.Fill;
             ItemToChooseListBox.FormattingEnabled = true;
-            ItemToChooseListBox.ItemHeight = 15;
-            ItemToChooseListBox.Location = new Point(12, 164);
-            ItemToChooseListBox.Margin = new Padding(3, 2, 3, 2);
+            ItemToChooseListBox.Location = new Point(0, 0);
             ItemToChooseListBox.Name = "ItemToChooseListBox";
-            ItemToChooseListBox.Size = new Size(249, 424);
+            ItemToChooseListBox.Size = new Size(364, 635);
             ItemToChooseListBox.TabIndex = 3;
             ItemToChooseListBox.SelectedIndexChanged += ItemToChooseListBox_SelectedIndexChanged;
             ItemToChooseListBox.MouseDoubleClick += ItemToChoose_MouseDoubleClick;
             // 
             // ChosenItemListBox
             // 
+            ChosenItemListBox.Dock = DockStyle.Fill;
             ChosenItemListBox.FormattingEnabled = true;
-            ChosenItemListBox.ItemHeight = 15;
-            ChosenItemListBox.Location = new Point(292, 164);
-            ChosenItemListBox.Margin = new Padding(3, 2, 3, 2);
+            ChosenItemListBox.Location = new Point(0, 0);
             ChosenItemListBox.Name = "ChosenItemListBox";
-            ChosenItemListBox.Size = new Size(249, 424);
+            ChosenItemListBox.Size = new Size(508, 635);
             ChosenItemListBox.TabIndex = 4;
             ChosenItemListBox.SelectedIndexChanged += ChosenItemListBox_SelectedIndexChanged;
             ChosenItemListBox.MouseDoubleClick += ChosenItemListBox_MouseDoubleClick;
             // 
             // button5
             // 
+            button5.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             button5.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
-            button5.Location = new Point(547, 164);
-            button5.Margin = new Padding(3, 2, 3, 2);
+            button5.Location = new Point(24, 18);
             button5.Name = "button5";
-            button5.Size = new Size(46, 85);
+            button5.Size = new Size(53, 113);
             button5.TabIndex = 7;
             button5.Text = "🡡";
             button5.UseVisualStyleBackColor = true;
@@ -113,11 +132,11 @@
             // 
             // button6
             // 
+            button6.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             button6.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
-            button6.Location = new Point(547, 502);
-            button6.Margin = new Padding(3, 2, 3, 2);
+            button6.Location = new Point(24, 370);
             button6.Name = "button6";
-            button6.Size = new Size(46, 85);
+            button6.Size = new Size(53, 113);
             button6.TabIndex = 8;
             button6.Text = "🡣";
             button6.UseVisualStyleBackColor = true;
@@ -136,27 +155,31 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(13, 139);
+            label2.Location = new Point(95, 18);
             label2.Name = "label2";
-            label2.Size = new Size(130, 15);
+            label2.Size = new Size(113, 20);
             label2.TabIndex = 9;
-            label2.Text = "Колони в Input файла:";
+            label2.Text = "Всички колони";
             // 
             // label3
             // 
+            label3.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label3.AutoSize = true;
-            label3.Location = new Point(292, 142);
+            label3.Location = new Point(590, 18);
             label3.Name = "label3";
-            label3.Size = new Size(140, 15);
+            label3.Size = new Size(140, 20);
             label3.TabIndex = 10;
-            label3.Text = "Колони в Output файла:";
+            label3.Text = "Колони за експорт";
             // 
             // autoOpenDirCheckBox
             // 
             autoOpenDirCheckBox.AutoSize = true;
-            autoOpenDirCheckBox.Location = new Point(611, 506);
+            autoOpenDirCheckBox.Checked = true;
+            autoOpenDirCheckBox.CheckState = CheckState.Checked;
+            autoOpenDirCheckBox.Location = new Point(315, 37);
+            autoOpenDirCheckBox.Margin = new Padding(3, 4, 3, 4);
             autoOpenDirCheckBox.Name = "autoOpenDirCheckBox";
-            autoOpenDirCheckBox.Size = new Size(195, 19);
+            autoOpenDirCheckBox.Size = new Size(248, 24);
             autoOpenDirCheckBox.TabIndex = 11;
             autoOpenDirCheckBox.Text = "Авт. отваряне на директорията";
             autoOpenDirCheckBox.UseVisualStyleBackColor = true;
@@ -164,43 +187,150 @@
             // 
             // SaveFileDialogButtom
             // 
-            SaveFileDialogButtom.Location = new Point(611, 77);
+            SaveFileDialogButtom.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            SaveFileDialogButtom.Location = new Point(916, 73);
+            SaveFileDialogButtom.Margin = new Padding(3, 4, 3, 4);
             SaveFileDialogButtom.Name = "SaveFileDialogButtom";
-            SaveFileDialogButtom.Size = new Size(195, 56);
+            SaveFileDialogButtom.Size = new Size(40, 39);
             SaveFileDialogButtom.TabIndex = 12;
-            SaveFileDialogButtom.Text = "Избери Output Директория";
+            SaveFileDialogButtom.Text = "...";
             SaveFileDialogButtom.UseVisualStyleBackColor = true;
             SaveFileDialogButtom.Click += SaveFileDialogButtom_Click;
             // 
             // SavePathTextBox
             // 
-            SavePathTextBox.Location = new Point(13, 77);
+            SavePathTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            SavePathTextBox.Font = new Font("Segoe UI", 12F);
+            SavePathTextBox.Location = new Point(315, 73);
+            SavePathTextBox.Margin = new Padding(3, 4, 3, 4);
             SavePathTextBox.Multiline = true;
             SavePathTextBox.Name = "SavePathTextBox";
-            SavePathTextBox.Size = new Size(529, 56);
+            SavePathTextBox.Size = new Size(595, 39);
             SavePathTextBox.TabIndex = 13;
+            // 
+            // groupbox1
+            // 
+            groupbox1.Controls.Add(pictureBox1);
+            groupbox1.Controls.Add(button1);
+            groupbox1.Controls.Add(label1);
+            groupbox1.Dock = DockStyle.Top;
+            groupbox1.Location = new Point(0, 0);
+            groupbox1.Name = "groupbox1";
+            groupbox1.Size = new Size(982, 140);
+            groupbox1.TabIndex = 14;
+            groupbox1.TabStop = false;
+            groupbox1.Text = "Стъпка 1 ";
+            // 
+            // pictureBox1
+            // 
+            pictureBox1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
+            pictureBox1.Location = new Point(684, 12);
+            pictureBox1.Name = "pictureBox1";
+            pictureBox1.Size = new Size(195, 122);
+            pictureBox1.TabIndex = 2;
+            pictureBox1.TabStop = false;
+            // 
+            // splitContainer1
+            // 
+            splitContainer1.Dock = DockStyle.Fill;
+            splitContainer1.Location = new Point(0, 0);
+            splitContainer1.Name = "splitContainer1";
+            // 
+            // splitContainer1.Panel1
+            // 
+            splitContainer1.Panel1.Controls.Add(ItemToChooseListBox);
+            // 
+            // splitContainer1.Panel2
+            // 
+            splitContainer1.Panel2.Controls.Add(ChosenItemListBox);
+            splitContainer1.Size = new Size(876, 635);
+            splitContainer1.SplitterDistance = 364;
+            splitContainer1.TabIndex = 15;
+            // 
+            // groupBox2
+            // 
+            groupBox2.Controls.Add(panel3);
+            groupBox2.Controls.Add(panel2);
+            groupBox2.Dock = DockStyle.Fill;
+            groupBox2.Location = new Point(0, 140);
+            groupBox2.Name = "groupBox2";
+            groupBox2.Size = new Size(982, 713);
+            groupBox2.TabIndex = 4;
+            groupBox2.TabStop = false;
+            groupBox2.Text = "Стъпка 2";
+            // 
+            // panel3
+            // 
+            panel3.Controls.Add(splitContainer1);
+            panel3.Controls.Add(panel1);
+            panel3.Dock = DockStyle.Fill;
+            panel3.Location = new Point(3, 75);
+            panel3.Name = "panel3";
+            panel3.Size = new Size(976, 635);
+            panel3.TabIndex = 18;
+            // 
+            // panel1
+            // 
+            panel1.Controls.Add(button6);
+            panel1.Controls.Add(button5);
+            panel1.Dock = DockStyle.Right;
+            panel1.Location = new Point(876, 0);
+            panel1.Name = "panel1";
+            panel1.Size = new Size(100, 635);
+            panel1.TabIndex = 16;
+            // 
+            // panel2
+            // 
+            panel2.Controls.Add(label2);
+            panel2.Controls.Add(label3);
+            panel2.Dock = DockStyle.Top;
+            panel2.Location = new Point(3, 23);
+            panel2.Name = "panel2";
+            panel2.Size = new Size(976, 52);
+            panel2.TabIndex = 17;
+            // 
+            // groupBox3
+            // 
+            groupBox3.Controls.Add(button2);
+            groupBox3.Controls.Add(SavePathTextBox);
+            groupBox3.Controls.Add(SaveFileDialogButtom);
+            groupBox3.Controls.Add(autoOpenDirCheckBox);
+            groupBox3.Dock = DockStyle.Bottom;
+            groupBox3.Location = new Point(0, 714);
+            groupBox3.Name = "groupBox3";
+            groupBox3.Size = new Size(982, 139);
+            groupBox3.TabIndex = 15;
+            groupBox3.TabStop = false;
+            groupBox3.Text = "Стъпка 3";
             // 
             // Form1
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(823, 599);
-            Controls.Add(SavePathTextBox);
-            Controls.Add(SaveFileDialogButtom);
-            Controls.Add(autoOpenDirCheckBox);
-            Controls.Add(label3);
-            Controls.Add(label2);
-            Controls.Add(button6);
-            Controls.Add(button5);
-            Controls.Add(ChosenItemListBox);
-            Controls.Add(ItemToChooseListBox);
-            Controls.Add(button2);
-            Controls.Add(button1);
-            Controls.Add(label1);
+            ClientSize = new Size(982, 853);
+            Controls.Add(groupBox3);
+            Controls.Add(groupBox2);
+            Controls.Add(groupbox1);
+            Margin = new Padding(3, 4, 3, 4);
+            MinimumSize = new Size(1000, 900);
             Name = "Form1";
-            Text = "Ексел Конвертор";
+            Text = "Одит лог процесор";
+            groupbox1.ResumeLayout(false);
+            groupbox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
+            splitContainer1.Panel1.ResumeLayout(false);
+            splitContainer1.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)splitContainer1).EndInit();
+            splitContainer1.ResumeLayout(false);
+            groupBox2.ResumeLayout(false);
+            panel3.ResumeLayout(false);
+            panel1.ResumeLayout(false);
+            panel2.ResumeLayout(false);
+            panel2.PerformLayout();
+            groupBox3.ResumeLayout(false);
+            groupBox3.PerformLayout();
             ResumeLayout(false);
-            PerformLayout();
         }
 
         #endregion
@@ -219,5 +349,13 @@
         private CheckBox autoOpenDirCheckBox;
         private Button SaveFileDialogButtom;
         private TextBox SavePathTextBox;
+        private GroupBox groupbox1;
+        private SplitContainer splitContainer1;
+        private GroupBox groupBox2;
+        private Panel panel2;
+        private Panel panel1;
+        private GroupBox groupBox3;
+        private Panel panel3;
+        private PictureBox pictureBox1;
     }
 }

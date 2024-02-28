@@ -48,7 +48,8 @@ namespace Excel_Convertor_v2
 
                 ItemToChooseListBox.Items.Add(name);
             }
-            label1.Text = "Моля изберете колоните които искате да включите в експорта: ";
+
+            //label1.Text = "Моля изберете колоните които искате да включите в експорта: ";
         }
         private void ItemToChooseListBox_MouseDoubleClick(object sender, MouseEventArgs e)
         {
@@ -74,6 +75,7 @@ namespace Excel_Convertor_v2
                 {
                     colNames = Read.ReadColTitles(fullFileNamePath).Result;
                     AddCheckBoxes(Read.ReadColTitles(fullFileNamePath).Result);
+                    label1.Text = fullFileNamePath;
                 }
                 catch (Exception ex)
                 {
@@ -93,7 +95,7 @@ namespace Excel_Convertor_v2
                 if (ChosenItemListBox.Items.Count <= 0)
                 {
                     button1.Focus();
-                    label1.ForeColor = Color.Red;
+                    //label1.ForeColor = Color.Red;
                     MessageBox.Show("Изберете кои колони искате да добавите!", "Не сте избрали поле", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
@@ -123,8 +125,11 @@ namespace Excel_Convertor_v2
                         openFinalPathFolder = autoOpenDirCheckBox.Checked;
                         if (openFinalPathFolder)
                         {
-                            //MessageBox.Show(savePathFolder, savePathFolder, MessageBoxButtons.OK, MessageBoxIcon.Information);
                             Process.Start("explorer.exe", savePathFolder);
+                        }
+                        else
+                        {
+                            MessageBox.Show("Одит лог файла е успешно експортиран в " + savePathFolder, "Успешен експорт", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         }
                     }
                     catch (Exception ex)
@@ -257,7 +262,7 @@ namespace Excel_Convertor_v2
                 // Return the selected directory
                 savePathFolder = folderBrowserDialog.SelectedPath.ToString();
                 ;
-                
+
             }
             SavePathTextBox.Text = savePathFolder;
         }
