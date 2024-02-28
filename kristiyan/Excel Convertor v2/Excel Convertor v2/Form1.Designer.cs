@@ -98,22 +98,22 @@
             // 
             // ItemToChooseListBox
             // 
-            ItemToChooseListBox.Dock = DockStyle.Fill;
+            ItemToChooseListBox.Dock = DockStyle.Top;
             ItemToChooseListBox.FormattingEnabled = true;
             ItemToChooseListBox.Location = new Point(0, 0);
             ItemToChooseListBox.Name = "ItemToChooseListBox";
-            ItemToChooseListBox.Size = new Size(364, 635);
+            ItemToChooseListBox.Size = new Size(364, 484);
             ItemToChooseListBox.TabIndex = 3;
             ItemToChooseListBox.SelectedIndexChanged += ItemToChooseListBox_SelectedIndexChanged;
             ItemToChooseListBox.MouseDoubleClick += ItemToChoose_MouseDoubleClick;
             // 
             // ChosenItemListBox
             // 
-            ChosenItemListBox.Dock = DockStyle.Fill;
+            ChosenItemListBox.Dock = DockStyle.Top;
             ChosenItemListBox.FormattingEnabled = true;
             ChosenItemListBox.Location = new Point(0, 0);
             ChosenItemListBox.Name = "ChosenItemListBox";
-            ChosenItemListBox.Size = new Size(508, 635);
+            ChosenItemListBox.Size = new Size(508, 484);
             ChosenItemListBox.TabIndex = 4;
             ChosenItemListBox.SelectedIndexChanged += ChosenItemListBox_SelectedIndexChanged;
             ChosenItemListBox.MouseDoubleClick += ChosenItemListBox_MouseDoubleClick;
