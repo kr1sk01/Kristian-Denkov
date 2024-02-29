@@ -2,6 +2,7 @@
 using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
@@ -10,37 +11,58 @@ namespace Excel_Convertor_v2.Services
 {
     public static class Read
     {
-        public static async Task<Dictionary<string, string>> ReadStaticCols(ExcelWorksheet worksheet)
-        {
-            Dictionary<string, string> staticCols = new Dictionary<string, string>();
 
-            // Get the first worksheet in the Excel file    
+        public static void JsonParser(int initialRow, List<string>? jsonColNames, ref List<string> uniqueNames, ExcelWorksheet worksheet, int colIndex)
+        {
             int rows = worksheet.Dimension.Rows;
-            int cols = worksheet.Dimension.Columns;
-            int initialRow = await Find.FindStartRowIndex(worksheet);
-
-            for (int col = 1; col < cols; col++)
+            for (int row = initialRow; row <= rows; row++)
             {
-
-                var somestaticvar = worksheet.Cells[initialRow - 1, col].Value?.ToString();
-                if (somestaticvar == null || somestaticvar.ToLower() == "стойност")
-                    return staticCols;
-                staticCols.Add(worksheet.Cells[initialRow - 1, col].Value?.ToString(), "");
-
+                string jsonString = worksheet.Cells[row, colIndex].Value?.ToString();
+                //;
+                if (!string.IsNullOrEmpty(jsonString))
+                {
+                    // Determine if the JSON represents an object or an array
+                    JsonDocument doc = JsonDocument.Parse(jsonString);
+                    if (doc.RootElement.ValueKind == JsonValueKind.Array)
+                    {
+                        // If it's an array, iterate over each element
+                        foreach (var element in doc.RootElement.EnumerateArray())
+                        {
+                            if (element.TryGetProperty("Name", out var nameProperty))
+                            {
+                                string nameValue = nameProperty.GetString();
+                                if (!uniqueNames.Contains(nameValue))
+                                {
+                                    uniqueNames.Add(nameValue);
+                                }
+                            }
+                        }
+                    }
+                    else if (doc.RootElement.ValueKind == JsonValueKind.Object)
+                    {
+                        // If it's an object, extract "Name" property directly
+                        if (doc.RootElement.TryGetProperty("Name", out var nameProperty))
+                        {
+                            string nameValue = nameProperty.GetString();
+                            if (!uniqueNames.Contains(nameValue))
+                            {
+                                uniqueNames.Add(nameValue);
+                            }
+                        }
+                    }
+                }
             }
-
-            return staticCols;
-        }//Ne se polzva
-        public static async Task<SortedSet<string>> ReadColTitles(string fileToRead)
+        }
+        public static List<string> ReadColTitles(string fileToRead, List<string>? jsonColNames)
         {
-
+            if (jsonColNames == null)
+                jsonColNames = new List<string> { "стойност", "нещо" };//TODO MAKE INPUT FROM FORM TO LOWER!!!!!!!!!!
 
             List<Object>? jsonList = new List<Object>();
+            List<string> uniqueNames = new List<string>();
 
-            SortedSet<string> uniqueNames = new SortedSet<string>();
             try
             {
-
                 using (ExcelPackage package = new ExcelPackage(new System.IO.FileInfo(fileToRead)))
                 {
                     ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
@@ -55,52 +77,25 @@ namespace Excel_Convertor_v2.Services
                     {
                         Log.LogException(new Exception("Couldn't find row with data!"));
                     }
-                    uniqueNames.Add(worksheet.Cells[initialRow, 1].Value?.ToString());
-                    uniqueNames.Add(worksheet.Cells[initialRow, 2].Value?.ToString());
-                    uniqueNames.Add(worksheet.Cells[initialRow, 3].Value?.ToString());
-                    uniqueNames.Add(worksheet.Cells[initialRow, 4].Value?.ToString());
-                    uniqueNames.Add(worksheet.Cells[initialRow, 5].Value?.ToString());
-                    initialRow += 1; //Почваме от следващия ред да взимаме Prop-совете на JsonString-овете
-                    for (int row = initialRow; row <= rows; row++)
+                    for (int colCounter = 1; colCounter <= cols; colCounter++)
                     {
+                        var cell = worksheet.Cells[initialRow, colCounter].Value;
 
-                        //var test = JsonConvert.DeserializeObject<Object>(worksheet.Cells[row, 6].Value?.ToString());
-                        //var props = test?.GetType().GetProperties();
-                        //var test1 = props.Where(x => someStr.Contains(x.Name)).ToList();
-                        //foreach (var item in test1)
-                        //{
-                        //    var value = item.GetValue(test, null);
-                        //}
-                        ////var test2 = test1.GetValue(test, null);
-                        string jsonString = worksheet.Cells[row, 6].Value?.ToString();
-                        //;
-                        if (!string.IsNullOrEmpty(jsonString))
+                        if (cell == null) { break; }
+
+                        uniqueNames.Add(cell.ToString());
+                    }
+
+                    initialRow += 1; //Почваме от следващия ред да взимаме Prop-совете на JsonString-овете
+
+                    foreach (var item in uniqueNames)
+                    {
+                        if (jsonColNames.Contains(item.ToLower()))
                         {
-                            // Determine if the JSON represents an object or an array
-                            JsonDocument doc = JsonDocument.Parse(jsonString);
-                            if (doc.RootElement.ValueKind == JsonValueKind.Array)
-                            {
-                                // If it's an array, iterate over each element
-                                foreach (var element in doc.RootElement.EnumerateArray())
-                                {
-                                    if (element.TryGetProperty("Name", out var nameProperty))
-                                    {
-                                        string nameValue = nameProperty.GetString();
-                                        uniqueNames.Add(nameValue);
-                                    }
-                                }
-                            }
-                            else if (doc.RootElement.ValueKind == JsonValueKind.Object)
-                            {
-                                // If it's an object, extract "Name" property directly
-                                if (doc.RootElement.TryGetProperty("Name", out var nameProperty))
-                                {
-                                    string nameValue = nameProperty.GetString();
-                                    uniqueNames.Add(nameValue);
-                                }
-                            }
+                            JsonParser(initialRow, jsonColNames, ref uniqueNames, worksheet, uniqueNames.IndexOf(item) + 1);
                         }
                     }
+
                 }
             }
             catch (Exception e)
@@ -149,18 +144,18 @@ namespace Excel_Convertor_v2.Services
 
                     tableRowHeaderIndex = currentRowIndex;
 
-                    
+
                     tableHeader = CreateTableHeader(ws, currentRowIndex, columnsCount);
 
                     break;
                 }
 
-                
+
                 var jsonColumnIndex = tableHeader.IndexOf(jsonColumnHeaderText) + 1;
 
                 var valuesStartingRow = tableRowHeaderIndex + 1;
 
-                
+
                 for (int currentRowIndex = valuesStartingRow; currentRowIndex <= rowsCount; currentRowIndex++)
                 {
                     var tableRow = new TableRow();
@@ -179,7 +174,7 @@ namespace Excel_Convertor_v2.Services
                         }
                         else
                         {
-                            
+
                             var value = ws.Cells[currentRowIndex, tableHeaderIndex + 1].Value?.ToString() ?? string.Empty;
 
                             tableRow.Columns.Add(new TableColumn(chosenProp, value));

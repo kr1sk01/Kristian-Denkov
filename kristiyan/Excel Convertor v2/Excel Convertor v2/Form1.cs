@@ -10,12 +10,13 @@ using Excel_Convertor_v2.Services;
 using Microsoft.VisualBasic;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Diagnostics;
+using AuditLogProcessor.Services;
 namespace Excel_Convertor_v2
 {
     public partial class Form1 : Form
     {
         List<string> chosenPropsToShowList = new List<string>();
-        SortedSet<string> colNames = new SortedSet<string>();
+        List<string> colNames = new List<string>();
         private TextBox textBox1;
 
         //Default save directory (excluding outputfile name )
@@ -28,6 +29,10 @@ namespace Excel_Convertor_v2
         string fullSavePath = $"{Directory.GetCurrentDirectory().ToString()}\\Output_{DateTime.Now:dd_MM_yyyy_HH_mm_ss}.xlsx";
 
         bool openFinalPathFolder = false;
+
+
+        List<string>? jsonColNames = null;
+
         public Form1()
         {
             InitializeComponent();
@@ -41,7 +46,7 @@ namespace Excel_Convertor_v2
         {
             textBox1.Text = text;
         }
-        private void AddCheckBoxes(SortedSet<string> checkboxNames)
+        private void AddCheckBoxes(List<string> checkboxNames)
         {
             foreach (string name in checkboxNames)
             {
@@ -76,8 +81,11 @@ namespace Excel_Convertor_v2
                 fullFileNamePath = openFileDialog1.FileName;
                 try
                 {
-                    colNames = Read.ReadColTitles(fullFileNamePath).Result;
-                    AddCheckBoxes(Read.ReadColTitles(fullFileNamePath).Result);
+                    jsonColNames = UserInput.ConvertStringToList();
+                    colNames = Read.ReadColTitles(fullFileNamePath, jsonColNames);
+                    var addCheckBoxesParam = Read.ReadColTitles(fullFileNamePath, jsonColNames);
+                    addCheckBoxesParam.Sort();
+                    AddCheckBoxes(addCheckBoxesParam);
                     label1.Text = fullFileNamePath;
                     pictureBox1.Hide();
                 }
