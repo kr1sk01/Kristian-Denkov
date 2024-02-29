@@ -66,6 +66,9 @@ namespace Excel_Convertor_v2
         }
         private void button1_Click(object sender, EventArgs e)
         {
+            label1.Text = "";
+            ItemToChooseListBox.Items.Clear();
+            ChosenItemListBox.Items.Clear();
             OpenFileDialog openFileDialog1 = new OpenFileDialog();
             openFileDialog1.Filter = "xlsx files (*.xlsx)|*.xlsx";
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
