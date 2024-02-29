@@ -52,6 +52,9 @@
             panel1 = new Panel();
             panel2 = new Panel();
             groupBox3 = new GroupBox();
+            panel4 = new Panel();
+            panel5 = new Panel();
+            panel6 = new Panel();
             groupbox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
@@ -63,6 +66,9 @@
             panel1.SuspendLayout();
             panel2.SuspendLayout();
             groupBox3.SuspendLayout();
+            panel4.SuspendLayout();
+            panel5.SuspendLayout();
+            panel6.SuspendLayout();
             SuspendLayout();
             // 
             // label1
@@ -98,33 +104,33 @@
             // 
             // ItemToChooseListBox
             // 
-            ItemToChooseListBox.Dock = DockStyle.Top;
+            ItemToChooseListBox.Dock = DockStyle.Fill;
             ItemToChooseListBox.FormattingEnabled = true;
             ItemToChooseListBox.Location = new Point(0, 0);
             ItemToChooseListBox.Name = "ItemToChooseListBox";
-            ItemToChooseListBox.Size = new Size(364, 484);
+            ItemToChooseListBox.Size = new Size(362, 515);
             ItemToChooseListBox.TabIndex = 3;
             ItemToChooseListBox.SelectedIndexChanged += ItemToChooseListBox_SelectedIndexChanged;
             ItemToChooseListBox.MouseDoubleClick += ItemToChoose_MouseDoubleClick;
             // 
             // ChosenItemListBox
             // 
-            ChosenItemListBox.Dock = DockStyle.Top;
+            ChosenItemListBox.Dock = DockStyle.Fill;
             ChosenItemListBox.FormattingEnabled = true;
             ChosenItemListBox.Location = new Point(0, 0);
             ChosenItemListBox.Name = "ChosenItemListBox";
-            ChosenItemListBox.Size = new Size(508, 484);
+            ChosenItemListBox.Size = new Size(507, 515);
             ChosenItemListBox.TabIndex = 4;
             ChosenItemListBox.SelectedIndexChanged += ChosenItemListBox_SelectedIndexChanged;
             ChosenItemListBox.MouseDoubleClick += ChosenItemListBox_MouseDoubleClick;
             // 
             // button5
             // 
-            button5.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            button5.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             button5.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
-            button5.Location = new Point(24, 18);
+            button5.Location = new Point(12, 0);
             button5.Name = "button5";
-            button5.Size = new Size(53, 113);
+            button5.Size = new Size(80, 140);
             button5.TabIndex = 7;
             button5.Text = "🡡";
             button5.UseVisualStyleBackColor = true;
@@ -132,11 +138,11 @@
             // 
             // button6
             // 
-            button6.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            button6.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             button6.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
-            button6.Location = new Point(24, 370);
+            button6.Location = new Point(12, 362);
             button6.Name = "button6";
-            button6.Size = new Size(53, 113);
+            button6.Size = new Size(80, 140);
             button6.TabIndex = 8;
             button6.Text = "🡣";
             button6.UseVisualStyleBackColor = true;
@@ -213,10 +219,10 @@
             groupbox1.Controls.Add(pictureBox1);
             groupbox1.Controls.Add(button1);
             groupbox1.Controls.Add(label1);
-            groupbox1.Dock = DockStyle.Top;
+            groupbox1.Dock = DockStyle.Fill;
             groupbox1.Location = new Point(0, 0);
             groupbox1.Name = "groupbox1";
-            groupbox1.Size = new Size(982, 140);
+            groupbox1.Size = new Size(982, 130);
             groupbox1.TabIndex = 14;
             groupbox1.TabStop = false;
             groupbox1.Text = "Стъпка 1 ";
@@ -225,9 +231,9 @@
             // 
             pictureBox1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
-            pictureBox1.Location = new Point(684, 12);
+            pictureBox1.Location = new Point(761, 12);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(195, 122);
+            pictureBox1.Size = new Size(195, 113);
             pictureBox1.TabIndex = 2;
             pictureBox1.TabStop = false;
             // 
@@ -244,18 +250,19 @@
             // splitContainer1.Panel2
             // 
             splitContainer1.Panel2.Controls.Add(ChosenItemListBox);
-            splitContainer1.Size = new Size(876, 635);
-            splitContainer1.SplitterDistance = 364;
+            splitContainer1.Size = new Size(873, 515);
+            splitContainer1.SplitterDistance = 362;
             splitContainer1.TabIndex = 15;
             // 
             // groupBox2
             // 
             groupBox2.Controls.Add(panel3);
+            groupBox2.Controls.Add(panel1);
             groupBox2.Controls.Add(panel2);
             groupBox2.Dock = DockStyle.Fill;
-            groupBox2.Location = new Point(0, 140);
+            groupBox2.Location = new Point(0, 0);
             groupBox2.Name = "groupBox2";
-            groupBox2.Size = new Size(982, 713);
+            groupBox2.Size = new Size(982, 593);
             groupBox2.TabIndex = 4;
             groupBox2.TabStop = false;
             groupBox2.Text = "Стъпка 2";
@@ -263,11 +270,10 @@
             // panel3
             // 
             panel3.Controls.Add(splitContainer1);
-            panel3.Controls.Add(panel1);
             panel3.Dock = DockStyle.Fill;
             panel3.Location = new Point(3, 75);
             panel3.Name = "panel3";
-            panel3.Size = new Size(976, 635);
+            panel3.Size = new Size(873, 515);
             panel3.TabIndex = 18;
             // 
             // panel1
@@ -275,9 +281,9 @@
             panel1.Controls.Add(button6);
             panel1.Controls.Add(button5);
             panel1.Dock = DockStyle.Right;
-            panel1.Location = new Point(876, 0);
+            panel1.Location = new Point(876, 75);
             panel1.Name = "panel1";
-            panel1.Size = new Size(100, 635);
+            panel1.Size = new Size(103, 515);
             panel1.TabIndex = 16;
             // 
             // panel2
@@ -296,22 +302,49 @@
             groupBox3.Controls.Add(SavePathTextBox);
             groupBox3.Controls.Add(SaveFileDialogButtom);
             groupBox3.Controls.Add(autoOpenDirCheckBox);
-            groupBox3.Dock = DockStyle.Bottom;
-            groupBox3.Location = new Point(0, 714);
+            groupBox3.Dock = DockStyle.Fill;
+            groupBox3.Location = new Point(0, 0);
             groupBox3.Name = "groupBox3";
-            groupBox3.Size = new Size(982, 139);
+            groupBox3.Size = new Size(982, 130);
             groupBox3.TabIndex = 15;
             groupBox3.TabStop = false;
             groupBox3.Text = "Стъпка 3";
+            // 
+            // panel4
+            // 
+            panel4.Controls.Add(groupbox1);
+            panel4.Dock = DockStyle.Top;
+            panel4.Location = new Point(0, 0);
+            panel4.Name = "panel4";
+            panel4.Size = new Size(982, 130);
+            panel4.TabIndex = 16;
+            // 
+            // panel5
+            // 
+            panel5.Controls.Add(groupBox3);
+            panel5.Dock = DockStyle.Bottom;
+            panel5.Location = new Point(0, 723);
+            panel5.Name = "panel5";
+            panel5.Size = new Size(982, 130);
+            panel5.TabIndex = 17;
+            // 
+            // panel6
+            // 
+            panel6.Controls.Add(groupBox2);
+            panel6.Dock = DockStyle.Fill;
+            panel6.Location = new Point(0, 130);
+            panel6.Name = "panel6";
+            panel6.Size = new Size(982, 593);
+            panel6.TabIndex = 18;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(982, 853);
-            Controls.Add(groupBox3);
-            Controls.Add(groupBox2);
-            Controls.Add(groupbox1);
+            Controls.Add(panel6);
+            Controls.Add(panel5);
+            Controls.Add(panel4);
             Margin = new Padding(3, 4, 3, 4);
             MinimumSize = new Size(1000, 900);
             Name = "Form1";
@@ -330,6 +363,9 @@
             panel2.PerformLayout();
             groupBox3.ResumeLayout(false);
             groupBox3.PerformLayout();
+            panel4.ResumeLayout(false);
+            panel5.ResumeLayout(false);
+            panel6.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -357,5 +393,8 @@
         private GroupBox groupBox3;
         private Panel panel3;
         private PictureBox pictureBox1;
+        private Panel panel4;
+        private Panel panel5;
+        private Panel panel6;
     }
 }

@@ -79,6 +79,7 @@ namespace Excel_Convertor_v2
                     colNames = Read.ReadColTitles(fullFileNamePath).Result;
                     AddCheckBoxes(Read.ReadColTitles(fullFileNamePath).Result);
                     label1.Text = fullFileNamePath;
+                    pictureBox1.Hide();
                 }
                 catch (Exception ex)
                 {
