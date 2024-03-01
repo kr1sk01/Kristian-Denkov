@@ -114,7 +114,7 @@ namespace Excel_Convertor_v2.Services
 
             return uniqueNames;
         }
-        public static List<TableRow> ReadData(string filePath, List<string> chosenPropsToShowList)
+        public static List<TableRow> ReadData(string filePath, List<string> chosenPropsToShowList, List<string> jsonColNameStrings)
         {
             var rows = new List<TableRow>();
 
@@ -158,8 +158,17 @@ namespace Excel_Convertor_v2.Services
 
                     break;
                 }
-
-
+                //Getting list of json column idenxes
+                List<int> jsonColumnIndexes = new List<int>();
+                foreach (var item in jsonColNameStrings)
+                {
+                    jsonColumnIndexes.Add(tableHeader.IndexOf(item));
+                }
+                /* We already got all indexes of the json columns
+                 * Now we should make a loop in which if it is json col and not regular one we desrialize and we are starting to search if 
+                 * one of the chosenProps are in this json or not, so we would be able to decide if we will add it to the row class
+                 * as column class or not 
+                 */
                 var jsonColumnIndex = tableHeader.IndexOf(jsonColumnHeaderText) + 1;
 
                 var valuesStartingRow = tableRowHeaderIndex + 1;
