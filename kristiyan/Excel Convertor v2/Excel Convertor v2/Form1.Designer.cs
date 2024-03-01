@@ -31,7 +31,6 @@
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             InputFileFullPathLabel = new Label();
-            SelectInputFileButton = new Button();
             ConvertFileButton = new Button();
             ItemToChooseListBox = new ListBox();
             ChosenItemListBox = new ListBox();
@@ -55,6 +54,8 @@
             panel2 = new Panel();
             groupBox3 = new GroupBox();
             panel4 = new Panel();
+            groupBox4 = new GroupBox();
+            SelectInputFileButton = new Button();
             panel5 = new Panel();
             panel6 = new Panel();
             groupbox1.SuspendLayout();
@@ -69,35 +70,26 @@
             panel2.SuspendLayout();
             groupBox3.SuspendLayout();
             panel4.SuspendLayout();
+            groupBox4.SuspendLayout();
             panel5.SuspendLayout();
             panel6.SuspendLayout();
             SuspendLayout();
             // 
-            // label1
+            // InputFileFullPathLabel
             // 
             InputFileFullPathLabel.AutoSize = true;
             InputFileFullPathLabel.Font = new Font("Segoe UI", 12F);
-            InputFileFullPathLabel.Location = new Point(251, 81);
-            InputFileFullPathLabel.Name = "label1";
-            InputFileFullPathLabel.Size = new Size(121, 21);
+            InputFileFullPathLabel.Location = new Point(290, 60);
+            InputFileFullPathLabel.Name = "InputFileFullPathLabel";
+            InputFileFullPathLabel.Size = new Size(0, 28);
             InputFileFullPathLabel.TabIndex = 0;
-            InputFileFullPathLabel.Text = "asdsdasadsadsa";
-            // 
-            // SelectInputFileButton
-            // 
-            SelectInputFileButton.Location = new Point(12, 65);
-            SelectInputFileButton.Name = "SelectInputFileButton";
-            SelectInputFileButton.Size = new Size(219, 56);
-            SelectInputFileButton.TabIndex = 1;
-            SelectInputFileButton.Text = "Изберете входящ файл";
-            SelectInputFileButton.UseVisualStyleBackColor = true;
-            SelectInputFileButton.Click += SelectInputFileButton_Click;
             // 
             // ConvertFileButton
             // 
-            ConvertFileButton.Location = new Point(26, 28);
+            ConvertFileButton.Location = new Point(30, 37);
+            ConvertFileButton.Margin = new Padding(3, 4, 3, 4);
             ConvertFileButton.Name = "ConvertFileButton";
-            ConvertFileButton.Size = new Size(219, 56);
+            ConvertFileButton.Size = new Size(250, 75);
             ConvertFileButton.TabIndex = 2;
             ConvertFileButton.Text = "Експорт";
             ConvertFileButton.UseVisualStyleBackColor = true;
@@ -107,11 +99,9 @@
             // 
             ItemToChooseListBox.Dock = DockStyle.Fill;
             ItemToChooseListBox.FormattingEnabled = true;
-            ItemToChooseListBox.ItemHeight = 15;
             ItemToChooseListBox.Location = new Point(0, 0);
-            ItemToChooseListBox.Margin = new Padding(3, 2, 3, 2);
             ItemToChooseListBox.Name = "ItemToChooseListBox";
-            ItemToChooseListBox.Size = new Size(317, 355);
+            ItemToChooseListBox.Size = new Size(362, 450);
             ItemToChooseListBox.TabIndex = 3;
             ItemToChooseListBox.SelectedIndexChanged += ItemToChooseListBox_SelectedIndexChanged;
             ItemToChooseListBox.MouseDoubleClick += ItemToChoose_MouseDoubleClick;
@@ -120,11 +110,9 @@
             // 
             ChosenItemListBox.Dock = DockStyle.Fill;
             ChosenItemListBox.FormattingEnabled = true;
-            ChosenItemListBox.ItemHeight = 15;
             ChosenItemListBox.Location = new Point(0, 0);
-            ChosenItemListBox.Margin = new Padding(3, 2, 3, 2);
             ChosenItemListBox.Name = "ChosenItemListBox";
-            ChosenItemListBox.Size = new Size(444, 355);
+            ChosenItemListBox.Size = new Size(508, 450);
             ChosenItemListBox.TabIndex = 4;
             ChosenItemListBox.SelectedIndexChanged += ChosenItemListBox_SelectedIndexChanged;
             ChosenItemListBox.MouseDoubleClick += ChosenItemListBox_MouseDoubleClick;
@@ -133,10 +121,9 @@
             // 
             button5.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             button5.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
-            button5.Location = new Point(10, 0);
-            button5.Margin = new Padding(3, 2, 3, 2);
+            button5.Location = new Point(11, 0);
             button5.Name = "button5";
-            button5.Size = new Size(70, 105);
+            button5.Size = new Size(80, 140);
             button5.TabIndex = 7;
             button5.Text = "🡡";
             button5.UseVisualStyleBackColor = true;
@@ -146,10 +133,9 @@
             // 
             button6.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             button6.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
-            button6.Location = new Point(10, 240);
-            button6.Margin = new Padding(3, 2, 3, 2);
+            button6.Location = new Point(11, 297);
             button6.Name = "button6";
-            button6.Size = new Size(70, 105);
+            button6.Size = new Size(80, 140);
             button6.TabIndex = 8;
             button6.Text = "🡣";
             button6.UseVisualStyleBackColor = true;
@@ -168,9 +154,9 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(83, 14);
+            label2.Location = new Point(95, 19);
             label2.Name = "label2";
-            label2.Size = new Size(91, 15);
+            label2.Size = new Size(113, 20);
             label2.TabIndex = 9;
             label2.Text = "Всички колони";
             // 
@@ -178,9 +164,9 @@
             // 
             label3.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label3.AutoSize = true;
-            label3.Location = new Point(517, 14);
+            label3.Location = new Point(592, 19);
             label3.Name = "label3";
-            label3.Size = new Size(110, 15);
+            label3.Size = new Size(140, 20);
             label3.TabIndex = 10;
             label3.Text = "Колони за експорт";
             // 
@@ -189,9 +175,10 @@
             autoOpenDirCheckBox.AutoSize = true;
             autoOpenDirCheckBox.Checked = true;
             autoOpenDirCheckBox.CheckState = CheckState.Checked;
-            autoOpenDirCheckBox.Location = new Point(276, 28);
+            autoOpenDirCheckBox.Location = new Point(315, 37);
+            autoOpenDirCheckBox.Margin = new Padding(3, 4, 3, 4);
             autoOpenDirCheckBox.Name = "autoOpenDirCheckBox";
-            autoOpenDirCheckBox.Size = new Size(195, 19);
+            autoOpenDirCheckBox.Size = new Size(248, 24);
             autoOpenDirCheckBox.TabIndex = 11;
             autoOpenDirCheckBox.Text = "Авт. отваряне на директорията";
             autoOpenDirCheckBox.UseVisualStyleBackColor = true;
@@ -200,9 +187,10 @@
             // SaveFileDialogButtom
             // 
             SaveFileDialogButtom.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            SaveFileDialogButtom.Location = new Point(804, 55);
+            SaveFileDialogButtom.Location = new Point(919, 73);
+            SaveFileDialogButtom.Margin = new Padding(3, 4, 3, 4);
             SaveFileDialogButtom.Name = "SaveFileDialogButtom";
-            SaveFileDialogButtom.Size = new Size(35, 29);
+            SaveFileDialogButtom.Size = new Size(40, 39);
             SaveFileDialogButtom.TabIndex = 12;
             SaveFileDialogButtom.Text = "...";
             SaveFileDialogButtom.UseVisualStyleBackColor = true;
@@ -212,53 +200,49 @@
             // 
             SavePathTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             SavePathTextBox.Font = new Font("Segoe UI", 12F);
-            SavePathTextBox.Location = new Point(276, 55);
+            SavePathTextBox.Location = new Point(315, 73);
+            SavePathTextBox.Margin = new Padding(3, 4, 3, 4);
             SavePathTextBox.Multiline = true;
             SavePathTextBox.Name = "SavePathTextBox";
-            SavePathTextBox.Size = new Size(523, 30);
+            SavePathTextBox.Size = new Size(597, 39);
             SavePathTextBox.TabIndex = 13;
             // 
             // groupbox1
             // 
             groupbox1.Controls.Add(jsonColumnNamesTextBox);
             groupbox1.Controls.Add(jsonColumnNamesLabel);
-            groupbox1.Controls.Add(pictureBox1);
-            groupbox1.Controls.Add(SelectInputFileButton);
-            groupbox1.Controls.Add(InputFileFullPathLabel);
-            groupbox1.Dock = DockStyle.Fill;
+            groupbox1.Dock = DockStyle.Top;
             groupbox1.Location = new Point(0, 0);
-            groupbox1.Margin = new Padding(3, 2, 3, 2);
             groupbox1.Name = "groupbox1";
-            groupbox1.Padding = new Padding(3, 2, 3, 2);
-            groupbox1.Size = new Size(861, 134);
+            groupbox1.Size = new Size(984, 96);
             groupbox1.TabIndex = 14;
             groupbox1.TabStop = false;
             groupbox1.Text = "Стъпка 1 ";
             // 
             // jsonColumnNamesTextBox
             // 
-            jsonColumnNamesTextBox.Location = new Point(12, 38);
+            jsonColumnNamesTextBox.Location = new Point(14, 51);
+            jsonColumnNamesTextBox.Margin = new Padding(3, 4, 3, 4);
             jsonColumnNamesTextBox.Name = "jsonColumnNamesTextBox";
-            jsonColumnNamesTextBox.Size = new Size(660, 23);
+            jsonColumnNamesTextBox.Size = new Size(754, 27);
             jsonColumnNamesTextBox.TabIndex = 4;
             // 
             // jsonColumnNamesLabel
             // 
             jsonColumnNamesLabel.AutoSize = true;
-            jsonColumnNamesLabel.Location = new Point(12, 20);
+            jsonColumnNamesLabel.Location = new Point(14, 27);
             jsonColumnNamesLabel.Name = "jsonColumnNamesLabel";
-            jsonColumnNamesLabel.Size = new Size(416, 15);
+            jsonColumnNamesLabel.Size = new Size(688, 20);
             jsonColumnNamesLabel.TabIndex = 3;
-            jsonColumnNamesLabel.Text = "Моля въведете json, като ги разделите със запетая ПРИМЕР: col1,col2,col3 ";
+            jsonColumnNamesLabel.Text = "Моля въведете имената на json колоните, като ги разделите със запетая (ПРИМЕР: col1,col2,col3) ";
             // 
             // pictureBox1
             // 
-            pictureBox1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            pictureBox1.Dock = DockStyle.Right;
             pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
-            pictureBox1.Location = new Point(684, 20);
-            pictureBox1.Margin = new Padding(3, 2, 3, 2);
+            pictureBox1.Location = new Point(806, 23);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(165, 110);
+            pictureBox1.Size = new Size(175, 122);
             pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
             pictureBox1.TabIndex = 2;
             pictureBox1.TabStop = false;
@@ -267,7 +251,6 @@
             // 
             splitContainer1.Dock = DockStyle.Fill;
             splitContainer1.Location = new Point(0, 0);
-            splitContainer1.Margin = new Padding(3, 2, 3, 2);
             splitContainer1.Name = "splitContainer1";
             // 
             // splitContainer1.Panel1
@@ -277,8 +260,9 @@
             // splitContainer1.Panel2
             // 
             splitContainer1.Panel2.Controls.Add(ChosenItemListBox);
-            splitContainer1.Size = new Size(765, 355);
-            splitContainer1.SplitterDistance = 317;
+            splitContainer1.Size = new Size(875, 450);
+            splitContainer1.SplitterDistance = 362;
+            splitContainer1.SplitterWidth = 5;
             splitContainer1.TabIndex = 15;
             // 
             // groupBox2
@@ -288,22 +272,19 @@
             groupBox2.Controls.Add(panel2);
             groupBox2.Dock = DockStyle.Fill;
             groupBox2.Location = new Point(0, 0);
-            groupBox2.Margin = new Padding(3, 2, 3, 2);
             groupBox2.Name = "groupBox2";
-            groupBox2.Padding = new Padding(3, 2, 3, 2);
-            groupBox2.Size = new Size(861, 414);
+            groupBox2.Size = new Size(984, 528);
             groupBox2.TabIndex = 4;
             groupBox2.TabStop = false;
-            groupBox2.Text = "Стъпка 2";
+            groupBox2.Text = "Стъпка 3";
             // 
             // panel3
             // 
             panel3.Controls.Add(splitContainer1);
             panel3.Dock = DockStyle.Fill;
-            panel3.Location = new Point(3, 57);
-            panel3.Margin = new Padding(3, 2, 3, 2);
+            panel3.Location = new Point(3, 75);
             panel3.Name = "panel3";
-            panel3.Size = new Size(765, 355);
+            panel3.Size = new Size(875, 450);
             panel3.TabIndex = 18;
             // 
             // panel1
@@ -311,10 +292,9 @@
             panel1.Controls.Add(button6);
             panel1.Controls.Add(button5);
             panel1.Dock = DockStyle.Right;
-            panel1.Location = new Point(768, 57);
-            panel1.Margin = new Padding(3, 2, 3, 2);
+            panel1.Location = new Point(878, 75);
             panel1.Name = "panel1";
-            panel1.Size = new Size(90, 355);
+            panel1.Size = new Size(103, 450);
             panel1.TabIndex = 16;
             // 
             // panel2
@@ -322,10 +302,9 @@
             panel2.Controls.Add(label2);
             panel2.Controls.Add(label3);
             panel2.Dock = DockStyle.Top;
-            panel2.Location = new Point(3, 18);
-            panel2.Margin = new Padding(3, 2, 3, 2);
+            panel2.Location = new Point(3, 23);
             panel2.Name = "panel2";
-            panel2.Size = new Size(855, 39);
+            panel2.Size = new Size(978, 52);
             panel2.TabIndex = 17;
             // 
             // groupBox3
@@ -336,53 +315,74 @@
             groupBox3.Controls.Add(autoOpenDirCheckBox);
             groupBox3.Dock = DockStyle.Fill;
             groupBox3.Location = new Point(0, 0);
-            groupBox3.Margin = new Padding(3, 2, 3, 2);
             groupBox3.Name = "groupBox3";
-            groupBox3.Padding = new Padding(3, 2, 3, 2);
-            groupBox3.Size = new Size(861, 98);
+            groupBox3.Size = new Size(984, 131);
             groupBox3.TabIndex = 15;
             groupBox3.TabStop = false;
-            groupBox3.Text = "Стъпка 3";
+            groupBox3.Text = "Стъпка 4";
             // 
             // panel4
             // 
+            panel4.Controls.Add(groupBox4);
             panel4.Controls.Add(groupbox1);
             panel4.Dock = DockStyle.Top;
             panel4.Location = new Point(0, 0);
-            panel4.Margin = new Padding(3, 2, 3, 2);
             panel4.Name = "panel4";
-            panel4.Size = new Size(861, 134);
+            panel4.Size = new Size(984, 244);
             panel4.TabIndex = 16;
+            // 
+            // groupBox4
+            // 
+            groupBox4.Controls.Add(SelectInputFileButton);
+            groupBox4.Controls.Add(InputFileFullPathLabel);
+            groupBox4.Controls.Add(pictureBox1);
+            groupBox4.Dock = DockStyle.Top;
+            groupBox4.Location = new Point(0, 96);
+            groupBox4.Name = "groupBox4";
+            groupBox4.Size = new Size(984, 148);
+            groupBox4.TabIndex = 5;
+            groupBox4.TabStop = false;
+            groupBox4.Text = "Стъпка 2";
+            // 
+            // SelectInputFileButton
+            // 
+            SelectInputFileButton.Location = new Point(14, 40);
+            SelectInputFileButton.Margin = new Padding(3, 4, 3, 4);
+            SelectInputFileButton.Name = "SelectInputFileButton";
+            SelectInputFileButton.Size = new Size(250, 75);
+            SelectInputFileButton.TabIndex = 1;
+            SelectInputFileButton.Text = "Изберете входящ файл";
+            SelectInputFileButton.UseVisualStyleBackColor = true;
+            SelectInputFileButton.Click += SelectInputFileButton_Click;
             // 
             // panel5
             // 
             panel5.Controls.Add(groupBox3);
             panel5.Dock = DockStyle.Bottom;
-            panel5.Location = new Point(0, 548);
-            panel5.Margin = new Padding(3, 2, 3, 2);
+            panel5.Location = new Point(0, 772);
             panel5.Name = "panel5";
-            panel5.Size = new Size(861, 98);
+            panel5.Size = new Size(984, 131);
             panel5.TabIndex = 17;
             // 
             // panel6
             // 
             panel6.Controls.Add(groupBox2);
             panel6.Dock = DockStyle.Fill;
-            panel6.Location = new Point(0, 134);
-            panel6.Margin = new Padding(3, 2, 3, 2);
+            panel6.Location = new Point(0, 244);
             panel6.Name = "panel6";
-            panel6.Size = new Size(861, 414);
+            panel6.Size = new Size(984, 528);
             panel6.TabIndex = 18;
             // 
             // Form1
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(861, 646);
+            ClientSize = new Size(984, 903);
             Controls.Add(panel6);
             Controls.Add(panel5);
             Controls.Add(panel4);
-            MinimumSize = new Size(877, 685);
+            Margin = new Padding(3, 4, 3, 4);
+            MinimumSize = new Size(1000, 950);
             Name = "Form1";
             Text = "Одит лог процесор";
             groupbox1.ResumeLayout(false);
@@ -400,6 +400,8 @@
             groupBox3.ResumeLayout(false);
             groupBox3.PerformLayout();
             panel4.ResumeLayout(false);
+            groupBox4.ResumeLayout(false);
+            groupBox4.PerformLayout();
             panel5.ResumeLayout(false);
             panel6.ResumeLayout(false);
             ResumeLayout(false);
@@ -408,7 +410,6 @@
         #endregion
 
         private Label InputFileFullPathLabel;
-        private Button SelectInputFileButton;
         private Button ConvertFileButton;
         private ListBox ItemToChooseListBox;
         private ListBox ChosenItemListBox;
@@ -433,5 +434,7 @@
         private Panel panel5;
         private Panel panel6;
         private Label jsonColumnNamesLabel;
+        private GroupBox groupBox4;
+        private Button SelectInputFileButton;
     }
 }
