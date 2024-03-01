@@ -45,6 +45,8 @@
             SaveFileDialogButtom = new Button();
             SavePathTextBox = new TextBox();
             groupbox1 = new GroupBox();
+            jsonColumnNamesTextBox = new TextBox();
+            jsonColumnNamesLabel = new Label();
             pictureBox1 = new PictureBox();
             splitContainer1 = new SplitContainer();
             groupBox2 = new GroupBox();
@@ -55,8 +57,6 @@
             panel4 = new Panel();
             panel5 = new Panel();
             panel6 = new Panel();
-            jsonPropColumnNamesTextBox = new TextBox();
-            jsonPropColumnNameLabel = new Label();
             groupbox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
@@ -84,7 +84,7 @@
             // 
             // button1
             // 
-            button1.Location = new Point(12, 21);
+            button1.Location = new Point(12, 65);
             button1.Name = "button1";
             button1.Size = new Size(219, 56);
             button1.TabIndex = 1;
@@ -110,7 +110,7 @@
             ItemToChooseListBox.Location = new Point(0, 0);
             ItemToChooseListBox.Margin = new Padding(3, 2, 3, 2);
             ItemToChooseListBox.Name = "ItemToChooseListBox";
-            ItemToChooseListBox.Size = new Size(317, 361);
+            ItemToChooseListBox.Size = new Size(317, 355);
             ItemToChooseListBox.TabIndex = 3;
             ItemToChooseListBox.SelectedIndexChanged += ItemToChooseListBox_SelectedIndexChanged;
             ItemToChooseListBox.MouseDoubleClick += ItemToChoose_MouseDoubleClick;
@@ -123,7 +123,7 @@
             ChosenItemListBox.Location = new Point(0, 0);
             ChosenItemListBox.Margin = new Padding(3, 2, 3, 2);
             ChosenItemListBox.Name = "ChosenItemListBox";
-            ChosenItemListBox.Size = new Size(444, 361);
+            ChosenItemListBox.Size = new Size(444, 355);
             ChosenItemListBox.TabIndex = 4;
             ChosenItemListBox.SelectedIndexChanged += ChosenItemListBox_SelectedIndexChanged;
             ChosenItemListBox.MouseDoubleClick += ChosenItemListBox_MouseDoubleClick;
@@ -145,7 +145,7 @@
             // 
             button6.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             button6.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
-            button6.Location = new Point(10, 246);
+            button6.Location = new Point(10, 240);
             button6.Margin = new Padding(3, 2, 3, 2);
             button6.Name = "button6";
             button6.Size = new Size(70, 105);
@@ -219,8 +219,8 @@
             // 
             // groupbox1
             // 
-            groupbox1.Controls.Add(jsonPropColumnNameLabel);
-            groupbox1.Controls.Add(jsonPropColumnNamesTextBox);
+            groupbox1.Controls.Add(jsonColumnNamesTextBox);
+            groupbox1.Controls.Add(jsonColumnNamesLabel);
             groupbox1.Controls.Add(pictureBox1);
             groupbox1.Controls.Add(button1);
             groupbox1.Controls.Add(label1);
@@ -229,19 +229,36 @@
             groupbox1.Margin = new Padding(3, 2, 3, 2);
             groupbox1.Name = "groupbox1";
             groupbox1.Padding = new Padding(3, 2, 3, 2);
-            groupbox1.Size = new Size(861, 128);
+            groupbox1.Size = new Size(861, 134);
             groupbox1.TabIndex = 14;
             groupbox1.TabStop = false;
             groupbox1.Text = "Стъпка 1 ";
+            // 
+            // jsonColumnNamesTextBox
+            // 
+            jsonColumnNamesTextBox.Location = new Point(12, 38);
+            jsonColumnNamesTextBox.Name = "jsonColumnNamesTextBox";
+            jsonColumnNamesTextBox.Size = new Size(660, 23);
+            jsonColumnNamesTextBox.TabIndex = 4;
+            // 
+            // jsonColumnNamesLabel
+            // 
+            jsonColumnNamesLabel.AutoSize = true;
+            jsonColumnNamesLabel.Location = new Point(12, 20);
+            jsonColumnNamesLabel.Name = "jsonColumnNamesLabel";
+            jsonColumnNamesLabel.Size = new Size(416, 15);
+            jsonColumnNamesLabel.TabIndex = 3;
+            jsonColumnNamesLabel.Text = "Моля въведете json, като ги разделите със запетая ПРИМЕР: col1,col2,col3 ";
             // 
             // pictureBox1
             // 
             pictureBox1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
-            pictureBox1.Location = new Point(690, 11);
+            pictureBox1.Location = new Point(684, 20);
             pictureBox1.Margin = new Padding(3, 2, 3, 2);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(171, 113);
+            pictureBox1.Size = new Size(165, 110);
+            pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
             pictureBox1.TabIndex = 2;
             pictureBox1.TabStop = false;
             // 
@@ -259,7 +276,7 @@
             // splitContainer1.Panel2
             // 
             splitContainer1.Panel2.Controls.Add(ChosenItemListBox);
-            splitContainer1.Size = new Size(765, 361);
+            splitContainer1.Size = new Size(765, 355);
             splitContainer1.SplitterDistance = 317;
             splitContainer1.TabIndex = 15;
             // 
@@ -273,7 +290,7 @@
             groupBox2.Margin = new Padding(3, 2, 3, 2);
             groupBox2.Name = "groupBox2";
             groupBox2.Padding = new Padding(3, 2, 3, 2);
-            groupBox2.Size = new Size(861, 420);
+            groupBox2.Size = new Size(861, 414);
             groupBox2.TabIndex = 4;
             groupBox2.TabStop = false;
             groupBox2.Text = "Стъпка 2";
@@ -285,7 +302,7 @@
             panel3.Location = new Point(3, 57);
             panel3.Margin = new Padding(3, 2, 3, 2);
             panel3.Name = "panel3";
-            panel3.Size = new Size(765, 361);
+            panel3.Size = new Size(765, 355);
             panel3.TabIndex = 18;
             // 
             // panel1
@@ -296,7 +313,7 @@
             panel1.Location = new Point(768, 57);
             panel1.Margin = new Padding(3, 2, 3, 2);
             panel1.Name = "panel1";
-            panel1.Size = new Size(90, 361);
+            panel1.Size = new Size(90, 355);
             panel1.TabIndex = 16;
             // 
             // panel2
@@ -333,7 +350,7 @@
             panel4.Location = new Point(0, 0);
             panel4.Margin = new Padding(3, 2, 3, 2);
             panel4.Name = "panel4";
-            panel4.Size = new Size(861, 128);
+            panel4.Size = new Size(861, 134);
             panel4.TabIndex = 16;
             // 
             // panel5
@@ -350,27 +367,11 @@
             // 
             panel6.Controls.Add(groupBox2);
             panel6.Dock = DockStyle.Fill;
-            panel6.Location = new Point(0, 128);
+            panel6.Location = new Point(0, 134);
             panel6.Margin = new Padding(3, 2, 3, 2);
             panel6.Name = "panel6";
-            panel6.Size = new Size(861, 420);
+            panel6.Size = new Size(861, 414);
             panel6.TabIndex = 18;
-            // 
-            // jsonPropColumnNamesTextBox
-            // 
-            jsonPropColumnNamesTextBox.Location = new Point(12, 100);
-            jsonPropColumnNamesTextBox.Name = "jsonPropColumnNamesTextBox";
-            jsonPropColumnNamesTextBox.Size = new Size(672, 23);
-            jsonPropColumnNamesTextBox.TabIndex = 3;
-            // 
-            // jsonPropColumnNameLabel
-            // 
-            jsonPropColumnNameLabel.AutoSize = true;
-            jsonPropColumnNameLabel.Location = new Point(12, 80);
-            jsonPropColumnNameLabel.Name = "jsonPropColumnNameLabel";
-            jsonPropColumnNameLabel.Size = new Size(493, 15);
-            jsonPropColumnNameLabel.TabIndex = 4;
-            jsonPropColumnNameLabel.Text = "Моля въведете имената на json колоните, разделени със запетая ПРИМЕР: col1,col2,col3\r\n";
             // 
             // Form1
             // 
@@ -430,7 +431,6 @@
         private Panel panel4;
         private Panel panel5;
         private Panel panel6;
-        private Label jsonPropColumnNameLabel;
-        private TextBox jsonPropColumnNamesTextBox;
+        private Label jsonColumnNamesLabel;
     }
 }
