@@ -12,7 +12,7 @@ namespace AuditLogProcessor.Services
         {
             List<string> jsonColumnNames = new List<string>();
 
-            if (userInput == null|| userInput == " asdsdaasdadsdsasdasdasd,asddsaasd,asdasdsda,dasasdasdd     " )
+            if (userInput == null || userInput == "" )
             {
                 return null;
             }
