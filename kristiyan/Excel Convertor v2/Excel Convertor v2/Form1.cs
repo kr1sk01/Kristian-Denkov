@@ -17,7 +17,7 @@ namespace Excel_Convertor_v2
     {
         List<string> chosenPropsToShowList = new List<string>();
         List<string> colNames = new List<string>();
-        private TextBox textBox1;
+        private TextBox jsonColumnNamesTextBox;
 
         //Default save directory (excluding outputfile name )
         string defaultDir = Directory.GetCurrentDirectory().ToString() + "\\Outputs";
@@ -44,7 +44,7 @@ namespace Excel_Convertor_v2
         }
         private void SetText(string text)
         {
-            textBox1.Text = text;
+            jsonColumnNamesTextBox.Text = text;
         }
         private void AddCheckBoxes(List<string> checkboxNames)
         {
