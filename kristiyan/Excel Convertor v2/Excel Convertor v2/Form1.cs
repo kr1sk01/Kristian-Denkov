@@ -50,11 +50,8 @@ namespace Excel_Convertor_v2
         {
             foreach (string name in checkboxNames)
             {
-
                 ItemToChooseListBox.Items.Add(name);
             }
-
-            //label1.Text = "Моля изберете колоните които искате да включите в експорта: ";
         }
         private void ItemToChooseListBox_MouseDoubleClick(object sender, MouseEventArgs e)
         {
@@ -65,13 +62,9 @@ namespace Excel_Convertor_v2
                 MessageBox.Show(index.ToString());
             }
         }
-        private void textBoxLogger_TextChanged(object sender, EventArgs e)
+        private void SelectInputFileButton_Click(object sender, EventArgs e)
         {
-
-        }
-        private void button1_Click(object sender, EventArgs e)
-        {
-            label1.Text = "";
+            InputFileFullPathLabel.Text = "";
             ItemToChooseListBox.Items.Clear();
             ChosenItemListBox.Items.Clear();
             OpenFileDialog openFileDialog1 = new OpenFileDialog();
@@ -86,7 +79,7 @@ namespace Excel_Convertor_v2
                     var addCheckBoxesParam = Read.ReadColTitles(fullFileNamePath, jsonColNames);
                     addCheckBoxesParam.Sort();
                     AddCheckBoxes(addCheckBoxesParam);
-                    label1.Text = fullFileNamePath;
+                    InputFileFullPathLabel.Text = fullFileNamePath;
                     pictureBox1.Hide();
                 }
                 catch (Exception ex)
@@ -95,18 +88,18 @@ namespace Excel_Convertor_v2
                 }
             }
         }
-        private void button2_Click(object sender, EventArgs e)//Convert button
+        private void ConvertFileButton_Click(object sender, EventArgs e)//Convert button
         {
             if (fullFileNamePath == "")
             {
-                button1.Focus();
+                SelectInputFileButton.Focus();
                 MessageBox.Show("Моля изберете Excel файл за обработка", "Не сте избрали файл", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             else
             {
                 if (ChosenItemListBox.Items.Count <= 0)
                 {
-                    button1.Focus();
+                    SelectInputFileButton.Focus();
                     //label1.ForeColor = Color.Red;
                     MessageBox.Show("Изберете кои колони искате да добавите!", "Не сте избрали поле", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
@@ -153,23 +146,6 @@ namespace Excel_Convertor_v2
             }
 
         }
-        private void button3_Click(object sender, EventArgs e)//Move Right
-        {
-            if (ItemToChooseListBox.SelectedItem != null)
-            {
-                ChosenItemListBox.Items.Add(ItemToChooseListBox.SelectedItem);
-                ItemToChooseListBox.Items.Remove(ItemToChooseListBox.SelectedItem);
-            }
-        }
-        private void button4_Click(object sender, EventArgs e)//Move Left
-        {
-            if (ChosenItemListBox.SelectedItem != null)
-            {
-                ItemToChooseListBox.Items.Add(ChosenItemListBox.SelectedItem);
-                ChosenItemListBox.Items.Remove(ChosenItemListBox.SelectedItem);
-                ItemToChooseListBox.Sorted = true;
-            }
-        }//Move Left
         private void button5_Click(object sender, EventArgs e)//Move Down
         {
             MoveItem(-1);

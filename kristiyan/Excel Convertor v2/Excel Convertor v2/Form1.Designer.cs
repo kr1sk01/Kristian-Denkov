@@ -30,9 +30,9 @@
         {
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            label1 = new Label();
-            button1 = new Button();
-            button2 = new Button();
+            InputFileFullPathLabel = new Label();
+            SelectInputFileButton = new Button();
+            ConvertFileButton = new Button();
             ItemToChooseListBox = new ListBox();
             ChosenItemListBox = new ListBox();
             button5 = new Button();
@@ -75,32 +75,33 @@
             // 
             // label1
             // 
-            label1.AutoSize = true;
-            label1.Font = new Font("Segoe UI", 12F);
-            label1.Location = new Point(284, 53);
-            label1.Name = "label1";
-            label1.Size = new Size(0, 21);
-            label1.TabIndex = 0;
+            InputFileFullPathLabel.AutoSize = true;
+            InputFileFullPathLabel.Font = new Font("Segoe UI", 12F);
+            InputFileFullPathLabel.Location = new Point(251, 81);
+            InputFileFullPathLabel.Name = "label1";
+            InputFileFullPathLabel.Size = new Size(121, 21);
+            InputFileFullPathLabel.TabIndex = 0;
+            InputFileFullPathLabel.Text = "asdsdasadsadsa";
             // 
-            // button1
+            // SelectInputFileButton
             // 
-            button1.Location = new Point(12, 65);
-            button1.Name = "button1";
-            button1.Size = new Size(219, 56);
-            button1.TabIndex = 1;
-            button1.Text = "Изберете входящ файл";
-            button1.UseVisualStyleBackColor = true;
-            button1.Click += button1_Click;
+            SelectInputFileButton.Location = new Point(12, 65);
+            SelectInputFileButton.Name = "SelectInputFileButton";
+            SelectInputFileButton.Size = new Size(219, 56);
+            SelectInputFileButton.TabIndex = 1;
+            SelectInputFileButton.Text = "Изберете входящ файл";
+            SelectInputFileButton.UseVisualStyleBackColor = true;
+            SelectInputFileButton.Click += SelectInputFileButton_Click;
             // 
-            // button2
+            // ConvertFileButton
             // 
-            button2.Location = new Point(26, 28);
-            button2.Name = "button2";
-            button2.Size = new Size(219, 56);
-            button2.TabIndex = 2;
-            button2.Text = "Експорт";
-            button2.UseVisualStyleBackColor = true;
-            button2.Click += button2_Click;
+            ConvertFileButton.Location = new Point(26, 28);
+            ConvertFileButton.Name = "ConvertFileButton";
+            ConvertFileButton.Size = new Size(219, 56);
+            ConvertFileButton.TabIndex = 2;
+            ConvertFileButton.Text = "Експорт";
+            ConvertFileButton.UseVisualStyleBackColor = true;
+            ConvertFileButton.Click += ConvertFileButton_Click;
             // 
             // ItemToChooseListBox
             // 
@@ -222,8 +223,8 @@
             groupbox1.Controls.Add(jsonColumnNamesTextBox);
             groupbox1.Controls.Add(jsonColumnNamesLabel);
             groupbox1.Controls.Add(pictureBox1);
-            groupbox1.Controls.Add(button1);
-            groupbox1.Controls.Add(label1);
+            groupbox1.Controls.Add(SelectInputFileButton);
+            groupbox1.Controls.Add(InputFileFullPathLabel);
             groupbox1.Dock = DockStyle.Fill;
             groupbox1.Location = new Point(0, 0);
             groupbox1.Margin = new Padding(3, 2, 3, 2);
@@ -329,7 +330,7 @@
             // 
             // groupBox3
             // 
-            groupBox3.Controls.Add(button2);
+            groupBox3.Controls.Add(ConvertFileButton);
             groupBox3.Controls.Add(SavePathTextBox);
             groupBox3.Controls.Add(SaveFileDialogButtom);
             groupBox3.Controls.Add(autoOpenDirCheckBox);
@@ -406,9 +407,9 @@
 
         #endregion
 
-        private Label label1;
-        private Button button1;
-        private Button button2;
+        private Label InputFileFullPathLabel;
+        private Button SelectInputFileButton;
+        private Button ConvertFileButton;
         private ListBox ItemToChooseListBox;
         private ListBox ChosenItemListBox;
         private Button button5;
