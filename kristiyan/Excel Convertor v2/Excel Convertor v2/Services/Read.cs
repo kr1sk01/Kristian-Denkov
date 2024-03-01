@@ -12,8 +12,11 @@ namespace Excel_Convertor_v2.Services
     public static class Read
     {
 
-        public static void JsonParser(int initialRow, List<string>? jsonColNames, ref List<string> uniqueNames, ExcelWorksheet worksheet, int colIndex)
+        public static List<string> JsonParser(int initialRow, List<string>? jsonColNames, List<string> uniqueNames, ExcelWorksheet worksheet, int colIndex)
         {
+            List<string> tempList = new List<string>();
+
+
             int rows = worksheet.Dimension.Rows;
             for (int row = initialRow; row <= rows; row++)
             {
@@ -31,9 +34,9 @@ namespace Excel_Convertor_v2.Services
                             if (element.TryGetProperty("Name", out var nameProperty))
                             {
                                 string nameValue = nameProperty.GetString();
-                                if (!uniqueNames.Contains(nameValue))
+                                if (!uniqueNames.Contains(nameValue) && !tempList.Contains(nameValue))
                                 {
-                                    uniqueNames.Add(nameValue);
+                                    tempList.Add(nameValue);
                                 }
                             }
                         }
@@ -44,14 +47,15 @@ namespace Excel_Convertor_v2.Services
                         if (doc.RootElement.TryGetProperty("Name", out var nameProperty))
                         {
                             string nameValue = nameProperty.GetString();
-                            if (!uniqueNames.Contains(nameValue))
+                            if (!uniqueNames.Contains(nameValue) && !tempList.Contains(nameValue))
                             {
-                                uniqueNames.Add(nameValue);
+                                tempList.Add(nameValue);
                             }
                         }
                     }
                 }
             }
+            return tempList;
         }
         public static List<string> ReadColTitles(string fileToRead, List<string>? jsonColNames)
         {
@@ -87,15 +91,20 @@ namespace Excel_Convertor_v2.Services
                     }
 
                     initialRow += 1; //Почваме от следващия ред да взимаме Prop-совете на JsonString-овете
-
+                    
+                    List<int> jsonColIndexes = new List<int>();
                     foreach (var item in uniqueNames)
                     {
                         if (jsonColNames.Contains(item.ToLower()))
                         {
-                            JsonParser(initialRow, jsonColNames, ref uniqueNames, worksheet, uniqueNames.IndexOf(item) + 1);
+                            jsonColIndexes.Add(uniqueNames.IndexOf(item) + 1);
                         }
                     }
-
+                    foreach (var index in jsonColIndexes)
+                    {
+                        List<string> temp = new List<string>(JsonParser(initialRow, jsonColNames, uniqueNames, worksheet, index));
+                        uniqueNames.AddRange(temp);
+                    }
                 }
             }
             catch (Exception e)
