@@ -55,6 +55,8 @@
             panel4 = new Panel();
             panel5 = new Panel();
             panel6 = new Panel();
+            jsonPropColumnNamesTextBox = new TextBox();
+            jsonPropColumnNameLabel = new Label();
             groupbox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
@@ -75,17 +77,16 @@
             // 
             label1.AutoSize = true;
             label1.Font = new Font("Segoe UI", 12F);
-            label1.Location = new Point(324, 71);
+            label1.Location = new Point(284, 53);
             label1.Name = "label1";
-            label1.Size = new Size(0, 28);
+            label1.Size = new Size(0, 21);
             label1.TabIndex = 0;
             // 
             // button1
             // 
-            button1.Location = new Point(30, 36);
-            button1.Margin = new Padding(3, 4, 3, 4);
+            button1.Location = new Point(12, 21);
             button1.Name = "button1";
-            button1.Size = new Size(250, 75);
+            button1.Size = new Size(219, 56);
             button1.TabIndex = 1;
             button1.Text = "Изберете входящ файл";
             button1.UseVisualStyleBackColor = true;
@@ -93,10 +94,9 @@
             // 
             // button2
             // 
-            button2.Location = new Point(30, 37);
-            button2.Margin = new Padding(3, 4, 3, 4);
+            button2.Location = new Point(26, 28);
             button2.Name = "button2";
-            button2.Size = new Size(250, 75);
+            button2.Size = new Size(219, 56);
             button2.TabIndex = 2;
             button2.Text = "Експорт";
             button2.UseVisualStyleBackColor = true;
@@ -106,9 +106,11 @@
             // 
             ItemToChooseListBox.Dock = DockStyle.Fill;
             ItemToChooseListBox.FormattingEnabled = true;
+            ItemToChooseListBox.ItemHeight = 15;
             ItemToChooseListBox.Location = new Point(0, 0);
+            ItemToChooseListBox.Margin = new Padding(3, 2, 3, 2);
             ItemToChooseListBox.Name = "ItemToChooseListBox";
-            ItemToChooseListBox.Size = new Size(362, 515);
+            ItemToChooseListBox.Size = new Size(317, 361);
             ItemToChooseListBox.TabIndex = 3;
             ItemToChooseListBox.SelectedIndexChanged += ItemToChooseListBox_SelectedIndexChanged;
             ItemToChooseListBox.MouseDoubleClick += ItemToChoose_MouseDoubleClick;
@@ -117,9 +119,11 @@
             // 
             ChosenItemListBox.Dock = DockStyle.Fill;
             ChosenItemListBox.FormattingEnabled = true;
+            ChosenItemListBox.ItemHeight = 15;
             ChosenItemListBox.Location = new Point(0, 0);
+            ChosenItemListBox.Margin = new Padding(3, 2, 3, 2);
             ChosenItemListBox.Name = "ChosenItemListBox";
-            ChosenItemListBox.Size = new Size(507, 515);
+            ChosenItemListBox.Size = new Size(444, 361);
             ChosenItemListBox.TabIndex = 4;
             ChosenItemListBox.SelectedIndexChanged += ChosenItemListBox_SelectedIndexChanged;
             ChosenItemListBox.MouseDoubleClick += ChosenItemListBox_MouseDoubleClick;
@@ -128,9 +132,10 @@
             // 
             button5.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             button5.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
-            button5.Location = new Point(12, 0);
+            button5.Location = new Point(10, 0);
+            button5.Margin = new Padding(3, 2, 3, 2);
             button5.Name = "button5";
-            button5.Size = new Size(80, 140);
+            button5.Size = new Size(70, 105);
             button5.TabIndex = 7;
             button5.Text = "🡡";
             button5.UseVisualStyleBackColor = true;
@@ -140,9 +145,10 @@
             // 
             button6.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             button6.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
-            button6.Location = new Point(12, 362);
+            button6.Location = new Point(10, 246);
+            button6.Margin = new Padding(3, 2, 3, 2);
             button6.Name = "button6";
-            button6.Size = new Size(80, 140);
+            button6.Size = new Size(70, 105);
             button6.TabIndex = 8;
             button6.Text = "🡣";
             button6.UseVisualStyleBackColor = true;
@@ -161,9 +167,9 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(95, 18);
+            label2.Location = new Point(83, 14);
             label2.Name = "label2";
-            label2.Size = new Size(113, 20);
+            label2.Size = new Size(91, 15);
             label2.TabIndex = 9;
             label2.Text = "Всички колони";
             // 
@@ -171,9 +177,9 @@
             // 
             label3.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label3.AutoSize = true;
-            label3.Location = new Point(590, 18);
+            label3.Location = new Point(517, 14);
             label3.Name = "label3";
-            label3.Size = new Size(140, 20);
+            label3.Size = new Size(110, 15);
             label3.TabIndex = 10;
             label3.Text = "Колони за експорт";
             // 
@@ -182,10 +188,9 @@
             autoOpenDirCheckBox.AutoSize = true;
             autoOpenDirCheckBox.Checked = true;
             autoOpenDirCheckBox.CheckState = CheckState.Checked;
-            autoOpenDirCheckBox.Location = new Point(315, 37);
-            autoOpenDirCheckBox.Margin = new Padding(3, 4, 3, 4);
+            autoOpenDirCheckBox.Location = new Point(276, 28);
             autoOpenDirCheckBox.Name = "autoOpenDirCheckBox";
-            autoOpenDirCheckBox.Size = new Size(248, 24);
+            autoOpenDirCheckBox.Size = new Size(195, 19);
             autoOpenDirCheckBox.TabIndex = 11;
             autoOpenDirCheckBox.Text = "Авт. отваряне на директорията";
             autoOpenDirCheckBox.UseVisualStyleBackColor = true;
@@ -194,10 +199,9 @@
             // SaveFileDialogButtom
             // 
             SaveFileDialogButtom.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            SaveFileDialogButtom.Location = new Point(916, 73);
-            SaveFileDialogButtom.Margin = new Padding(3, 4, 3, 4);
+            SaveFileDialogButtom.Location = new Point(804, 55);
             SaveFileDialogButtom.Name = "SaveFileDialogButtom";
-            SaveFileDialogButtom.Size = new Size(40, 39);
+            SaveFileDialogButtom.Size = new Size(35, 29);
             SaveFileDialogButtom.TabIndex = 12;
             SaveFileDialogButtom.Text = "...";
             SaveFileDialogButtom.UseVisualStyleBackColor = true;
@@ -207,22 +211,25 @@
             // 
             SavePathTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             SavePathTextBox.Font = new Font("Segoe UI", 12F);
-            SavePathTextBox.Location = new Point(315, 73);
-            SavePathTextBox.Margin = new Padding(3, 4, 3, 4);
+            SavePathTextBox.Location = new Point(276, 55);
             SavePathTextBox.Multiline = true;
             SavePathTextBox.Name = "SavePathTextBox";
-            SavePathTextBox.Size = new Size(595, 39);
+            SavePathTextBox.Size = new Size(523, 30);
             SavePathTextBox.TabIndex = 13;
             // 
             // groupbox1
             // 
+            groupbox1.Controls.Add(jsonPropColumnNameLabel);
+            groupbox1.Controls.Add(jsonPropColumnNamesTextBox);
             groupbox1.Controls.Add(pictureBox1);
             groupbox1.Controls.Add(button1);
             groupbox1.Controls.Add(label1);
             groupbox1.Dock = DockStyle.Fill;
             groupbox1.Location = new Point(0, 0);
+            groupbox1.Margin = new Padding(3, 2, 3, 2);
             groupbox1.Name = "groupbox1";
-            groupbox1.Size = new Size(982, 130);
+            groupbox1.Padding = new Padding(3, 2, 3, 2);
+            groupbox1.Size = new Size(861, 128);
             groupbox1.TabIndex = 14;
             groupbox1.TabStop = false;
             groupbox1.Text = "Стъпка 1 ";
@@ -231,9 +238,10 @@
             // 
             pictureBox1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
-            pictureBox1.Location = new Point(761, 12);
+            pictureBox1.Location = new Point(690, 11);
+            pictureBox1.Margin = new Padding(3, 2, 3, 2);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(195, 113);
+            pictureBox1.Size = new Size(171, 113);
             pictureBox1.TabIndex = 2;
             pictureBox1.TabStop = false;
             // 
@@ -241,6 +249,7 @@
             // 
             splitContainer1.Dock = DockStyle.Fill;
             splitContainer1.Location = new Point(0, 0);
+            splitContainer1.Margin = new Padding(3, 2, 3, 2);
             splitContainer1.Name = "splitContainer1";
             // 
             // splitContainer1.Panel1
@@ -250,8 +259,8 @@
             // splitContainer1.Panel2
             // 
             splitContainer1.Panel2.Controls.Add(ChosenItemListBox);
-            splitContainer1.Size = new Size(873, 515);
-            splitContainer1.SplitterDistance = 362;
+            splitContainer1.Size = new Size(765, 361);
+            splitContainer1.SplitterDistance = 317;
             splitContainer1.TabIndex = 15;
             // 
             // groupBox2
@@ -261,8 +270,10 @@
             groupBox2.Controls.Add(panel2);
             groupBox2.Dock = DockStyle.Fill;
             groupBox2.Location = new Point(0, 0);
+            groupBox2.Margin = new Padding(3, 2, 3, 2);
             groupBox2.Name = "groupBox2";
-            groupBox2.Size = new Size(982, 593);
+            groupBox2.Padding = new Padding(3, 2, 3, 2);
+            groupBox2.Size = new Size(861, 420);
             groupBox2.TabIndex = 4;
             groupBox2.TabStop = false;
             groupBox2.Text = "Стъпка 2";
@@ -271,9 +282,10 @@
             // 
             panel3.Controls.Add(splitContainer1);
             panel3.Dock = DockStyle.Fill;
-            panel3.Location = new Point(3, 75);
+            panel3.Location = new Point(3, 57);
+            panel3.Margin = new Padding(3, 2, 3, 2);
             panel3.Name = "panel3";
-            panel3.Size = new Size(873, 515);
+            panel3.Size = new Size(765, 361);
             panel3.TabIndex = 18;
             // 
             // panel1
@@ -281,9 +293,10 @@
             panel1.Controls.Add(button6);
             panel1.Controls.Add(button5);
             panel1.Dock = DockStyle.Right;
-            panel1.Location = new Point(876, 75);
+            panel1.Location = new Point(768, 57);
+            panel1.Margin = new Padding(3, 2, 3, 2);
             panel1.Name = "panel1";
-            panel1.Size = new Size(103, 515);
+            panel1.Size = new Size(90, 361);
             panel1.TabIndex = 16;
             // 
             // panel2
@@ -291,9 +304,10 @@
             panel2.Controls.Add(label2);
             panel2.Controls.Add(label3);
             panel2.Dock = DockStyle.Top;
-            panel2.Location = new Point(3, 23);
+            panel2.Location = new Point(3, 18);
+            panel2.Margin = new Padding(3, 2, 3, 2);
             panel2.Name = "panel2";
-            panel2.Size = new Size(976, 52);
+            panel2.Size = new Size(855, 39);
             panel2.TabIndex = 17;
             // 
             // groupBox3
@@ -304,8 +318,10 @@
             groupBox3.Controls.Add(autoOpenDirCheckBox);
             groupBox3.Dock = DockStyle.Fill;
             groupBox3.Location = new Point(0, 0);
+            groupBox3.Margin = new Padding(3, 2, 3, 2);
             groupBox3.Name = "groupBox3";
-            groupBox3.Size = new Size(982, 130);
+            groupBox3.Padding = new Padding(3, 2, 3, 2);
+            groupBox3.Size = new Size(861, 98);
             groupBox3.TabIndex = 15;
             groupBox3.TabStop = false;
             groupBox3.Text = "Стъпка 3";
@@ -315,38 +331,56 @@
             panel4.Controls.Add(groupbox1);
             panel4.Dock = DockStyle.Top;
             panel4.Location = new Point(0, 0);
+            panel4.Margin = new Padding(3, 2, 3, 2);
             panel4.Name = "panel4";
-            panel4.Size = new Size(982, 130);
+            panel4.Size = new Size(861, 128);
             panel4.TabIndex = 16;
             // 
             // panel5
             // 
             panel5.Controls.Add(groupBox3);
             panel5.Dock = DockStyle.Bottom;
-            panel5.Location = new Point(0, 723);
+            panel5.Location = new Point(0, 548);
+            panel5.Margin = new Padding(3, 2, 3, 2);
             panel5.Name = "panel5";
-            panel5.Size = new Size(982, 130);
+            panel5.Size = new Size(861, 98);
             panel5.TabIndex = 17;
             // 
             // panel6
             // 
             panel6.Controls.Add(groupBox2);
             panel6.Dock = DockStyle.Fill;
-            panel6.Location = new Point(0, 130);
+            panel6.Location = new Point(0, 128);
+            panel6.Margin = new Padding(3, 2, 3, 2);
             panel6.Name = "panel6";
-            panel6.Size = new Size(982, 593);
+            panel6.Size = new Size(861, 420);
             panel6.TabIndex = 18;
+            // 
+            // jsonPropColumnNamesTextBox
+            // 
+            jsonPropColumnNamesTextBox.Location = new Point(12, 100);
+            jsonPropColumnNamesTextBox.Name = "jsonPropColumnNamesTextBox";
+            jsonPropColumnNamesTextBox.Size = new Size(672, 23);
+            jsonPropColumnNamesTextBox.TabIndex = 3;
+            // 
+            // jsonPropColumnNameLabel
+            // 
+            jsonPropColumnNameLabel.AutoSize = true;
+            jsonPropColumnNameLabel.Location = new Point(12, 80);
+            jsonPropColumnNameLabel.Name = "jsonPropColumnNameLabel";
+            jsonPropColumnNameLabel.Size = new Size(493, 15);
+            jsonPropColumnNameLabel.TabIndex = 4;
+            jsonPropColumnNameLabel.Text = "Моля въведете имената на json колоните, разделени със запетая ПРИМЕР: col1,col2,col3\r\n";
             // 
             // Form1
             // 
-            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(982, 853);
+            ClientSize = new Size(861, 646);
             Controls.Add(panel6);
             Controls.Add(panel5);
             Controls.Add(panel4);
-            Margin = new Padding(3, 4, 3, 4);
-            MinimumSize = new Size(1000, 900);
+            MinimumSize = new Size(877, 685);
             Name = "Form1";
             Text = "Одит лог процесор";
             groupbox1.ResumeLayout(false);
@@ -396,5 +430,7 @@
         private Panel panel4;
         private Panel panel5;
         private Panel panel6;
+        private Label jsonPropColumnNameLabel;
+        private TextBox jsonPropColumnNamesTextBox;
     }
 }
