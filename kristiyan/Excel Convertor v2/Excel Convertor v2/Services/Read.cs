@@ -12,8 +12,9 @@ namespace Excel_Convertor_v2.Services
     public static class Read
     {
 
-        public static void JsonParser(int initialRow, List<string>? jsonColNames, ref List<string> uniqueNames, ExcelWorksheet worksheet, int colIndex)
+        public static List<string> JsonParser(int initialRow, List<string>? jsonColNames, ExcelWorksheet worksheet, List<string> uniqueNames,int colIndex)
         {
+            List<string> tempUniqueNames = new List<string>();
             int rows = worksheet.Dimension.Rows;
             for (int row = initialRow; row <= rows; row++)
             {
@@ -31,9 +32,9 @@ namespace Excel_Convertor_v2.Services
                             if (element.TryGetProperty("Name", out var nameProperty))
                             {
                                 string nameValue = nameProperty.GetString();
-                                if (!uniqueNames.Contains(nameValue))
+                                if (!uniqueNames.Contains(nameValue) && !tempUniqueNames.Contains(nameValue))
                                 {
-                                    uniqueNames.Add(nameValue);
+                                    tempUniqueNames.Add(nameValue);
                                 }
                             }
                         }
@@ -44,22 +45,22 @@ namespace Excel_Convertor_v2.Services
                         if (doc.RootElement.TryGetProperty("Name", out var nameProperty))
                         {
                             string nameValue = nameProperty.GetString();
-                            if (!uniqueNames.Contains(nameValue))
+                            if (!uniqueNames.Contains(nameValue) && !tempUniqueNames.Contains(nameValue))
                             {
-                                uniqueNames.Add(nameValue);
+                                tempUniqueNames.Add(nameValue);
                             }
                         }
                     }
                 }
             }
+            return tempUniqueNames;
         }
         public static List<string> ReadColTitles(string fileToRead, List<string>? jsonColNames)
         {
             if (jsonColNames == null)
                 jsonColNames = new List<string> { "стойност", "нещо" };//TODO MAKE INPUT FROM FORM TO LOWER!!!!!!!!!!
 
-            List<Object>? jsonList = new List<Object>();
-            List<string> uniqueNames = new List<string>();
+            List<string>? uniqueNames = new List<string>();
 
             try
             {
@@ -87,15 +88,20 @@ namespace Excel_Convertor_v2.Services
                     }
 
                     initialRow += 1; //Почваме от следващия ред да взимаме Prop-совете на JsonString-овете
-
-                    foreach (var item in uniqueNames)
+                    List<string> jsonPropList = new List<string>();
+                    foreach (string? item in uniqueNames)
                     {
                         if (jsonColNames.Contains(item.ToLower()))
-                        {
-                            JsonParser(initialRow, jsonColNames, ref uniqueNames, worksheet, uniqueNames.IndexOf(item) + 1);
+                        {                           
+                            jsonPropList = JsonParser(initialRow, jsonColNames, worksheet, uniqueNames, uniqueNames.IndexOf(item) + 1);
+                                                      
                         }
                     }
-
+                    uniqueNames.AddRange(jsonPropList);
+                    foreach (string? item in jsonColNames)
+                    {
+                        uniqueNames.Remove(item);
+                    }
                 }
             }
             catch (Exception e)
@@ -105,8 +111,12 @@ namespace Excel_Convertor_v2.Services
 
             return uniqueNames;
         }
-        public static List<TableRow> ReadData(string filePath, List<string> chosenPropsToShowList)
+        public static List<TableRow> ReadData(string filePath, List<string> chosenPropsToShowList, List<string>? jsonColNames = null)
         {
+
+            if (jsonColNames == null)
+                jsonColNames = new List<string> { "стойност", "нещо" };//TODO MAKE INPUT FROM FORM TO LOWER!!!!!!!!!!
+
             var rows = new List<TableRow>();
 
             using (var package = new ExcelPackage(new FileInfo(filePath)))
