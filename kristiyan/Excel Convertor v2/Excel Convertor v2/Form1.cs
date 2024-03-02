@@ -75,7 +75,7 @@ namespace Excel_Convertor_v2
                 try
                 {
                     jsonColNames = UserInput.ConvertStringToList(jsonColumnNamesTextBox.Text);
-                    colNames = Read.ReadColTitles(fullFileNamePath, jsonColNames);
+                    colNames = Read.ReadColTitles(fullFileNamePath, ref jsonColNames);
                     var addCheckBoxesParam = colNames;
                     addCheckBoxesParam.Sort();
                     AddCheckBoxes(addCheckBoxesParam);
@@ -115,14 +115,13 @@ namespace Excel_Convertor_v2
                             // Assuming the items are strings, you may need to adjust the type accordingly
                             chosenPropsToShowList.Add(item.ToString());
                         }
-                        //var rows = Read.ReadData(fullFileNamePath,
-                        //   chosenPropsToShowList);
+                        var rows = Read.ReadData(fullFileNamePath, chosenPropsToShowList, jsonColNames);
                         if (!Directory.Exists(defaultDir))
                         {
                             // If not, create the directory
                             Directory.CreateDirectory(defaultDir);
                         }
-                        //Write.WriteData(fullSavePath, rows);
+                        Write.WriteData(fullSavePath, rows);
                         
                         openFinalPathFolder = autoOpenDirCheckBox.Checked;
                         if (openFinalPathFolder)
