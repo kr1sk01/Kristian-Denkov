@@ -16,7 +16,7 @@ namespace Excel_Convertor_v2
     public partial class Form1 : Form
     {
         List<string> chosenPropsToShowList = new List<string>();
-        List<string> colNames = new List<string>();
+        Dictionary<string, string> colNames = new Dictionary<string, string>();
         private TextBox jsonColumnNamesTextBox;
 
         //Default save directory (excluding outputfile name )
@@ -42,24 +42,11 @@ namespace Excel_Convertor_v2
             SavePathTextBox.Multiline = true;
             SavePathTextBox.Text = Directory.GetCurrentDirectory().ToString() + "\\Output";
         }
-        private void SetText(string text)
-        {
-            jsonColumnNamesTextBox.Text = text;
-        }
         private void AddCheckBoxes(List<string> checkboxNames)
         {
             foreach (string name in checkboxNames)
             {
                 ItemToChooseListBox.Items.Add(name);
-            }
-        }
-        private void ItemToChooseListBox_MouseDoubleClick(object sender, MouseEventArgs e)
-        {
-            // Check if the double click occurred on an item
-            int? index = this.ItemToChooseListBox.IndexFromPoint(e.Location);
-            if (index != null)
-            {
-                MessageBox.Show(index.ToString());
             }
         }
         private void SelectInputFileButton_Click(object sender, EventArgs e)
@@ -76,7 +63,7 @@ namespace Excel_Convertor_v2
                 {
                     jsonColNames = UserInput.ConvertStringToList(jsonColumnNamesTextBox.Text);
                     colNames = Read.ReadColTitles(fullFileNamePath, ref jsonColNames);
-                    var addCheckBoxesParam = colNames;
+                    var addCheckBoxesParam = colNames.Keys.ToList();
                     addCheckBoxesParam.Sort();
                     AddCheckBoxes(addCheckBoxesParam);
                     InputFileFullPathLabel.Text = fullFileNamePath;
@@ -115,7 +102,8 @@ namespace Excel_Convertor_v2
                             // Assuming the items are strings, you may need to adjust the type accordingly
                             chosenPropsToShowList.Add(item.ToString());
                         }
-                        var rows = Read.ReadData(fullFileNamePath, chosenPropsToShowList, jsonColNames);
+                        var rows = Read.ReadData(fullFileNamePath, chosenPropsToShowList, jsonColNames, colNames);
+
                         if (!Directory.Exists(defaultDir))
                         {
                             // If not, create the directory
@@ -183,12 +171,7 @@ namespace Excel_Convertor_v2
                     ItemToChooseListBox.Items.Remove(ItemToChooseListBox.SelectedItem);
 
                 }
-
-                // Do something with the double-clicked item
-                //MessageBox.Show("You double-clicked: " + item.Content.ToString());
             }
-
-
         }
         private void ChosenItemListBox_MouseDoubleClick(object sender, MouseEventArgs e)
         {
@@ -202,8 +185,6 @@ namespace Excel_Convertor_v2
                     ItemToChooseListBox.Sorted = true;
 
                 }
-                // Do something with the double-clicked item
-                //MessageBox.Show("You double-clicked: " + item.Content.ToString());
             }
         }
         private void timer1_Tick(object sender, EventArgs e)

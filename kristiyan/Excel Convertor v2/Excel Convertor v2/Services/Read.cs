@@ -12,16 +12,15 @@ namespace Excel_Convertor_v2.Services
     public static class Read
     {
 
-        public static List<string> JsonParser(int initialRow, List<string>? jsonColNames, List<string> uniqueNames, ExcelWorksheet worksheet, int colIndex)
+        public static Dictionary<string, string> JsonParser(int initialRow, Dictionary<string, string> uniqueNames, ExcelWorksheet worksheet, int colIndex)
         {
-            List<string> tempList = new List<string>();
-
+            Dictionary<string, string> tempDict = new Dictionary<string, string>();
 
             int rows = worksheet.Dimension.Rows;
             for (int row = initialRow; row <= rows; row++)
             {
                 string jsonString = worksheet.Cells[row, colIndex].Value?.ToString();
-                //;
+
                 if (!string.IsNullOrEmpty(jsonString))
                 {
                     // Determine if the JSON represents an object or an array
@@ -34,9 +33,9 @@ namespace Excel_Convertor_v2.Services
                             if (element.TryGetProperty("Name", out var nameProperty))
                             {
                                 string nameValue = nameProperty.GetString();
-                                if (!uniqueNames.Contains(nameValue) && !tempList.Contains(nameValue))
+                                if (!uniqueNames.ContainsKey(nameValue) && !tempDict.ContainsKey(nameValue))
                                 {
-                                    tempList.Add(nameValue);
+                                    tempDict.Add(nameValue, worksheet.Cells[initialRow-1, colIndex].Value.ToString());
                                 }
                             }
                         }
@@ -47,27 +46,25 @@ namespace Excel_Convertor_v2.Services
                         if (doc.RootElement.TryGetProperty("Name", out var nameProperty))
                         {
                             string nameValue = nameProperty.GetString();
-                            if (!uniqueNames.Contains(nameValue) && !tempList.Contains(nameValue))
+                            if (!uniqueNames.ContainsKey(nameValue) && !tempDict.ContainsKey(nameValue))
                             {
-                                tempList.Add(nameValue);
+                                tempDict.Add(nameValue, worksheet.Cells[initialRow - 1, colIndex].Value.ToString());
                             }
                         }
                     }
                 }
             }
-            return tempList;
+            return tempDict;
         }
-        public static List<string> ReadColTitles(string fileToRead, ref List<string>? jsonColNames)
+        public static Dictionary<string, string> ReadColTitles(string fileToRead, ref List<string>? jsonColNames)
         {
             if (jsonColNames == null)
             {
-                jsonColNames = new List<string> { "стойност" };//TODO MAKE INPUT FROM FORM TO LOWER!!!!!!!!!!
+                jsonColNames = new List<string> { "стойност" };
                 MessageBox.Show("Понеже не сте въвели json колони, при наличието на колона 'Стойност', тя ще бъде избрана за json колона", "Не сте въвели json колони", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
                 
-
-            List<Object>? jsonList = new List<Object>();
-            List<string> uniqueNames = new List<string>();
+            Dictionary<string, string> uniqueNames = new Dictionary<string, string>();
 
             try
             {
@@ -95,30 +92,19 @@ namespace Excel_Convertor_v2.Services
                         string cellValue = cell.ToString().ToLower().Replace(" ", "");
                         if (!jsonColNames.Contains(cellValue))
                         {
-                            uniqueNames.Add(cell.ToString());
+                            uniqueNames.Add(cell.ToString(), "");
                         }
                         else
                         {
-                            uniqueNames.AddRange(JsonParser(initialRow + 1, jsonColNames, uniqueNames, worksheet, colCounter));
+                            var dictToAdd = JsonParser(initialRow + 1, uniqueNames, worksheet, colCounter);
+
+                            foreach (var kvp in dictToAdd)
+                            {
+                                uniqueNames.Add(kvp.Key, kvp.Value);
+                            }
                         }
                         
                     }
-
-                    /*initialRow += 1; Почваме от следващия ред да взимаме Prop-совете на JsonString-овете
-                    
-                    List<int> jsonColIndexes = new List<int>();
-                    foreach (var item in uniqueNames)
-                    {
-                        if (jsonColNames.Contains(item.ToLower()))
-                        {
-                            jsonColIndexes.Add(uniqueNames.IndexOf(item) + 1);
-                        }
-                    }
-                    foreach (var index in jsonColIndexes)
-                    {
-                        List<string> temp = new List<string>(JsonParser(initialRow, jsonColNames, uniqueNames, worksheet, index));
-                        uniqueNames.AddRange(temp);
-                    }*/
                 }
             }
             catch (Exception e)
@@ -128,7 +114,7 @@ namespace Excel_Convertor_v2.Services
 
             return uniqueNames;
         }
-        public static List<TableRow> ReadData(string filePath, List<string> chosenPropsToShowList, List<string> jsonColNameStrings)
+        public static List<TableRow> ReadData(string filePath, List<string> chosenPropsToShowList, List<string> jsonColNameStrings, Dictionary<string, string> jsonPropsOrigin)
         {
             var rows = new List<TableRow>();
 
@@ -141,36 +127,13 @@ namespace Excel_Convertor_v2.Services
                 var rowsCount = ws.Dimension.Rows;
                 var columnsCount = ws.Dimension.Columns;
 
-                Console.WriteLine($"rowcount: {rowsCount}");
-
-                var startingHeaderRowFirstCellText = "Дата";
-
-                var jsonColumnHeaderText = "Стойност";
-
-                var tableRowHeaderIndex = 0;
-
                 var tableHeader = new List<string>();
 
                 int startRowIndex = Find.FindStartRowIndex(ws).Result;
                 tableHeader = CreateTableHeader(ws, startRowIndex, columnsCount, jsonColNameStrings);
-                tableRowHeaderIndex = startRowIndex;
-
-                
-                //Getting list of json column idenxes
-                List<int> jsonColumnIndexes = new List<int>();
-                foreach (var item in jsonColNameStrings)
-                {
-                    jsonColumnIndexes.Add(tableHeader.IndexOf(item));
-                }
-                /* We already got all indexes of the json columns
-                 * Now we should make a loop in which if it is json col and not regular one we desrialize and we are starting to search if 
-                 * one of the chosenProps are in this json or not, so we would be able to decide if we will add it to the row class
-                 * as column class or not 
-                 */
-                var jsonColumnIndex = tableHeader.IndexOf(jsonColumnHeaderText) + 1;
+                var tableRowHeaderIndex = startRowIndex;
 
                 var valuesStartingRow = tableRowHeaderIndex + 1;
-
 
                 for (int currentRowIndex = valuesStartingRow; currentRowIndex <= rowsCount; currentRowIndex++)
                 {
@@ -182,11 +145,12 @@ namespace Excel_Convertor_v2.Services
 
                         if (!tableHeader.Contains(chosenProp))
                         {
+                            var jsonColumnOrigin = jsonPropsOrigin[chosenProp];
+
                             for (int col = 1; col <= columnsCount; col++)
                             {
-                                var headerCell = ws.Cells[startRowIndex, col].Value?.ToString().Replace(" ", "").ToLower();
-
-                                if (jsonColNameStrings.Contains(headerCell))
+                                var headerCell = ws.Cells[startRowIndex, col].Value?.ToString();
+                                if (jsonColumnOrigin == headerCell)
                                 {
                                     var jsonString = ws.Cells[currentRowIndex, col].Value?.ToString();
                                     var column = CreateJsonColumn(jsonString, chosenProp);

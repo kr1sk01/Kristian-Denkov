@@ -28,16 +28,5 @@ namespace Excel_Convertor_v2.Services
             // If the search string is not found, return a default value or handle accordingly
             return -1;
         }
-        public static async Task<int> FindJsonColumn(ExcelWorksheet worksheet)//Find col index with value == стойност
-        {
-            var startingRow = FindStartRowIndex(worksheet).Result;
-            for (int col = 1; col <= worksheet.Dimension.End.Column; col++)
-            {
-                string? test = worksheet.Cells[startingRow - 1, col].Value?.ToString();
-                if (test == "Стойност")
-                    return col;
-            }
-            return worksheet.Dimension.End.Column;
-        }
     }
 }
