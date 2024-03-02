@@ -60,7 +60,11 @@ namespace Excel_Convertor_v2.Services
         public static List<string> ReadColTitles(string fileToRead, List<string>? jsonColNames)
         {
             if (jsonColNames == null)
-                jsonColNames = new List<string> { "стойност", "нещо" };//TODO MAKE INPUT FROM FORM TO LOWER!!!!!!!!!!
+            {
+                jsonColNames = new List<string> { "стойност" };//TODO MAKE INPUT FROM FORM TO LOWER!!!!!!!!!!
+                MessageBox.Show("Понеже не сте въвели json колони, при наличието на колона 'Стойност', тя ще бъде избрана за json колона", "Не сте въвели json колони", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+                
 
             List<Object>? jsonList = new List<Object>();
             List<string> uniqueNames = new List<string>();
@@ -79,6 +83,7 @@ namespace Excel_Convertor_v2.Services
                     var initialRow = Find.FindStartRowIndex(package.Workbook.Worksheets[0]).Result;
                     if (initialRow == -1)//Check if program can't find row with data
                     {
+                        MessageBox.Show("Файлът трябва да има начална колона 'Дата'", "Грешка при четене", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                         Log.LogException(new Exception("Couldn't find row with data!"));
                     }
                     for (int colCounter = 1; colCounter <= cols; colCounter++)
@@ -87,10 +92,19 @@ namespace Excel_Convertor_v2.Services
 
                         if (cell == null) { break; }
 
-                        uniqueNames.Add(cell.ToString());
+                        string cellValue = cell.ToString().ToLower().Replace(" ", "");
+                        if (!jsonColNames.Contains(cellValue))
+                        {
+                            uniqueNames.Add(cell.ToString());
+                        }
+                        else
+                        {
+                            uniqueNames.AddRange(JsonParser(initialRow + 1, jsonColNames, uniqueNames, worksheet, colCounter));
+                        }
+                        
                     }
 
-                    initialRow += 1; //Почваме от следващия ред да взимаме Prop-совете на JsonString-овете
+                    /*initialRow += 1; Почваме от следващия ред да взимаме Prop-совете на JsonString-овете
                     
                     List<int> jsonColIndexes = new List<int>();
                     foreach (var item in uniqueNames)
@@ -104,7 +118,7 @@ namespace Excel_Convertor_v2.Services
                     {
                         List<string> temp = new List<string>(JsonParser(initialRow, jsonColNames, uniqueNames, worksheet, index));
                         uniqueNames.AddRange(temp);
-                    }
+                    }*/
                 }
             }
             catch (Exception e)

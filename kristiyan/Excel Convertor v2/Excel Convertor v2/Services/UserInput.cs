@@ -10,7 +10,7 @@ namespace AuditLogProcessor.Services
     {
         public static List<string>? ConvertStringToList(string? userInput = null)
         {
-            List<string> jsonColumnNames = new List<string>();
+            List<string> jsonColumnNames;
 
             if (userInput == null || userInput == "" )
             {
@@ -18,7 +18,7 @@ namespace AuditLogProcessor.Services
             }
             else
             {
-                var str = userInput.Trim();
+                var str = userInput.ToLower().Replace(" ", "");
                 jsonColumnNames = str.Split(",").ToList();
 
             }

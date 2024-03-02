@@ -31,7 +31,7 @@ namespace Excel_Convertor_v2
         bool openFinalPathFolder = false;
 
 
-        List<string>? jsonColNames = null;
+        public List<string>? jsonColNames = null;
 
         public Form1()
         {
@@ -74,9 +74,9 @@ namespace Excel_Convertor_v2
                 fullFileNamePath = openFileDialog1.FileName;
                 try
                 {
-                    jsonColNames = UserInput.ConvertStringToList();
+                    jsonColNames = UserInput.ConvertStringToList(jsonColumnNamesTextBox.Text);
                     colNames = Read.ReadColTitles(fullFileNamePath, jsonColNames);
-                    var addCheckBoxesParam = Read.ReadColTitles(fullFileNamePath, jsonColNames);
+                    var addCheckBoxesParam = colNames;
                     addCheckBoxesParam.Sort();
                     AddCheckBoxes(addCheckBoxesParam);
                     InputFileFullPathLabel.Text = fullFileNamePath;
