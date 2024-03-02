@@ -57,7 +57,7 @@ namespace Excel_Convertor_v2.Services
             }
             return tempList;
         }
-        public static List<string> ReadColTitles(string fileToRead, List<string>? jsonColNames)
+        public static List<string> ReadColTitles(string fileToRead, ref List<string>? jsonColNames)
         {
             if (jsonColNames == null)
             {
@@ -151,27 +151,11 @@ namespace Excel_Convertor_v2.Services
 
                 var tableHeader = new List<string>();
 
-                for (int currentRowIndex = 1; currentRowIndex <= rowsCount; currentRowIndex++)
-                {
-                    var cellValue = ws.Cells[currentRowIndex, 1].Value?.ToString();
+                int startRowIndex = Find.FindStartRowIndex(ws).Result;
+                tableHeader = CreateTableHeader(ws, startRowIndex, columnsCount, jsonColNameStrings);
+                tableRowHeaderIndex = startRowIndex;
 
-                    if (cellValue is null)
-                    {
-                        continue;
-                    }
-
-                    if (!startingHeaderRowFirstCellText.Equals(cellValue, StringComparison.CurrentCultureIgnoreCase))
-                    {
-                        continue;
-                    }
-
-                    tableRowHeaderIndex = currentRowIndex;
-
-
-                    tableHeader = CreateTableHeader(ws, currentRowIndex, columnsCount);
-
-                    break;
-                }
+                
                 //Getting list of json column idenxes
                 List<int> jsonColumnIndexes = new List<int>();
                 foreach (var item in jsonColNameStrings)
@@ -196,20 +180,32 @@ namespace Excel_Convertor_v2.Services
                     {
                         var tableHeaderIndex = tableHeader.IndexOf(chosenProp);
 
-                        if (tableHeaderIndex == -1)
+                        if (!tableHeader.Contains(chosenProp))
                         {
-                            var jsonString = ws.Cells[currentRowIndex, jsonColumnIndex].Value?.ToString();
+                            for (int col = 1; col <= columnsCount; col++)
+                            {
+                                var headerCell = ws.Cells[startRowIndex, col].Value?.ToString().Replace(" ", "").ToLower();
 
-                            var column = CreateJsonColumn(jsonString, chosenProp);
-
-                            tableRow.Columns.Add(column);
+                                if (jsonColNameStrings.Contains(headerCell))
+                                {
+                                    var jsonString = ws.Cells[currentRowIndex, col].Value?.ToString();
+                                    var column = CreateJsonColumn(jsonString, chosenProp);
+                                    tableRow.Columns.Add(column);
+                                }
+                            }
                         }
                         else
                         {
+                            for (int col = 1; col <= columnsCount; col++)
+                            {
+                                var headerCell = ws.Cells[startRowIndex, col].Value?.ToString();
 
-                            var value = ws.Cells[currentRowIndex, tableHeaderIndex + 1].Value?.ToString() ?? string.Empty;
-
-                            tableRow.Columns.Add(new TableColumn(chosenProp, value));
+                                if (chosenProp == headerCell)
+                                {
+                                    var value = ws.Cells[currentRowIndex, col].Value?.ToString() ?? string.Empty;
+                                    tableRow.Columns.Add(new TableColumn(chosenProp, value));
+                                }
+                            }
                         }
                     }
 
@@ -219,15 +215,18 @@ namespace Excel_Convertor_v2.Services
 
             return rows;
         }
-        private static List<string> CreateTableHeader(ExcelWorksheet ws, int currentRowIndex, int columnsCount)
+        private static List<string> CreateTableHeader(ExcelWorksheet ws, int headerRowIndex, int columnsCount, List<string> jsonColNames)
         {
             var tableHeader = new List<string>();
 
             for (int currentColumnIndex = 1; currentColumnIndex <= columnsCount; currentColumnIndex++)
             {
-                var cellValue = ws.Cells[currentRowIndex, currentColumnIndex].Value?.ToString() ?? string.Empty;
+                var cellValue = ws.Cells[headerRowIndex, currentColumnIndex].Value?.ToString() ?? string.Empty;
 
-                tableHeader.Add(cellValue);
+                if (!jsonColNames.Contains(cellValue.Replace(" ", "").ToLower()))
+                {
+                    tableHeader.Add(cellValue);
+                }
             }
 
             return tableHeader;
