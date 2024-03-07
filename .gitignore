@@ -332,3 +332,5 @@ ASALocalRun/
 # Ignore Appsettings.Development.json
 *.Development.json
 /Web/MintStore.Web/MintStore.Web/logs
+/teodor/PizzaStore/PizzaStore/Pizzas.db-shm
+/teodor/PizzaStore/PizzaStore/Pizzas.db-wal
