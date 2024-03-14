@@ -1,0 +1,74 @@
+﻿@page "/clicker"
+@rendermode InteractiveServer
+@inject AppStateService appState
+<PageTitle>Clicker</PageTitle>
+
+<h1>Clicker</h1>
+
+
+Username:
+<input @bind-value="message" @oninput="InputChanged" /><button id="clearUsername" class ="btn btn-primary" @onclick="@(()=>message = "")">Clear</button>
+<p>Hello, @message</p>
+<p role="status">Current value: @appState.currentCount</p>
+<p>Value per click: @appState.incrementAmount</p>
+<p>Upgrades bought: @appState.upgrades</p>
+<button class="btn btn-primary" @onclick="()=>IncrementCount()">Mine</button>
+<button class="btn btn-primary" @onclick="BuyUpgrade">Buy Upgrade: @appState.price</button>
+
+
+@code {
+    string message = "";
+
+    void InputChanged(ChangeEventArgs e)
+    {
+        message = (string)e.Value;
+    }
+}
+@if (!appState.hasMoney)
+{
+    <p>
+        Not enough money!
+    </p>
+}
+@code { // Value obtaining logic
+
+    private void IncrementCount()
+    {
+        appState.currentCount += appState.incrementAmount;
+    }
+    public void BuyUpgrade()
+    {
+        if (appState.currentCount < appState.price)
+        {
+            appState.hasMoney = false;
+        }
+        else
+        {
+            appState.hasMoney = true;
+            appState.currentCount -= appState.price;
+            appState.price = (int)(1.2*appState.price);
+            appState.upgrades++;
+            appState.incrementAmount += 1;
+         
+        }
+    }
+
+
+
+}
+@code{
+    // Experience system
+
+
+    int currentLevel = 1;
+    int currentXp = 1;
+
+    int maxLevelXp = 80;
+    
+
+
+
+
+
+
+}
