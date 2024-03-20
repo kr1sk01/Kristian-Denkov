@@ -13,7 +13,7 @@ public class Program
             .AddInteractiveServerComponents();
 
         builder.Services.AddSingleton<AppStateService>();
-
+        //builder.Services.AddTransient<TodoItem>();
         
 
         var app = builder.Build();
