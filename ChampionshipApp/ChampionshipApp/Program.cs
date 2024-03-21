@@ -43,14 +43,16 @@ namespace ChampionshipApp
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireLowercase = false;
                 options.Password.RequiredUniqueChars = 0;
+                options.SignIn.RequireConfirmedAccount = false;
                 
             })
+                .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddSignInManager()
                 .AddDefaultTokenProviders();
 
             builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
-
+            
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -76,6 +78,11 @@ namespace ChampionshipApp
             // Add additional endpoints required by the Identity /Account Razor components.
             app.MapAdditionalIdentityEndpoints();
 
+
+
+            using(var scope = app.Services.CreateScope()){
+
+            }
             app.Run();
         }
     }
