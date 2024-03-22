@@ -1,24 +1,29 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using ChampionshipApp.Data;
+using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace ChampionshipApp.Models
 {
-    public class Player
+    public class Player : ApplicationUser
     {
-        [Key]
-        public int Id { get; set; }
-        [Required]
-        [StringLength(255)]
-        public string? Name { get; set; }
+        //public Player()
+        //{
+        //    Teams = new HashSet<Team>();
+        //    TeamPlayers = new HashSet<TeamPlayers>();
+        //}
 
-        //The profile picture
-        public byte[] Avatar { get; set; } = default!;
-        public bool Active { get; set; } = default!;
-        [Required]
-        public string? CreatedBy { get; set; }
-        [Required]
-        public DateTime CreatedOn { get; set; }
-        public string? ModifiedBy { get; set; }
-        public DateTime? ModifiedOn { get; set; }
+        ////The profile picture
+        //public byte[] Avatar { get; set; } = default!;
+        //public bool Active { get; set; } = default!;
+        //[Required]
+        //public string? CreatedBy { get; set; }
+        //[Required]
+        //public DateTime CreatedOn { get; set; }
+        //public string? ModifiedBy { get; set; }
+        //public DateTime? ModifiedOn { get; set; }
+
+        //public virtual ICollection<Team> Teams { get; set; } 
+        //public virtual ICollection<TeamPlayers> TeamPlayers { get; set; }
     }
 }

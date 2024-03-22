@@ -1,10 +1,17 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using ChampionshipApp.Data;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ChampionshipApp.Models
 {
     public class Team
     {
+        public Team()
+        {
+            Players = new HashSet<ApplicationUser>();
+            TeamPlayers = new HashSet<TeamPlayers>();
+        }
+
         [Key]
         public int Id { get; set; }
         [Required]
@@ -14,6 +21,7 @@ namespace ChampionshipApp.Models
         [ForeignKey("TeamType")]
         public int TeamTypeId { get; set; }
         public TeamType TeamType { get; set; } = default!;
+        [Required]
         public bool Active { get; set; } = default!;
         [Required]
         public string? CreatedBy { get; set; }
@@ -22,6 +30,7 @@ namespace ChampionshipApp.Models
         public string? ModifiedBy { get; set; }
         public DateTime? ModifiedOn { get; set; }
 
-        public TeamPlayers TeamPlayers { get; set; } = default!;
+        public virtual ICollection<ApplicationUser> Players { get; set; }
+        public virtual ICollection<TeamPlayers> TeamPlayers {  get; set; }
     }
 }
