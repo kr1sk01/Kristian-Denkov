@@ -20,6 +20,13 @@ namespace ChampionshipApp.Models
         public int? RedTeamID { get; set; }
         public int? BluePoints { get; set; }
         public int? RedPoints { get; set; }
+        public DateTime? Date { get; set; }
+        [Required]
+        public string? CreatedBy { get; set; }
+        [Required]
+        public DateTime CreatedOn { get; set; }
+        public string? ModifiedBy { get; set; }
+        public DateTime? ModifiedOn { get; set; }
         // Add other properties as needed
 
         // Navigation properties
@@ -29,5 +36,9 @@ namespace ChampionshipApp.Models
         public virtual GameType? GameType { get; set; }
         [Required]
         public virtual GameStatus? GameStatus { get; set; }
+        [Required]
+        public virtual Team BlueTeam { get; set; }
+        [Required]
+        public virtual Team RedTeam { get; set; }
     }
 }

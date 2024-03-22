@@ -106,6 +106,223 @@ namespace ChampionshipApp.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("ChampionshipApp.Models.Championship", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ChampionshipStatusId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ChampionshipTypeId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("Date")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("GameTypeId")
+                        .HasColumnType("integer");
+
+                    b.Property<byte[]>("Logo")
+                        .HasColumnType("bytea");
+
+                    b.Property<DateTime?>("LotDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("ModifiedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<int?>("WinnerId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChampionshipStatusId");
+
+                    b.HasIndex("ChampionshipTypeId");
+
+                    b.HasIndex("GameTypeId");
+
+                    b.HasIndex("WinnerId");
+
+                    b.ToTable("Championships");
+                });
+
+            modelBuilder.Entity("ChampionshipApp.Models.ChampionshipStatus", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("ModifiedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ChampionshipStatuses");
+                });
+
+            modelBuilder.Entity("ChampionshipApp.Models.ChampionshipType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ChampionshipTypes");
+                });
+
+            modelBuilder.Entity("ChampionshipApp.Models.Game", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("BluePoints")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("BlueTeamID")
+                        .IsRequired()
+                        .HasColumnType("integer");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("Date")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("GameStatusID")
+                        .IsRequired()
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("GameTypeID")
+                        .IsRequired()
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("ModifiedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<int?>("RedPoints")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("RedTeamID")
+                        .IsRequired()
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BlueTeamID");
+
+                    b.HasIndex("GameStatusID");
+
+                    b.HasIndex("GameTypeID");
+
+                    b.HasIndex("RedTeamID");
+
+                    b.ToTable("Games");
+                });
+
+            modelBuilder.Entity("ChampionshipApp.Models.GameStatus", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("GameStatuses");
+                });
+
+            modelBuilder.Entity("ChampionshipApp.Models.GameType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("MaxPoints")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<int>("TeamTypeId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TeamTypeId");
+
+                    b.ToTable("GameTypes");
+                });
+
             modelBuilder.Entity("ChampionshipApp.Models.Team", b =>
                 {
                     b.Property<int>("Id")
@@ -331,6 +548,85 @@ namespace ChampionshipApp.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("ChampionshipApp.Models.Championship", b =>
+                {
+                    b.HasOne("ChampionshipApp.Models.ChampionshipStatus", "ChampionshipStatus")
+                        .WithMany()
+                        .HasForeignKey("ChampionshipStatusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ChampionshipApp.Models.ChampionshipType", "ChampionshipType")
+                        .WithMany()
+                        .HasForeignKey("ChampionshipTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ChampionshipApp.Models.GameType", "GameType")
+                        .WithMany()
+                        .HasForeignKey("GameTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ChampionshipApp.Models.Team", "Winner")
+                        .WithMany()
+                        .HasForeignKey("WinnerId");
+
+                    b.Navigation("ChampionshipStatus");
+
+                    b.Navigation("ChampionshipType");
+
+                    b.Navigation("GameType");
+
+                    b.Navigation("Winner");
+                });
+
+            modelBuilder.Entity("ChampionshipApp.Models.Game", b =>
+                {
+                    b.HasOne("ChampionshipApp.Models.Team", "BlueTeam")
+                        .WithMany()
+                        .HasForeignKey("BlueTeamID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ChampionshipApp.Models.GameStatus", "GameStatus")
+                        .WithMany()
+                        .HasForeignKey("GameStatusID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ChampionshipApp.Models.GameType", "GameType")
+                        .WithMany()
+                        .HasForeignKey("GameTypeID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ChampionshipApp.Models.Team", "RedTeam")
+                        .WithMany()
+                        .HasForeignKey("RedTeamID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BlueTeam");
+
+                    b.Navigation("GameStatus");
+
+                    b.Navigation("GameType");
+
+                    b.Navigation("RedTeam");
+                });
+
+            modelBuilder.Entity("ChampionshipApp.Models.GameType", b =>
+                {
+                    b.HasOne("ChampionshipApp.Models.TeamType", "TeamType")
+                        .WithMany()
+                        .HasForeignKey("TeamTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TeamType");
                 });
 
             modelBuilder.Entity("ChampionshipApp.Models.Team", b =>
