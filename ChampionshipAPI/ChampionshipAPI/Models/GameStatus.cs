@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace ChampionshipAPI.Models;
-
-public partial class GameStatus
+namespace ChampionshipAPI.Models
 {
-    public int Id { get; set; }
-
-    public string Name { get; set; } = null!;
-
-    public virtual ICollection<Game> Games { get; set; } = new List<Game>();
+    public class GameStatus
+    {
+        [Key]
+        public int Id { get; set; }
+        [Required]
+        [StringLength(255)]
+        public string? Name { get; set; }
+    }
 }

@@ -1,5 +1,3 @@
-
-using ChampionshipAPI.Controllers;
 using ChampionshipAPI.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,7 +9,7 @@ namespace ChampionshipAPI
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddDbContext<ChampionshipContext>(options =>
+            builder.Services.AddDbContext<ApplicationDbContext>(options =>
             {
                 options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
@@ -40,11 +38,11 @@ namespace ChampionshipAPI
 
             app.UseAuthorization();
 
-            app.MapGet("/teams", (HttpContext http, ChampionshipContext context) => TeamController.GetTeams(http, context));
-            app.MapGet("/team/{id}", (HttpContext http, ChampionshipContext context, int id) => TeamController.GetTeam(http, context, id));
-            app.MapPost("/team", (HttpContext http, ChampionshipContext context, Team team) => TeamController.AddTeam(http, context, team));
-            app.MapPut("/team/{id}", (HttpContext http, ChampionshipContext context, int id, Team team) => TeamController.EditTeam(http, context, id, team));
-            app.MapDelete("/team/{id}", (HttpContext http, ChampionshipContext context, int id) => TeamController.DeleteTeam(http, context, id));
+            //app.MapGet("/teams", (HttpContext http, ChampionshipContext context) => TeamController.GetTeams(http, context));
+            //app.MapGet("/team/{id}", (HttpContext http, ChampionshipContext context, int id) => TeamController.GetTeam(http, context, id));
+            //app.MapPost("/team", (HttpContext http, ChampionshipContext context, Team team) => TeamController.AddTeam(http, context, team));
+            //app.MapPut("/team/{id}", (HttpContext http, ChampionshipContext context, int id, Team team) => TeamController.EditTeam(http, context, id, team));
+            //app.MapDelete("/team/{id}", (HttpContext http, ChampionshipContext context, int id) => TeamController.DeleteTeam(http, context, id));
 
             app.Run();
         }

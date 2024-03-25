@@ -1,35 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ChampionshipAPI.Models;
-
-public partial class Team
+namespace ChampionshipAPI.Models
 {
-    public int Id { get; set; }
+    public class Team
+    {
+        [Key]
+        public int Id { get; set; }
 
-    public string Name { get; set; } = null!;
+        [Required]
+        [StringLength(255)]
+        public string? Name { get; set; }
 
-    public byte[] Logo { get; set; } = null!;
+        public byte[] Logo { get; set; } = default!;
 
-    public int TeamTypeId { get; set; }
+        public int? TeamTypeId { get; set; }
+        [ForeignKey("TeamTypeId")]
+        public virtual TeamType? TeamType { get; set; } = default;
 
-    public bool Active { get; set; }
+        [Required]
+        public bool Active { get; set; } = default!;
 
-    public string CreatedBy { get; set; } = null!;
+        public string? CreatedBy { get; set; }
 
-    public DateTime CreatedOn { get; set; }
+        public DateTime CreatedOn { get; set; } = default!;
 
-    public string? ModifiedBy { get; set; }
+        public string? ModifiedBy { get; set; }
 
-    public DateTime? ModifiedOn { get; set; }
+        public DateTime? ModifiedOn { get; set; }
 
-    public virtual ICollection<Championship> Championships { get; set; } = new List<Championship>();
+        public virtual ICollection<TeamPlayers> Players { get; set; } = new HashSet<TeamPlayers>();
 
-    public virtual ICollection<Game> GameBlueTeams { get; set; } = new List<Game>();
+        public virtual ICollection<Game> Games { get; set; } = new HashSet<Game>();
 
-    public virtual ICollection<Game> GameRedTeams { get; set; } = new List<Game>();
-
-    public virtual ICollection<TeamPlayer> TeamPlayers { get; set; } = new List<TeamPlayer>();
-
-    public virtual TeamType TeamType { get; set; } = null!;
+        public virtual ICollection<ChampionshipTeams> Championships { get; set; } = new HashSet<ChampionshipTeams>();
+    }
 }
