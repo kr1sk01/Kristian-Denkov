@@ -1,21 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ChampionshipAPI.Models;
-
-public partial class GameType
+namespace ChampionshipAPI.Models
 {
-    public int Id { get; set; }
+    public class GameType
+    {
+        [Key]
+        public int Id { get; set; }
+        [Required]
+        [StringLength(255)]
+        public string? Name { get; set; }
 
-    public string Name { get; set; } = null!;
-
-    public int MaxPoints { get; set; }
-
-    public int TeamTypeId { get; set; }
-
-    public virtual ICollection<Championship> Championships { get; set; } = new List<Championship>();
-
-    public virtual ICollection<Game> Games { get; set; } = new List<Game>();
-
-    public virtual TeamType TeamType { get; set; } = null!;
+        public int? MaxPoints { get; set; }
+        
+        public int? TeamTypeId { get; set; }
+        [ForeignKey("TeamTypeId")]
+        public TeamType? TeamType { get; set; }
+    }
 }

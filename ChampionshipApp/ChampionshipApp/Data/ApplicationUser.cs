@@ -17,9 +17,6 @@ namespace ChampionshipApp.Data
         public DateTime CreatedOn { get; set; }
         public string? ModifiedBy { get; set; }
         public DateTime? ModifiedOn { get; set; }
-
-        public virtual ICollection<Team> Teams { get; set; } = new HashSet<Team>();
-        public virtual ICollection<TeamPlayers> TeamPlayers { get; set; } = new HashSet<TeamPlayers>();
     }
 
 }

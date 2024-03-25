@@ -1,17 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace ChampionshipAPI.Models;
-
-public partial class TeamType
+namespace ChampionshipAPI.Models
 {
-    public int Id { get; set; }
+    public class TeamType
+    {
+        [Key]
+        public int Id { get; set; }
+        [Required]
+        [StringLength(255)]
+        public string? Name { get; set; }
+        [Required]
+        public int TeamSize { get; set; }
 
-    public string Name { get; set; } = null!;
-
-    public int TeamSize { get; set; }
-
-    public virtual ICollection<GameType> GameTypes { get; set; } = new List<GameType>();
-
-    public virtual ICollection<Team> Teams { get; set; } = new List<Team>();
+        public virtual ICollection<Team> Teams { get; set;} = new HashSet<Team>();
+    }
 }
