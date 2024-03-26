@@ -1,4 +1,5 @@
 using Championship.API.Models;
+using Championship.API.Services;
 using Championship.DATA.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -44,14 +45,19 @@ public class Program
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
+        builder.Services.AddTransient<DataSeedingService>();
 
         var app = builder.Build();
+        
         //Creating Db if it hasn't created already
         using (var scope = app.Services.CreateScope())
         {
             var services = scope.ServiceProvider;
             var dbContext = services.GetRequiredService<ApplicationDbContext>();
             dbContext.Database.EnsureCreated();
+
+            var seeder = services.GetRequiredService<DataSeedingService>();
+            seeder.SeedData();
         }
         //Creating roles to the Db if they haven't created already
         using (var scope = app.Services.CreateScope())
@@ -64,8 +70,6 @@ public class Program
                 if (!await roleManager.RoleExistsAsync(role))
                     await roleManager.CreateAsync(new IdentityRole {  Name = role  });
             }
-
-
         }
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
