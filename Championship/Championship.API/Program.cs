@@ -11,7 +11,8 @@ using Microsoft.Identity.Web.Resource;
 namespace Championship.API;
 public class Program
 {
-    public static void Main(string[] args)
+    public static string[] roles = { "Admin", "User" };
+    public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
 
@@ -45,7 +46,27 @@ public class Program
         builder.Services.AddSwaggerGen();
 
         var app = builder.Build();
+        //Creating Db if it hasn't created already
+        using (var scope = app.Services.CreateScope())
+        {
+            var services = scope.ServiceProvider;
+            var dbContext = services.GetRequiredService<ApplicationDbContext>();
+            dbContext.Database.EnsureCreated();
+        }
+        //Creating roles to the Db if they haven't created already
+        using (var scope = app.Services.CreateScope())
+        {
+            var services = scope.ServiceProvider;
+            var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+            foreach (var role in roles)
+            {
 
+                if (!await roleManager.RoleExistsAsync(role))
+                    await roleManager.CreateAsync(new IdentityRole {  Name = role  });
+            }
+
+
+        }
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
