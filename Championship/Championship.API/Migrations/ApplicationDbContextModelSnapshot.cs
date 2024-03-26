@@ -74,7 +74,7 @@ namespace Championship.API.Migrations
 
                     b.HasIndex("WinnerId");
 
-                    b.ToTable("Championships", (string)null);
+                    b.ToTable("Championships");
                 });
 
             modelBuilder.Entity("Championship.DATA.Models.ChampionshipStatus", b =>
@@ -87,7 +87,7 @@ namespace Championship.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ChampionshipStatuses", (string)null);
+                    b.ToTable("ChampionshipStatuses");
                 });
 
             modelBuilder.Entity("Championship.DATA.Models.ChampionshipTeams", b =>
@@ -113,7 +113,7 @@ namespace Championship.API.Migrations
 
                     b.HasIndex("TeamId");
 
-                    b.ToTable("ChampionshipTeams", (string)null);
+                    b.ToTable("ChampionshipTeams");
                 });
 
             modelBuilder.Entity("Championship.DATA.Models.ChampionshipType", b =>
@@ -127,7 +127,7 @@ namespace Championship.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ChampionshipTypes", (string)null);
+                    b.ToTable("ChampionshipTypes");
                 });
 
             modelBuilder.Entity("Championship.DATA.Models.Game", b =>
@@ -192,7 +192,7 @@ namespace Championship.API.Migrations
 
                     b.HasIndex("WinnerId");
 
-                    b.ToTable("Games", (string)null);
+                    b.ToTable("Games");
                 });
 
             modelBuilder.Entity("Championship.DATA.Models.GameStatus", b =>
@@ -206,7 +206,7 @@ namespace Championship.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("GameStatuses", (string)null);
+                    b.ToTable("GameStatuses");
                 });
 
             modelBuilder.Entity("Championship.DATA.Models.GameType", b =>
@@ -228,7 +228,7 @@ namespace Championship.API.Migrations
 
                     b.HasIndex("TeamTypeId");
 
-                    b.ToTable("GameTypes", (string)null);
+                    b.ToTable("GameTypes");
                 });
 
             modelBuilder.Entity("Championship.DATA.Models.Player", b =>
@@ -347,7 +347,7 @@ namespace Championship.API.Migrations
 
                     b.HasIndex("TeamTypeId");
 
-                    b.ToTable("Teams", (string)null);
+                    b.ToTable("Teams");
                 });
 
             modelBuilder.Entity("Championship.DATA.Models.TeamPlayers", b =>
@@ -373,7 +373,7 @@ namespace Championship.API.Migrations
 
                     b.HasIndex("TeamId");
 
-                    b.ToTable("TeamPlayers", (string)null);
+                    b.ToTable("TeamPlayers");
                 });
 
             modelBuilder.Entity("Championship.DATA.Models.TeamType", b =>
@@ -390,7 +390,7 @@ namespace Championship.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TeamTypes", (string)null);
+                    b.ToTable("TeamTypes");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

@@ -1,3 +1,4 @@
+using Championship.API.Controllers;
 using Championship.API.Models;
 using Championship.API.Services;
 using Championship.DATA.Models;
@@ -8,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Abstractions;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.Resource;
+using Microsoft.OpenApi.Models;
 
 namespace Championship.API;
 public class Program
@@ -46,6 +48,7 @@ public class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
         builder.Services.AddTransient<DataSeedingService>();
+        builder.Services.AddScoped<ChampionshipClassController>();
 
         var app = builder.Build();
         
@@ -84,7 +87,6 @@ public class Program
 
 
         app.MapControllers();
-
         app.Run();
     }
 }
