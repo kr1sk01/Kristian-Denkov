@@ -8,7 +8,7 @@ namespace Championship.DATA.Models
         [Key]
         public int Id { get; set; }
 
-        [Required]
+        //
         [StringLength(255)]
         public string? Name { get; set; }
 
@@ -34,10 +34,10 @@ namespace Championship.DATA.Models
 
         public DateTime? Date { get; set; }
 
-        [Required]
+        //
         public string? CreatedBy { get; set; }
 
-        [Required]
+        //
         public DateTime CreatedOn { get; set; } = default!;
 
         public string? ModifiedBy { get; set; }

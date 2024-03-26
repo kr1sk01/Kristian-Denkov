@@ -8,7 +8,7 @@ namespace Championship.DATA.Models
         [Key]
         public int Id { get; set; }
 
-        [Required]
+        //
         [StringLength(255)]
         public string? Name { get; set; }
 
@@ -18,7 +18,7 @@ namespace Championship.DATA.Models
         [ForeignKey("TeamTypeId")]
         public virtual TeamType? TeamType { get; set; } = default;
 
-        [Required]
+        //
         public bool Active { get; set; } = default!;
 
         public string? CreatedBy { get; set; }
@@ -30,8 +30,6 @@ namespace Championship.DATA.Models
         public DateTime? ModifiedOn { get; set; }
 
         public virtual ICollection<TeamPlayers> Players { get; set; } = new HashSet<TeamPlayers>();
-
-        public virtual ICollection<Game> Games { get; set; } = new List<Game>();
 
         public virtual ICollection<ChampionshipTeams> Championships { get; set; } = new HashSet<ChampionshipTeams>();
     }
