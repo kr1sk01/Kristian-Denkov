@@ -3,10 +3,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Championship.DATA.Models
 {
-    public class Championship
+    public class ChampionshipClass
     {
         [Key]
-        public int Id { get; set; }
+        public string Id { get; set; } = default!;
 
         //
         [StringLength(255)]
@@ -14,19 +14,19 @@ namespace Championship.DATA.Models
 
         public byte[]? Logo { get; set; }
 
-        public int? ChampionshipTypeId { get; set; }
+        public string? ChampionshipTypeId { get; set; }
         [ForeignKey("ChampionshipTypeId")]
         public virtual ChampionshipType? ChampionshipType { get; set; }
 
-        public int? ChampionshipStatusId { get; set; }
+        public string? ChampionshipStatusId { get; set; }
         [ForeignKey("ChampionshipStatusId")]
         public virtual ChampionshipStatus? ChampionshipStatus { get; set; }
 
-        public int? GameTypeId { get; set; }
+        public string? GameTypeId { get; set; }
         [ForeignKey("GameTypeId")]
         public virtual GameType? GameType { get; set; }
 
-        public int? WinnerId { get; set; }
+        public string? WinnerId { get; set; }
         [ForeignKey("WinnerId")]
         public virtual Team? Winner { get; set; }
 
@@ -38,7 +38,7 @@ namespace Championship.DATA.Models
         public string? CreatedBy { get; set; }
 
         //
-        public DateTime CreatedOn { get; set; } = default!;
+        public DateTime? CreatedOn { get; set; }
 
         public string? ModifiedBy { get; set; }
 

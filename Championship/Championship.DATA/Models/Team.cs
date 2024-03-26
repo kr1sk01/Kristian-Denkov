@@ -6,24 +6,24 @@ namespace Championship.DATA.Models
     public class Team
     {
         [Key]
-        public int Id { get; set; }
+        public string Id { get; set; } = default!;
 
         //
         [StringLength(255)]
         public string? Name { get; set; }
 
-        public byte[] Logo { get; set; } = default!;
+        public byte[]? Logo { get; set; }
 
-        public int? TeamTypeId { get; set; }
+        public string? TeamTypeId { get; set; }
         [ForeignKey("TeamTypeId")]
-        public virtual TeamType? TeamType { get; set; } = default;
+        public virtual TeamType? TeamType { get; set; }
 
         //
-        public bool Active { get; set; } = default!;
+        public bool? Active { get; set; }
 
         public string? CreatedBy { get; set; }
 
-        public DateTime CreatedOn { get; set; } = default!;
+        public DateTime? CreatedOn { get; set; }
 
         public string? ModifiedBy { get; set; }
 

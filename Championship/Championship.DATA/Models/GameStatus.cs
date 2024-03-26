@@ -5,7 +5,7 @@ namespace Championship.DATA.Models
     public class GameStatus
     {
         [Key]
-        public int Id { get; set; }
+        public string Id { get; set; } = default!;
         //
         [StringLength(255)]
         public string? Name { get; set; }
