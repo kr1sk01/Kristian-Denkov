@@ -60,7 +60,7 @@ public class Program
             dbContext.Database.EnsureCreated();
 
             var seeder = services.GetRequiredService<DataSeedingService>();
-            seeder.SeedData();
+            await seeder.SeedData();
         }
         //Creating roles to the Db if they haven't created already
         using (var scope = app.Services.CreateScope())

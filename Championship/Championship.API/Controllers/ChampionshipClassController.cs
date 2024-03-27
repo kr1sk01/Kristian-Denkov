@@ -66,7 +66,7 @@ namespace Championship.API.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ChampionshipClassExists(id))
+                if (!await ChampionshipClassExists(id))
                 {
                     return NotFound();
                 }
@@ -89,15 +89,18 @@ namespace Championship.API.Controllers
                 return NotFound();
             }
 
+            var championshipTeamsToDelete = await _context.ChampionshipTeams.Where(c => c.ChampionshipId == id).ToListAsync();
+            _context.ChampionshipTeams.RemoveRange(championshipTeamsToDelete);
+            await _context.SaveChangesAsync();
             _context.Championships.Remove(championshipClass);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool ChampionshipClassExists(string id)
+        private async Task<bool> ChampionshipClassExists(string id)
         {
-            return _context.Championships.Any(e => e.Id == id);
+            return await _context.Championships.AnyAsync(e => e.Id == id);
         }
     }
 }

@@ -15,36 +15,36 @@ namespace Championship.API.Services
             _options = options;
         }
 
-        public void SeedData()
+        public async Task SeedData()
         {
             using (var context = new ApplicationDbContext(_options))
             {
-                SeedStaticTypes(context);
-                SeedDynamicTypes(context);
+                await SeedStaticTypes(context);
+                await SeedDynamicTypes(context);
             }
         }
 
-        private static void SeedStaticTypes(ApplicationDbContext context)
+        private static async Task SeedStaticTypes(ApplicationDbContext context)
         {
-            SeedRoles(context);
-            SeedTeamTypes(context);
-            SeedGameTypes(context);
-            SeedGameStatuses(context);
-            SeedChampionshipTypes(context);
-            SeedChampionshipStatuses(context);
+            await SeedRoles(context);
+            await SeedTeamTypes(context);
+            await SeedGameTypes(context);
+            await SeedGameStatuses(context);
+            await SeedChampionshipTypes(context);
+            await SeedChampionshipStatuses(context);
         }
 
-        private static void SeedDynamicTypes(ApplicationDbContext context)
+        private static async Task SeedDynamicTypes(ApplicationDbContext context)
         {
-            SeedPlayers(context);
-            SeedTeams(context);
-            SeedGames(context);
-            SeedChampionships(context);
-            SeedTeamPlayers(context);
-            SeedChampionshipTeams(context);
+            await SeedPlayers(context);
+            await SeedTeams(context);
+            await SeedGames(context);
+            await SeedChampionships(context);
+            await SeedTeamPlayers(context);
+            await SeedChampionshipTeams(context);
         }
 
-        private static void SeedRoles(ApplicationDbContext context)
+        private static async Task SeedRoles(ApplicationDbContext context)
         {
             List<IdentityRole> roles = new List<IdentityRole>()
             {
@@ -54,14 +54,14 @@ namespace Championship.API.Services
 
             foreach (var role in roles)
             {
-                if (!context.Roles.Contains(role))
-                    context.Roles.Add(role);
+                if (!await context.Roles.AnyAsync(r => r.Id == role.Id))
+                    await context.Roles.AddAsync(role);
             }
 
-            context.SaveChanges();
+            await context.SaveChangesAsync();
         }
 
-        private static void SeedTeamTypes(ApplicationDbContext context)
+        private static async Task SeedTeamTypes(ApplicationDbContext context)
         {
             List<TeamType> teamTypes = new List<TeamType>()
             {
@@ -87,14 +87,14 @@ namespace Championship.API.Services
 
             foreach (var teamType in teamTypes)
             {
-                if(!context.TeamTypes.Contains(teamType))
-                    context.TeamTypes.Add(teamType);
+                if(!await context.TeamTypes.AnyAsync(t => t.Id == teamType.Id))
+                    await context.TeamTypes.AddAsync(teamType);
             }
 
-            context.SaveChanges();
+            await context.SaveChangesAsync();
         }
 
-        private static void SeedGameTypes(ApplicationDbContext context)
+        private static async Task SeedGameTypes(ApplicationDbContext context)
         {
             List<GameType> gameTypes = new List<GameType>()
             {
@@ -116,14 +116,14 @@ namespace Championship.API.Services
 
             foreach(var gameType in gameTypes)
             {
-                if(!context.GameTypes.Contains(gameType))
-                    context.GameTypes.Add(gameType);
+                if(!await context.GameTypes.AnyAsync(g => g.Id == gameType.Id))
+                    await context.GameTypes.AddAsync(gameType);
             }
 
-            context.SaveChanges();
+            await context.SaveChangesAsync();
         }
 
-        private static void SeedGameStatuses(ApplicationDbContext context)
+        private static async Task SeedGameStatuses(ApplicationDbContext context)
         {
             List<GameStatus> gameStatuses = new List<GameStatus>()
             {
@@ -151,14 +151,14 @@ namespace Championship.API.Services
 
             foreach (var gameStatus in gameStatuses)
             {
-                if (!context.GameStatuses.Contains(gameStatus))
-                    context.GameStatuses.Add(gameStatus);
+                if (!await context.GameStatuses.AnyAsync(g => g.Id == gameStatus.Id))
+                    await context.GameStatuses.AddAsync(gameStatus);
             }
 
-            context.SaveChanges();
+            await context.SaveChangesAsync();
         }
 
-        private static void SeedChampionshipTypes(ApplicationDbContext context)
+        private static async Task SeedChampionshipTypes(ApplicationDbContext context)
         {
             List<ChampionshipType> championshipTypes = new List<ChampionshipType>()
             {
@@ -176,14 +176,14 @@ namespace Championship.API.Services
 
             foreach (var championshipType in championshipTypes)
             {
-                if (!context.ChampionshipTypes.Contains(championshipType))
-                    context.ChampionshipTypes.Add(championshipType);
+                if (!await context.ChampionshipTypes.AnyAsync(c => c.Id == championshipType.Id))
+                    await context.ChampionshipTypes.AddAsync(championshipType);
             }
 
-            context.SaveChanges();
+            await context.SaveChangesAsync();
         }
 
-        private static void SeedChampionshipStatuses(ApplicationDbContext context)
+        private static async Task SeedChampionshipStatuses(ApplicationDbContext context)
         {
             List<ChampionshipStatus> championshipStatuses = new List<ChampionshipStatus>()
             {
@@ -211,14 +211,14 @@ namespace Championship.API.Services
 
             foreach (var championshipStatus in championshipStatuses)
             {
-                if (!context.ChampionshipStatuses.Contains(championshipStatus))
-                    context.ChampionshipStatuses.Add(championshipStatus);
+                if (!await context.ChampionshipStatuses.AnyAsync(c => c.Id == championshipStatus.Id))
+                    await context.ChampionshipStatuses.AddAsync(championshipStatus);
             }
 
-            context.SaveChanges();
+            await context.SaveChangesAsync();
         }
 
-        private static void SeedPlayers(ApplicationDbContext context)
+        private static async Task SeedPlayers(ApplicationDbContext context)
         {
             List<Player> players = new List<Player>()
             {
@@ -274,18 +274,18 @@ namespace Championship.API.Services
 
             foreach (var player in players)
             {
-                if (!context.Users.Contains(player))
-                    context.Users.Add(player);
+                if (!await context.Users.AnyAsync(p => p.Id == player.Id))
+                    await context.Users.AddAsync(player);
             }
 
             var userRole = new IdentityUserRole<string> { RoleId = "1", UserId = "1" };
-            if (!context.UserRoles.Contains(userRole))
-                context.UserRoles.Add(userRole);
+            if (!await context.UserRoles.AnyAsync(u => u.RoleId == userRole.RoleId && u.UserId == userRole.UserId))
+                await context.UserRoles.AddAsync(userRole);
 
-            context.SaveChanges();
+            await context.SaveChangesAsync();
         }
 
-        private static void SeedTeams(ApplicationDbContext context)
+        private static async Task SeedTeams(ApplicationDbContext context)
         {
             List<Team> teams = new List<Team>()
             {
@@ -307,14 +307,14 @@ namespace Championship.API.Services
 
             foreach (var team in teams)
             {
-                if (!context.Teams.Contains(team))
-                    context.Teams.Add(team);    
+                if (!await context.Teams.AnyAsync(c => c.Id == team.Id))
+                    await context.Teams.AddAsync(team);    
             }
 
-            context.SaveChanges();
+            await context.SaveChangesAsync();
         }
 
-        private static void SeedGames(ApplicationDbContext context)
+        private static async Task SeedGames(ApplicationDbContext context)
         {
             List<Game> games = new List<Game>()
             {
@@ -342,14 +342,14 @@ namespace Championship.API.Services
 
             foreach (var game in games)
             {
-                if (!context.Games.Contains(game))
-                    context.Games.Add(game);
+                if (!await context.Games.AnyAsync(g => g.Id == game.Id))
+                    await context.Games.AddAsync(game);
             }
 
-            context.SaveChanges();
+            await context.SaveChangesAsync();
         }
 
-        private static void SeedChampionships(ApplicationDbContext context)
+        private static async Task SeedChampionships(ApplicationDbContext context)
         {
             List<ChampionshipClass> championships = new List<ChampionshipClass>()
             {
@@ -366,14 +366,14 @@ namespace Championship.API.Services
 
             foreach (var championship in championships)
             {
-                if (!context.Championships.Contains(championship))
-                    context.Championships.Add(championship);
+                if (!await context.Championships.AnyAsync(c => c.Id == championship.Id))
+                    await context.Championships.AddAsync(championship);
             }
 
-            context.SaveChanges();
+            await context.SaveChangesAsync();
         }
 
-        private static void SeedTeamPlayers(ApplicationDbContext context)
+        private static async Task SeedTeamPlayers(ApplicationDbContext context)
         {
             List<TeamPlayers> teamPlayers = new List<TeamPlayers>()
             {
@@ -393,14 +393,14 @@ namespace Championship.API.Services
 
             foreach (var teamPlayer in teamPlayers)
             {
-                if (!context.TeamPlayers.Contains(teamPlayer))
-                    context.TeamPlayers.Add(teamPlayer);
+                if (!await context.TeamPlayers.AnyAsync(t => t.Id == teamPlayer.Id || (t.PlayerId == teamPlayer.PlayerId && t.TeamId == teamPlayer.TeamId)))
+                    await context.TeamPlayers.AddAsync(teamPlayer);
             }
 
-            context.SaveChanges();
+            await context.SaveChangesAsync();
         }
 
-        private static void SeedChampionshipTeams(ApplicationDbContext context)
+        private static async Task SeedChampionshipTeams(ApplicationDbContext context)
         {
             List<ChampionshipTeams> championshipTeams = new List<ChampionshipTeams>()
             {
@@ -414,11 +414,11 @@ namespace Championship.API.Services
 
             foreach (var champishipTeam in championshipTeams)
             {
-                if (!context.ChampionshipTeams.Contains(champishipTeam))
-                    context.ChampionshipTeams.Add(champishipTeam);
+                if (!await context.ChampionshipTeams.AnyAsync(c => c.Id == champishipTeam.Id || (c.ChampionshipId == champishipTeam.ChampionshipId && c.TeamId == champishipTeam.TeamId)))
+                    await context.ChampionshipTeams.AddAsync(champishipTeam);
             }
 
-            context.SaveChanges();
+            await context.SaveChangesAsync();
         }
     }
 }
