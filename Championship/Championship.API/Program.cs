@@ -2,6 +2,7 @@ using Championship.API.Controllers;
 using Championship.API.Models;
 using Championship.API.Services;
 using Championship.DATA.Models;
+using Championship.SHARED.DTO;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;

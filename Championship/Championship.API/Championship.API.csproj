@@ -29,6 +29,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Championship.DATA\Championship.DATA.csproj" />
+    <ProjectReference Include="..\Championship.SHARED\Championship.SHARED.csproj" />
   </ItemGroup>
 
 </Project>

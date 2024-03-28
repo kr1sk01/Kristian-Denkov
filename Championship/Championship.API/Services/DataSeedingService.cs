@@ -1,5 +1,6 @@
 ﻿using Championship.API.Models;
 using Championship.DATA.Models;
+using Championship.SHARED.DTO;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;

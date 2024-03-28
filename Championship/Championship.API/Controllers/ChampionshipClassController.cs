@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Championship.DATA.Models;
 using Championship.API.Models;
+using Championship.SHARED.DTO;
 
 namespace Championship.API.Controllers
 {
