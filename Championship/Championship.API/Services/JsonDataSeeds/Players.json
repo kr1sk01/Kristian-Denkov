@@ -1,0 +1,46 @@
+[
+  {
+    "Id": "1",
+    "UserName": "Pesho",
+    "Email": "Pesho@gmail.com",
+    "Active": true,
+    "AccessFailedCount": 0,
+    "EmailConfirmed": true,
+    "PhoneNumberConfirmed": false,
+    "LockoutEnabled": false,
+    "TwoFactorEnabled": false
+  },
+  {
+    "Id": "2",
+    "UserName": "Gosho",
+    "Email": "Gosho@gmail.com",
+    "Active": true,
+    "AccessFailedCount": 0,
+    "EmailConfirmed": true,
+    "PhoneNumberConfirmed": false,
+    "LockoutEnabled": false,
+    "TwoFactorEnabled": false
+  },
+  {
+    "Id": "3",
+    "UserName": "Ivan",
+    "Email": "Ivan@gmail.com",
+    "Active": true,
+    "AccessFailedCount": 0,
+    "EmailConfirmed": true,
+    "PhoneNumberConfirmed": false,
+    "LockoutEnabled": false,
+    "TwoFactorEnabled": false
+  },
+  {
+    "Id": "4",
+    "UserName": "Asen",
+    "Email": "Asen@gmail.com",
+    "Active": true,
+    "AccessFailedCount": 0,
+    "EmailConfirmed": true,
+    "PhoneNumberConfirmed": false,
+    "LockoutEnabled": false,
+    "TwoFactorEnabled": false
+  }
+]

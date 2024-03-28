@@ -1,0 +1,14 @@
+[
+  {
+    "Id": "1",
+    "Name": "Team1",
+    "TeamTypeId": "2",
+    "Active": true
+  },
+  {
+    "Id": "2",
+    "Name": "Team2",
+    "TeamTypeId": "2",
+    "Active": true
+  }
+]

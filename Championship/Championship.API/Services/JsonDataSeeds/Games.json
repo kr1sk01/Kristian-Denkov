@@ -1,0 +1,19 @@
+[
+  {
+    "Id": "1",
+    "Name": "Game1",
+    "GameTypeId": "2",
+    "GameStatusId": "2",
+    "BlueTeamId": "1",
+    "RedTeamId": "2"
+  },
+  {
+    "Id": "2",
+    "Name": "Game2",
+    "GameTypeId": "2",
+    "GameStatusId": "2",
+    "BlueTeamId": "2",
+    "RedTeamId": "1",
+    "WinnerId": "2"
+  }
+]
