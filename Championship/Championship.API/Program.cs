@@ -48,7 +48,7 @@ public class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
         builder.Services.AddTransient<DataSeedingService>();
-        builder.Services.AddScoped<ChampionshipClassController>();
+        builder.Services.AddScoped<DataSeeding>();
 
         var app = builder.Build();
         
@@ -66,6 +66,9 @@ public class Program
             var services = scope.ServiceProvider;
             var seeder = services.GetRequiredService<DataSeedingService>();
             await seeder.SeedData();
+
+            var teamTypeSeeder = services.GetRequiredService<DataSeeding>();
+            await teamTypeSeeder.SeedTeamTypes();
         }
 
         // Configure the HTTP request pipeline.
