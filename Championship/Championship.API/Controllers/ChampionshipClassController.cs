@@ -47,7 +47,9 @@ namespace Championship.API.Controllers
             _context.Championships.Add(championshipClass);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetChampionshipClass), new { id = championshipClass.Id }, championshipClass);
+            return CreatedAtAction(nameof(GetChampionshipClass), new { 
+                id = championshipClass.Id },
+                championshipClass);
         }
 
         // PUT: api/ChampionshipClass/5
@@ -91,8 +93,8 @@ namespace Championship.API.Controllers
             }
 
             var championshipTeamsToDelete = await _context.ChampionshipTeams.Where(c => c.ChampionshipId == id).ToListAsync();
-            _context.ChampionshipTeams.RemoveRange(championshipTeamsToDelete);
-            await _context.SaveChangesAsync();
+            
+            _context.ChampionshipTeams.RemoveRange(championshipTeamsToDelete);         
             _context.Championships.Remove(championshipClass);
             await _context.SaveChangesAsync();
 

@@ -15,7 +15,6 @@ using Microsoft.OpenApi.Models;
 namespace Championship.API;
 public class Program
 {
-    public static string[] roles = { "Admin", "User" };
     public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
@@ -59,22 +58,16 @@ public class Program
             var services = scope.ServiceProvider;
             var dbContext = services.GetRequiredService<ApplicationDbContext>();
             dbContext.Database.EnsureCreated();
-
-            var seeder = services.GetRequiredService<DataSeedingService>();
-            await seeder.SeedData();
         }
-        //Creating roles to the Db if they haven't created already
+
+        //Seeding the data to the db
         using (var scope = app.Services.CreateScope())
         {
             var services = scope.ServiceProvider;
-            var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-            foreach (var role in roles)
-            {
-
-                if (!await roleManager.RoleExistsAsync(role))
-                    await roleManager.CreateAsync(new IdentityRole {  Name = role  });
-            }
+            var seeder = services.GetRequiredService<DataSeedingService>();
+            await seeder.SeedData();
         }
+
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {

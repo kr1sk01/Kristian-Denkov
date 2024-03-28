@@ -1,11 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Identity;
+
 
 namespace Championship.SHARED.DTO
 {
-    public class PlayerDto : IdentityUser
+    public class PlayerDto
     {
+
+   
         public byte[]? Avatar { get; set; } = default;
 
         public bool? Active { get; set; } = null;

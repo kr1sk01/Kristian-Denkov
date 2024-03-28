@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Championship.DATA.Models
+namespace Championship.SHARED.DTO
 {
     public class GameTypeDto
     {
@@ -15,6 +15,6 @@ namespace Championship.DATA.Models
         
         public string? TeamTypeId { get; set; }
         [ForeignKey("TeamTypeId")]
-        public TeamType? TeamType { get; set; }
+        public TeamTypeDto? TeamType { get; set; }
     }
 }
