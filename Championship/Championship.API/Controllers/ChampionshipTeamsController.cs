@@ -8,51 +8,51 @@ using Microsoft.EntityFrameworkCore;
 using Championship.API.Models;
 using Championship.DATA.Models;
 
-namespace Championship.API
+namespace Championship.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class GameStatusController : ControllerBase
+    public class ChampionshipTeamsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
 
-        public GameStatusController(ApplicationDbContext context)
+        public ChampionshipTeamsController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: api/GameStatus
+        // GET: api/ChampionshipTeams
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<GameStatus>>> GetGameStatuses()
+        public async Task<ActionResult<IEnumerable<ChampionshipTeams>>> GetChampionshipTeams()
         {
-            return await _context.GameStatuses.ToListAsync();
+            return await _context.ChampionshipTeams.ToListAsync();
         }
 
-        // GET: api/GameStatus/5
+        // GET: api/ChampionshipTeams/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<GameStatus>> GetGameStatus(string id)
+        public async Task<ActionResult<ChampionshipTeams>> GetChampionshipTeams(string id)
         {
-            var gameStatus = await _context.GameStatuses.FindAsync(id);
+            var championshipTeams = await _context.ChampionshipTeams.FindAsync(id);
 
-            if (gameStatus == null)
+            if (championshipTeams == null)
             {
                 return NotFound();
             }
 
-            return gameStatus;
+            return championshipTeams;
         }
 
-        // PUT: api/GameStatus/5
+        // PUT: api/ChampionshipTeams/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutGameStatus(string id, GameStatus gameStatus)
+        public async Task<IActionResult> PutChampionshipTeams(string id, ChampionshipTeams championshipTeams)
         {
-            if (id != gameStatus.Id)
+            if (id != championshipTeams.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(gameStatus).State = EntityState.Modified;
+            _context.Entry(championshipTeams).State = EntityState.Modified;
 
             try
             {
@@ -60,7 +60,7 @@ namespace Championship.API
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!GameStatusExists(id))
+                if (!ChampionshipTeamsExists(id))
                 {
                     return NotFound();
                 }
@@ -73,19 +73,19 @@ namespace Championship.API
             return NoContent();
         }
 
-        // POST: api/GameStatus
+        // POST: api/ChampionshipTeams
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<GameStatus>> PostGameStatus(GameStatus gameStatus)
+        public async Task<ActionResult<ChampionshipTeams>> PostChampionshipTeams(ChampionshipTeams championshipTeams)
         {
-            _context.GameStatuses.Add(gameStatus);
+            _context.ChampionshipTeams.Add(championshipTeams);
             try
             {
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateException)
             {
-                if (GameStatusExists(gameStatus.Id))
+                if (ChampionshipTeamsExists(championshipTeams.Id))
                 {
                     return Conflict();
                 }
@@ -95,28 +95,28 @@ namespace Championship.API
                 }
             }
 
-            return CreatedAtAction("GetGameStatus", new { id = gameStatus.Id }, gameStatus);
+            return CreatedAtAction("GetChampionshipTeams", new { id = championshipTeams.Id }, championshipTeams);
         }
 
-        // DELETE: api/GameStatus/5
+        // DELETE: api/ChampionshipTeams/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteGameStatus(string id)
+        public async Task<IActionResult> DeleteChampionshipTeams(string id)
         {
-            var gameStatus = await _context.GameStatuses.FindAsync(id);
-            if (gameStatus == null)
+            var championshipTeams = await _context.ChampionshipTeams.FindAsync(id);
+            if (championshipTeams == null)
             {
                 return NotFound();
             }
 
-            _context.GameStatuses.Remove(gameStatus);
+            _context.ChampionshipTeams.Remove(championshipTeams);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool GameStatusExists(string id)
+        private bool ChampionshipTeamsExists(string id)
         {
-            return _context.GameStatuses.Any(e => e.Id == id);
+            return _context.ChampionshipTeams.Any(e => e.Id == id);
         }
     }
 }
