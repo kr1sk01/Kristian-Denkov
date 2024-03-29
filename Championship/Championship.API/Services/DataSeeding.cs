@@ -38,8 +38,8 @@ namespace Championship.API.Services
                 await SeedPlayers(context);
                 await SeedUserRoles(context);
                 await SeedTeams(context);
-                await SeedGames(context);
                 await SeedChampionships(context);
+                await SeedGames(context);
                 await SeedTeamPlayers(context);
                 await SeedChampionshipTeams(context);
             }
