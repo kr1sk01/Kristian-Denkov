@@ -36,7 +36,7 @@ namespace Championship.API.Controllers
         {
             var team = await _context.Teams
                 .Include(x => x.TeamType)
-                .Include(x => x.Players)
+                .Include(x => x.TeamPlayers)
                     .ThenInclude(x => x.Player)
                 .FirstOrDefaultAsync(x => x.Id == id);
 
@@ -46,8 +46,6 @@ namespace Championship.API.Controllers
             }
 
             var dto = team.Adapt<TeamDto>();
-            //var players = await _context.Users.Where(x => x.Teams.Any(t => t.PlayerId == x.Id)).ToListAsync();
-            //dto.Players = players.Adapt<List<PlayerDto>>();
             return Ok(dto);
         }
 
