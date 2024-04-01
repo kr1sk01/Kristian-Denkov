@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Championship.DATA.Models;
 using Championship.API.Models;
 using Championship.SHARED.DTO;
+using Mapster;
 
 namespace Championship.API.Controllers
 {
@@ -28,16 +29,30 @@ namespace Championship.API.Controllers
 
         // GET: api/ChampionshipClass/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<ChampionshipClass>> GetChampionshipClass(string id)
+        public async Task<ActionResult<ChampionshipClassDto>> GetChampionshipClass(string id)
         {
-            var championshipClass = await _context.Championships.FindAsync(id);
+            var championshipClass = await _context.Championships
+                .Include(x => x.ChampionshipStatus)
+                .Include(x => x.ChampionshipType)
+                .Include(x => x.Winner)
+                .Include(x => x.GameType)
+                .Include(x => x.Games)
+                    .ThenInclude(g => g.GameStatus)
+                .Include(x => x.Games)
+                    .ThenInclude(g => g.RedTeam)
+                .Include(x => x.Games)
+                    .ThenInclude(g => g.BlueTeam)
+                .Include(x => x.Games)
+                    .ThenInclude(g => g.Winner)
+                .FirstOrDefaultAsync(a => a.Id == id);
 
             if (championshipClass == null)
             {
                 return NotFound();
             }
 
-            return championshipClass;
+            var dto = championshipClass.Adapt<ChampionshipClassDto>();
+            return Ok(dto);
         }
 
         // POST: api/ChampionshipClass
