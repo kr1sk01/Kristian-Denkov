@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Championship.API.Models;
 using Championship.DATA.Models;
+using Championship.SHARED.DTO;
+using Mapster;
 
 namespace Championship.API.Controllers
 {
@@ -30,16 +32,23 @@ namespace Championship.API.Controllers
 
         // GET: api/Teams/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Team>> GetTeam(string id)
+        public async Task<ActionResult<TeamDto>> GetTeam(string id)
         {
-            var team = await _context.Teams.FindAsync(id);
+            var team = await _context.Teams
+                .Include(x => x.TeamType)
+                .Include(x => x.Players)
+                    .ThenInclude(x => x.Player)
+                .FirstOrDefaultAsync(x => x.Id == id);
 
             if (team == null)
             {
                 return NotFound();
             }
 
-            return team;
+            var dto = team.Adapt<TeamDto>();
+            //var players = await _context.Users.Where(x => x.Teams.Any(t => t.PlayerId == x.Id)).ToListAsync();
+            //dto.Players = players.Adapt<List<PlayerDto>>();
+            return Ok(dto);
         }
 
         // PUT: api/Teams/5
