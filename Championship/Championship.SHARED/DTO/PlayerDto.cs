@@ -15,6 +15,6 @@ namespace Championship.SHARED.DTO
 
         public bool? Active { get; set; }
 
-        public virtual ICollection<TeamPlayersDto> Teams { get; set; } = new HashSet<TeamPlayersDto>();
+        public virtual ICollection<TeamDto> Teams { get; set; } = new HashSet<TeamDto>();
     }
 }

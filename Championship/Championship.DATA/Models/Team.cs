@@ -29,7 +29,7 @@ namespace Championship.DATA.Models
 
         public DateTime? ModifiedOn { get; set; }
 
-        public virtual ICollection<TeamPlayers> Players { get; set; } = new HashSet<TeamPlayers>();
+        public virtual ICollection<TeamPlayers> TeamPlayers { get; set; } = new HashSet<TeamPlayers>();
 
         public virtual ICollection<ChampionshipTeams> Championships { get; set; } = new HashSet<ChampionshipTeams>();
     }

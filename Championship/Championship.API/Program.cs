@@ -1,4 +1,5 @@
 using Championship.API.Controllers;
+using Championship.API.Data;
 using Championship.API.Models;
 using Championship.API.Services;
 using Championship.DATA.Models;
@@ -48,6 +49,7 @@ public class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
         builder.Services.AddScoped<DataSeeding>();
+        builder.Services.ConfigureMappings();
 
         var app = builder.Build();
         
