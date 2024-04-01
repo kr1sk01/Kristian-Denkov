@@ -26,6 +26,25 @@ namespace Championship.API.Controllers
         {
             return await _context.Championships.ToListAsync();
         }
+        [HttpGet("details")]
+        public async Task<ActionResult<IEnumerable<ChampionshipClassDto>>> GetChampionshipClassesDetails()
+        {
+            var championshipClassesWithDetails = await _context.Championships
+                .Include(x => x.ChampionshipStatus)
+                .Include(x => x.ChampionshipType)
+                .Include(x => x.Winner)
+                .Include(x => x.GameType)
+                .Include(x => x.Games)
+                    .ThenInclude(g => g.GameStatus)
+                .Include(x => x.Games)
+                    .ThenInclude(g => g.RedTeam)
+                .Include(x => x.Games)
+                    .ThenInclude(g => g.BlueTeam)
+                .Include(x => x.Games)
+                    .ThenInclude(g => g.Winner).ToListAsync();
+            var dtos = championshipClassesWithDetails.Adapt<List<ChampionshipClassDto>>();
+            return Ok(dtos);
+        }
 
         // GET: api/ChampionshipClass/5
         [HttpGet("{id}")]
