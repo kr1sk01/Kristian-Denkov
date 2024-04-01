@@ -1,24 +1,19 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 
 namespace Championship.SHARED.DTO
 {
     public class PlayerDto
     {
+        public string? Id { get; set; } = default!;
 
-   
-        public byte[]? Avatar { get; set; } = default;
+        public string? Name { get; set; }
 
-        public bool? Active { get; set; } = null;
+        public byte[]? Avatar { get; set; }
 
-        public string? CreatedBy { get; set; }
-
-        public DateTime? CreatedOn { get; set; } = null;
-
-        public string? ModifiedBy { get; set; }
-
-        public DateTime? ModifiedOn { get; set; }
+        public bool? Active { get; set; }
 
         public virtual ICollection<TeamPlayersDto> Teams { get; set; } = new HashSet<TeamPlayersDto>();
     }

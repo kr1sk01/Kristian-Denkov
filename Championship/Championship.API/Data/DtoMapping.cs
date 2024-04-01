@@ -8,6 +8,7 @@ namespace Championship.API.Data
     {
         public static void ConfigureMappings()
         {
+            // ChampionshipClass mapping
             TypeAdapterConfig<ChampionshipClass, ChampionshipClassDto>.NewConfig()
               .Map(dest => dest.ChampionshipStatusName, src => src.ChampionshipStatus.Name);
 
@@ -20,6 +21,7 @@ namespace Championship.API.Data
             TypeAdapterConfig<ChampionshipClass, ChampionshipClassDto>.NewConfig()
               .Map(dest => dest.WinnerName, src => src.Winner.Name);
 
+            // Game mapping
             TypeAdapterConfig<Game, GameDto>.NewConfig()
               .Map(dest => dest.GameTypeName, src => src.GameType.Name);
 
@@ -37,6 +39,38 @@ namespace Championship.API.Data
 
             TypeAdapterConfig<Game, GameDto>.NewConfig()
               .Map(dest => dest.ChampionshipName, src => src.Championship.Name);
+
+            // Team mapping
+            TypeAdapterConfig<Team, TeamDto>.NewConfig()
+                .Map(dest => dest.TeamTypeName, src => src.TeamType.Name);
+
+            TypeAdapterConfig<Team, TeamDto>.NewConfig()
+                .Map(dest => dest.Players, src => src.Players);
+
+            // Player mapping
+            TypeAdapterConfig<Player, PlayerDto>.NewConfig()
+                .Map(dest => dest.Id, src => src.Id);
+
+            TypeAdapterConfig<Player, PlayerDto>.NewConfig()
+                .Map(dest => dest.Name, src => src.UserName);
+
+            // TeamPlayers mapping
+            TypeAdapterConfig<TeamPlayers, TeamPlayersDto>.NewConfig()
+                .Map(dest => dest.PlayerName, src => src.Player.UserName);
+
+            TypeAdapterConfig<TeamPlayers, TeamPlayersDto>.NewConfig()
+                .Map(dest => dest.TeamName, src => src.Team.Name);
+
+            TypeAdapterConfig<TeamPlayers, PlayerDto>.NewConfig()
+                .Map(dest => dest.Id, src => src.PlayerId);
+
+            TypeAdapterConfig<TeamPlayers, PlayerDto>.NewConfig()
+                .Map(dest => dest.Name, src => src.Player.UserName);
+
+            TypeAdapterConfig<TeamPlayers, PlayerDto>.NewConfig()
+                .Map(dest => dest.Active, src => src.Player.Active);
+
+            
         }
     }
 }

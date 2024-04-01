@@ -8,10 +8,10 @@ namespace Championship.SHARED.DTO
         [Key]
         public string Id { get; set; } = default!;
 
-        public string? PlayerId { get; set; }
+        public string? PlayerName { get; set; }
         public virtual PlayerDto? Player { get; set; }
 
-        public string? TeamId { get; set; }
+        public string? TeamName { get; set; }
         public virtual TeamDto? Team { get; set; }
 
         public string? CreatedBy { get; set; }
