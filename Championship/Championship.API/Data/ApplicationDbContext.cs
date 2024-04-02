@@ -2,6 +2,7 @@
 using Championship.SHARED.DTO;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
 
 #pragma warning disable VSSpell001 // Spell Check
 namespace Championship.API.Models
@@ -29,14 +30,14 @@ namespace Championship.API.Models
             base.OnModelCreating(builder);
 
             builder.Entity<TeamPlayers>()
-               .HasOne(p => p.Team)
-               .WithMany(t => t.Players)
-               .HasForeignKey(p => p.TeamId);
+            .HasOne(sc => sc.Player)
+            .WithMany(s => s.TeamPlayers)
+            .HasForeignKey(sc => sc.PlayerId);
 
             builder.Entity<TeamPlayers>()
-               .HasOne(p => p.Player)
-               .WithMany(t => t.Teams)
-               .HasForeignKey(p => p.PlayerId);
+                .HasOne(sc => sc.Team)
+                .WithMany(c => c.TeamPlayers)
+                .HasForeignKey(sc => sc.TeamId);
 
             builder.Entity<ChampionshipTeams>()
                .HasOne(p => p.Team)

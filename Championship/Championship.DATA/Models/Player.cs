@@ -18,6 +18,6 @@ namespace Championship.DATA.Models
 
         public DateTime? ModifiedOn { get; set; }
 
-        public virtual ICollection<TeamPlayers> Teams { get; set; } = new HashSet<TeamPlayers>();
+        public virtual ICollection<TeamPlayers> TeamPlayers { get; set; } = new HashSet<TeamPlayers>();
     }
 }
