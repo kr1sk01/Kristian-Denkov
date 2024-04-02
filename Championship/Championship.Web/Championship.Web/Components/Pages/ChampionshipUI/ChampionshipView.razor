@@ -1,6 +1,7 @@
 ﻿@page "/championshipview"
 @using System.Net.Http
 @inject HttpClient httpClient
+@inject NavigationManager nManager
 
 @rendermode InteractiveServer
 
@@ -9,6 +10,7 @@
 <table class="table">
     <thead>
         <tr>
+            <td>id</td>
             <th>Name</th>
             <th>Game Type</th>
             <th>Date</th>
@@ -23,6 +25,7 @@
             foreach (var item in championshipWithDetails)
             {
                 <tr class="table-row">
+                    <td>@item.Id</td>
                     <td>@item.Name</td>
                     <td>@item.GameTypeName</td>
                     <td>@item.Date</td>
@@ -31,13 +34,13 @@
                     @switch (item.ChampionshipStatusName)
                     {
                         case "Finished":
-                            StatusColor = "black";
+                            StatusColor = "blue";
                             break;
                         case "Coming":
-                            StatusColor = "green";
+                            StatusColor = "red";
                             break;
                         case "Live":
-                            StatusColor = "red";
+                            StatusColor = "green";
                             break;
                         case "Cancelled":
                             StatusColor = "darkgray";
@@ -47,7 +50,7 @@
                     }
                     <td style="color:@StatusColor">@item.ChampionshipStatusName</td>
                     <td>@item.ChampionshipTypeName</td>
-                    <td><button class="btn-primary">Details</button></td>
+                    <td><button class="btn-primary" @onclick="() => Details(item.Id)">Details</button></td>
                 </tr>
             }
         }
@@ -77,5 +80,10 @@
             championshipWithDetails = test;
         else
             done = false; 
+    }
+
+    private void Details(string id)
+    {
+        nManager.NavigateTo($"/championshipDetails?id={Uri.EscapeDataString(id)}");
     }
 }

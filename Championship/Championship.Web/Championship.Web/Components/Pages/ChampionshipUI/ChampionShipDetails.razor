@@ -1,0 +1,55 @@
+﻿@page "/championshipDetails"
+@using Microsoft.AspNetCore.WebUtilities
+@inject HttpClient httpClient
+@inject NavigationManager nManager
+<PageTitle>Championship Info</PageTitle>
+
+@if (championshipWithDetails != null)
+{
+    <div class="container">
+        @foreach (var game in championshipWithDetails.Games)
+        {
+            <div class="box">
+                <center><p>Game name: @game.Name</p></center>
+                <p>Game Type: @game.GameTypeName</p>
+                <p>Blue Team: @game.BlueTeamName</p>
+                <p>Red name: @game.RedTeamName</p>
+            </div>
+
+            <div class="box">
+                <center><p>Game name: @game.Name</p></center>
+                <p>Game Type: @game.GameTypeName</p>
+                <p>Blue Team: @game.BlueTeamName</p>
+                <p>Red name: @game.RedTeamName</p>
+            </div>
+        }
+    </div>
+
+}
+
+@code {
+    public string id;
+    protected override void OnInitialized()
+    {
+
+        // Get the query parameters from the URL
+        var uri = nManager.ToAbsoluteUri(nManager.Uri);
+        var queryParams = QueryHelpers.ParseQuery(uri.Query);
+
+        // Extract the data parameter from the query parameters
+        if (queryParams.TryGetValue("id", out var data))
+        {
+            id = Uri.UnescapeDataString(data);
+
+        }
+    }
+
+    private ChampionshipClassDto championshipWithDetails;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var test = await httpClient.GetFromJsonAsync<ChampionshipClassDto>($"api/ChampionshipClass/{id}");
+        if (test != null)
+            championshipWithDetails = test;
+    }
+}
