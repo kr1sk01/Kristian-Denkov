@@ -22,9 +22,21 @@ namespace Championship.API.Controllers
 
         // GET: api/ChampionshipClass
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ChampionshipClass>>> GetChampionshipClasses()
+        public async Task<ActionResult<IEnumerable<ChampionshipClass>>> GetChampionshipClasses([FromQuery] string? championshipStatusName)
         {
-            return await _context.Championships.ToListAsync();
+            var championships = await _context.Championships
+                .Include(x => x.ChampionshipStatus)
+                .Include(x => x.ChampionshipType)
+                .Include(x => x.Winner)
+                .Include(x => x.GameType)
+                .ToListAsync();
+
+            var dto = championships.Adapt<List<ChampionshipClassDto>>();
+            if (string.IsNullOrEmpty(championshipStatusName))
+                return Ok(dto);
+
+            var filteredDto = dto.Where(x => x.ChampionshipStatusName == championshipStatusName).ToList();
+            return Ok(filteredDto);
         }
         [HttpGet("details")]
         public async Task<ActionResult<IEnumerable<ChampionshipClassDto>>> GetChampionshipClassesDetails()
@@ -42,6 +54,7 @@ namespace Championship.API.Controllers
                     .ThenInclude(g => g.BlueTeam)
                 .Include(x => x.Games)
                     .ThenInclude(g => g.Winner).ToListAsync();
+
             var dtos = championshipClassesWithDetails.Adapt<List<ChampionshipClassDto>>();
             return Ok(dtos);
         }
@@ -63,6 +76,8 @@ namespace Championship.API.Controllers
                     .ThenInclude(g => g.BlueTeam)
                 .Include(x => x.Games)
                     .ThenInclude(g => g.Winner)
+                .Include(x => x.ChampionshipTeams)
+                    .ThenInclude(x => x.Team)
                 .FirstOrDefaultAsync(a => a.Id == id);
 
             if (championshipClass == null)

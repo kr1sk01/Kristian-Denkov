@@ -27,6 +27,6 @@ namespace Championship.SHARED.DTO
 
         public virtual ICollection<GameDto> Games { get; set; } = new HashSet<GameDto>();
 
-        public virtual ICollection<ChampionshipTeamsDto> Teams { get; set; } = new HashSet<ChampionshipTeamsDto>();
+        public virtual ICollection<TeamDto> Teams { get; set; } = new HashSet<TeamDto>();
     }
 }

@@ -27,7 +27,12 @@ namespace Championship.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Team>>> GetTeams()
         {
-            return await _context.Teams.ToListAsync();
+            var teams = await _context.Teams
+                .Include(x => x.TeamType)
+                .ToListAsync();
+
+            var dto = teams.Adapt<List<TeamDto>>();
+            return Ok(dto);
         }
 
         // GET: api/Teams/5
@@ -46,6 +51,29 @@ namespace Championship.API.Controllers
             }
 
             var dto = team.Adapt<TeamDto>();
+            return Ok(dto);
+        }
+
+        [HttpGet("{id}/Game_History")]
+        public async Task<ActionResult<TeamDto>> GameHistory(string id)
+        {
+            var team = await _context.Teams
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (team == null)
+            {
+                return NotFound();
+            }
+
+            var games = await _context.Games
+                .Where(x => x.BlueTeamId == id || x.RedTeamId == id)
+                    .Include(x => x.GameType)
+                    .Include(x => x.GameStatus)
+                    .Include(x => x.RedTeam)
+                    .Include(x => x.BlueTeam)
+                    .Include(x => x.Championship)
+                .ToListAsync();
+            var dto = games.Adapt<List<GameDto>>();
             return Ok(dto);
         }
 
@@ -115,6 +143,9 @@ namespace Championship.API.Controllers
                 return NotFound();
             }
 
+            var championshipTeamsToDelete = await _context.ChampionshipTeams.Where(c => c.TeamId == id).ToListAsync();
+
+            _context.ChampionshipTeams.RemoveRange(championshipTeamsToDelete);
             _context.Teams.Remove(team);
             await _context.SaveChangesAsync();
 

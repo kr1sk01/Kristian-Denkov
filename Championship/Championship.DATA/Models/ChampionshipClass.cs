@@ -46,6 +46,6 @@ namespace Championship.DATA.Models
 
         public virtual ICollection<Game> Games { get; set; } = new HashSet<Game>();
 
-        public virtual ICollection<ChampionshipTeams> Teams { get; set; } = new HashSet<ChampionshipTeams>();
+        public virtual ICollection<ChampionshipTeams> ChampionshipTeams { get; set; } = new HashSet<ChampionshipTeams>();
     }
 }

@@ -30,9 +30,9 @@ namespace Championship.API.Models
             base.OnModelCreating(builder);
 
             builder.Entity<TeamPlayers>()
-            .HasOne(sc => sc.Player)
-            .WithMany(s => s.TeamPlayers)
-            .HasForeignKey(sc => sc.PlayerId);
+                .HasOne(sc => sc.Player)
+                .WithMany(s => s.TeamPlayers)
+                .HasForeignKey(sc => sc.PlayerId);
 
             builder.Entity<TeamPlayers>()
                 .HasOne(sc => sc.Team)
@@ -41,12 +41,12 @@ namespace Championship.API.Models
 
             builder.Entity<ChampionshipTeams>()
                .HasOne(p => p.Team)
-               .WithMany(t => t.Championships)
+               .WithMany(t => t.ChampionshipTeams)
                .HasForeignKey(p => p.TeamId);
 
             builder.Entity<ChampionshipTeams>()
                .HasOne(p => p.Championship)
-               .WithMany(t => t.Teams)
+               .WithMany(t => t.ChampionshipTeams)
                .HasForeignKey(p => p.ChampionshipId);
         }
     }

@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Championship.API.Models;
 using Championship.DATA.Models;
+using Mapster;
+using Championship.SHARED.DTO;
 
 namespace Championship.API.Controllers
 {
@@ -23,23 +25,41 @@ namespace Championship.API.Controllers
 
         // GET: api/Game
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Game>>> GetGames()
+        public async Task<ActionResult<IEnumerable<GameDto>>> GetGames()
         {
-            return await _context.Games.ToListAsync();
+            var games = await _context.Games
+                .Include(x => x.GameType)
+                .Include(x => x.GameStatus)
+                .Include(x => x.BlueTeam)
+                .Include(x => x.RedTeam)
+                .Include(x => x.Winner)
+                .Include(x => x.Championship)
+                .ToListAsync();
+
+            var dto = games.Adapt<List<GameDto>>();
+            return Ok(dto);
         }
 
         // GET: api/Game/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Game>> GetGame(string id)
+        public async Task<ActionResult<GameDto>> GetGame(string id)
         {
-            var game = await _context.Games.FindAsync(id);
+            var game = await _context.Games
+                .Include(x => x.GameType)
+                .Include(x => x.GameStatus)
+                .Include(x => x.BlueTeam)
+                .Include(x => x.RedTeam)
+                .Include(x => x.Winner)
+                .Include(x => x.Championship)
+                .FirstOrDefaultAsync(x => x.Id == id);
 
             if (game == null)
             {
                 return NotFound();
             }
 
-            return game;
+            var dto = game.Adapt<GameDto>();
+            return Ok(dto);
         }
 
         // PUT: api/Game/5

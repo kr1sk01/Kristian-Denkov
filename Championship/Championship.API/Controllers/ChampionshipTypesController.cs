@@ -10,6 +10,8 @@ using Championship.DATA.Models;
 
 namespace Championship.API.Controllers
 {
+    [Route("api/[controller]")]
+    [ApiController]
     public class ChampionshipTypesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -20,138 +22,80 @@ namespace Championship.API.Controllers
         }
 
         // GET: ChampionshipTypes
-        public async Task<IActionResult> Index()
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<ChampionshipType>>> Get()
         {
-            return View(await _context.ChampionshipTypes.ToListAsync());
+            return await _context.ChampionshipTypes.ToListAsync();
         }
 
         // GET: ChampionshipTypes/Details/5
-        public async Task<IActionResult> Details(string id)
+        [HttpGet("{id}")]
+        public async Task<ActionResult<ChampionshipType>> Get(string id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var championshipType = await _context.ChampionshipTypes
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var championshipType = await _context.ChampionshipTypes.FirstOrDefaultAsync(cs => cs.Id == id);
             if (championshipType == null)
             {
                 return NotFound();
             }
-
-            return View(championshipType);
+            return championshipType;
         }
 
-        // GET: ChampionshipTypes/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: ChampionshipTypes/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // POST: ChampionshipTypes
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name")] ChampionshipType championshipType)
+        public async Task<ActionResult<ChampionshipType>> Post(ChampionshipType championshipType)
         {
-            if (ModelState.IsValid)
+            await _context.ChampionshipTypes.AddAsync(championshipType);
+            await _context.SaveChangesAsync();
+            return CreatedAtAction(nameof(Get), new
             {
-                _context.Add(championshipType);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(championshipType);
+                id = championshipType.Id
+            },
+                championshipType);
         }
 
-        // GET: ChampionshipTypes/Edit/5
-        public async Task<IActionResult> Edit(string id)
+        // PUT: ChampionshipTypes/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(string id, ChampionshipType championshipType)
         {
-            if (id == null)
+            var existingChampionshipType = await _context.ChampionshipTypes.FirstOrDefaultAsync(cs => cs.Id == id);
+            if (existingChampionshipType == null)
             {
                 return NotFound();
             }
 
-            var championshipType = await _context.ChampionshipTypes.FindAsync(id);
-            if (championshipType == null)
-            {
-                return NotFound();
-            }
-            return View(championshipType);
-        }
-
-        // POST: ChampionshipTypes/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("Id,Name")] ChampionshipType championshipType)
-        {
-            if (id != championshipType.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(championshipType);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ChampionshipTypeExists(championshipType.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(championshipType);
-        }
-
-        // GET: ChampionshipTypes/Delete/5
-        public async Task<IActionResult> Delete(string id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var championshipType = await _context.ChampionshipTypes
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (championshipType == null)
-            {
-                return NotFound();
-            }
-
-            return View(championshipType);
-        }
-
-        // POST: ChampionshipTypes/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(string id)
-        {
-            var championshipType = await _context.ChampionshipTypes.FindAsync(id);
-            if (championshipType != null)
-            {
-                _context.ChampionshipTypes.Remove(championshipType);
-            }
+            _context.Entry(championshipType).State = EntityState.Modified;
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            return NoContent();
         }
 
-        private bool ChampionshipTypeExists(string id)
+        // DELETE: api/ChampionshipTypes/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(string id)
         {
-            return _context.ChampionshipTypes.Any(e => e.Id == id);
+
+            var championshipType = await _context.ChampionshipTypes.FirstOrDefaultAsync(cs => cs.Id == id);
+
+            if (championshipType == null)
+            {
+                return NotFound();
+            }
+
+            var championship = await _context.Championships.Where(x => x.ChampionshipTypeId == id).ToListAsync();
+
+            foreach (var item in championship)
+            {
+                item.ChampionshipTypeId = null;
+
+                _context.Entry(item).State = EntityState.Modified;
+            }
+
+            _context.ChampionshipTypes.Remove(championshipType);
+
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
     }
 }

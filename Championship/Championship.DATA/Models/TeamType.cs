@@ -11,7 +11,5 @@ namespace Championship.DATA.Models
         public string? Name { get; set; }
         //
         public int? TeamSize { get; set; }
-
-        public virtual ICollection<Team> Teams { get; set;} = new HashSet<Team>();
     }
 }

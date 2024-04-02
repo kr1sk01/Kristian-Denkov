@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Championship.API.Models;
 using Championship.DATA.Models;
+using Mapster;
+using Championship.SHARED.DTO;
 
 namespace Championship.API.Controllers
 {
@@ -25,21 +27,29 @@ namespace Championship.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<GameType>>> GetGameTypes()
         {
-            return await _context.GameTypes.ToListAsync();
+            var gameTypes = await _context.GameTypes
+                .Include(x => x.TeamType)
+                .ToListAsync();
+
+            var dto = gameTypes.Adapt<List<GameTypeDto>>();
+            return Ok(dto);
         }
 
         // GET: api/GameTypes/5
         [HttpGet("{id}")]
         public async Task<ActionResult<GameType>> GetGameType(string id)
         {
-            var gameType = await _context.GameTypes.FindAsync(id);
+            var gameType = await _context.GameTypes
+                .Include(x => x.TeamType)
+                .FirstOrDefaultAsync(x => x.Id == id);
 
             if (gameType == null)
             {
                 return NotFound();
             }
 
-            return gameType;
+            var dto = gameType.Adapt<GameTypeDto>();
+            return Ok(dto);
         }
 
         // PUT: api/GameTypes/5
@@ -106,6 +116,14 @@ namespace Championship.API.Controllers
             if (gameType == null)
             {
                 return NotFound();
+            }
+
+            var games = await _context.Games.Where(x => x.GameTypeId == id).ToListAsync();
+
+            foreach (var game in games)
+            {
+                game.GameTypeId = null;
+                _context.Entry(game).State = EntityState.Modified;
             }
 
             _context.GameTypes.Remove(gameType);

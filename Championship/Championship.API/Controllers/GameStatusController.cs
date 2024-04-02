@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Championship.API.Models;
 using Championship.DATA.Models;
+using Mono.TextTemplating;
 
 namespace Championship.API.Controllers
 {
@@ -106,6 +107,14 @@ namespace Championship.API.Controllers
             if (gameStatus == null)
             {
                 return NotFound();
+            }
+
+            var games = await _context.Games.Where(x => x.GameStatusId == id).ToListAsync();
+
+            foreach (var game in games)
+            {
+                game.GameStatusId = null;
+                _context.Entry(game).State = EntityState.Modified;
             }
 
             _context.GameStatuses.Remove(gameStatus);

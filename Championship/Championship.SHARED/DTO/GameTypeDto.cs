@@ -13,8 +13,6 @@ namespace Championship.SHARED.DTO
 
         public int? MaxPoints { get; set; }
         
-        public string? TeamTypeId { get; set; }
-        [ForeignKey("TeamTypeId")]
-        public TeamTypeDto? TeamType { get; set; }
+        public string? TeamTypeName { get; set; }
     }
 }

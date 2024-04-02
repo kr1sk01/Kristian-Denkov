@@ -555,11 +555,11 @@ namespace Championship.API.Migrations
             modelBuilder.Entity("Championship.DATA.Models.ChampionshipTeams", b =>
                 {
                     b.HasOne("Championship.DATA.Models.ChampionshipClass", "Championship")
-                        .WithMany("Teams")
+                        .WithMany("ChampionshipTeams")
                         .HasForeignKey("ChampionshipId");
 
                     b.HasOne("Championship.DATA.Models.Team", "Team")
-                        .WithMany("Championships")
+                        .WithMany("ChampionshipTeams")
                         .HasForeignKey("TeamId");
 
                     b.Navigation("Championship");
@@ -627,11 +627,11 @@ namespace Championship.API.Migrations
             modelBuilder.Entity("Championship.DATA.Models.TeamPlayers", b =>
                 {
                     b.HasOne("Championship.DATA.Models.Player", "Player")
-                        .WithMany("Teams")
+                        .WithMany("TeamPlayers")
                         .HasForeignKey("PlayerId");
 
                     b.HasOne("Championship.DATA.Models.Team", "Team")
-                        .WithMany("Players")
+                        .WithMany("TeamPlayers")
                         .HasForeignKey("TeamId");
 
                     b.Navigation("Player");
@@ -692,21 +692,21 @@ namespace Championship.API.Migrations
 
             modelBuilder.Entity("Championship.DATA.Models.ChampionshipClass", b =>
                 {
-                    b.Navigation("Games");
+                    b.Navigation("ChampionshipTeams");
 
-                    b.Navigation("Teams");
+                    b.Navigation("Games");
                 });
 
             modelBuilder.Entity("Championship.DATA.Models.Player", b =>
                 {
-                    b.Navigation("Teams");
+                    b.Navigation("TeamPlayers");
                 });
 
             modelBuilder.Entity("Championship.DATA.Models.Team", b =>
                 {
-                    b.Navigation("Championships");
+                    b.Navigation("ChampionshipTeams");
 
-                    b.Navigation("Players");
+                    b.Navigation("TeamPlayers");
                 });
 
             modelBuilder.Entity("Championship.DATA.Models.TeamType", b =>
