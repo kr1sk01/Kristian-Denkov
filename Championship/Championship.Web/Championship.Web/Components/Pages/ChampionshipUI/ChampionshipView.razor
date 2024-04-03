@@ -7,22 +7,23 @@
 
 <PageTitle>Championships</PageTitle>
 <button @onclick="Sort">Sort</button>
-<table class="table">
-    <thead>
-        <tr>
-            <td>id</td>
-            <th>Name</th>
-            <th>Game Type</th>
-            <th>Date</th>
-            <th>Winner</th>
-            <th>Champ Status</th>
-            <th>Champ Type</th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (championshipWithDetails != null)
-        {
-            foreach (var item in championshipWithDetails)
+
+@if (championshipWithDetails != null)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <td>id</td>
+                <th>Name</th>
+                <th>Game Type</th>
+                <th>Date</th>
+                <th>Winner</th>
+                <th>Champ Status</th>
+                <th>Champ Type</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in championshipWithDetails)
             {
                 <tr class="table-row">
                     <td>@item.Id</td>
@@ -30,7 +31,7 @@
                     <td>@item.GameTypeName</td>
                     <td>@item.Date</td>
                     <td>@item.WinnerName</td>
-                    
+
                     @switch (item.ChampionshipStatusName)
                     {
                         case "Finished":
@@ -53,33 +54,34 @@
                     <td><button class="btn-primary" @onclick="() => Details(item.Id)">Details</button></td>
                 </tr>
             }
-        }
-        else
-            {
-               <p>There are no championships...</p>
-            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>There are no championships...</p>
+}
 
-    </tbody>
-</table>
+
 
 @code {
     string StatusColor = "black";
 
     private void Sort()
     {
-        championshipWithDetails = championshipWithDetails.OrderBy(x => x.Name).ToList();
-        StateHasChanged();
+        if (championshipWithDetails != null)
+        {
+            championshipWithDetails = championshipWithDetails.OrderBy(x => x.Name).ToList();
+            StateHasChanged();
+        }
     }
-    private List<ChampionshipClassDto> championshipWithDetails;
+    private List<ChampionshipClassDto>? championshipWithDetails;
 
-    bool done;
     protected override async Task OnInitializedAsync()
     {
         var test = await httpClient.GetFromJsonAsync<List<ChampionshipClassDto>>("api/championshipclass/details");
         if (test != null)
             championshipWithDetails = test;
-        else
-            done = false; 
     }
 
     private void Details(string id)
