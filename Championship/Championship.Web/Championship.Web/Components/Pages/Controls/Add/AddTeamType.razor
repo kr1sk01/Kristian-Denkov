@@ -1,0 +1,60 @@
+﻿@page "/addteamtype"
+
+@inject HttpClient httpClient 
+
+@rendermode InteractiveServer
+
+@if (errorMessage != null)
+{
+    <p class="text-danger">@errorMessage</p>
+}
+
+<h1>Add Team Type</h1>
+<EditForm Model="@team" OnValidSubmit="HandleValidSubmit" FormName="TeamForm">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="teamName">Team Name:</label>
+        <InputText id="teamName" @bind-Value="team.Name" class="form-control" />
+        <ValidationMessage For="@(() => team.Name)" />
+    </div>
+
+    <div class="form-group">
+        <label for="teamSize">Team Size:</label>
+        <InputNumber id="teamSize" @bind-Value="team.TeamSize" class="form-control" />
+        <ValidationMessage For="@(() => team.TeamSize)" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create</button>
+</EditForm>
+
+@code {
+    private TeamType team = new TeamType();
+    private string errorMessage;
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            // Make an HTTP POST request to the controller endpoint
+            var response = await httpClient.PostAsJsonAsync("api/TeamTypes", team);
+
+            // Check if the request was successful
+            if (response.IsSuccessStatusCode)
+            {
+                // Optionally, handle success
+            }
+            else
+            {
+                // Optionally, handle errors
+                errorMessage = "Failed to create team. Please try again later.";
+            }
+        }
+        catch (Exception ex)
+        {
+            // Handle any exceptions
+            errorMessage = "An error occurred: " + ex.Message;
+        }
+    }
+}

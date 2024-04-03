@@ -28,7 +28,10 @@
 }
 
 @code {
-    public string id;
+    public string? id;
+
+    private string? data;
+
     protected override void OnInitialized()
     {
 
@@ -39,12 +42,11 @@
         // Extract the data parameter from the query parameters
         if (queryParams.TryGetValue("id", out var data))
         {
-            id = Uri.UnescapeDataString(data);
-
+                id = Uri.UnescapeDataString(data);
         }
     }
 
-    private ChampionshipClassDto championshipWithDetails;
+    private ChampionshipClassDto? championshipWithDetails;
 
     protected override async Task OnInitializedAsync()
     {
