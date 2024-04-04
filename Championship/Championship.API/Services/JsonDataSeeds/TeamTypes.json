@@ -1,21 +1,21 @@
 [
   {
-    "Id": "1",
+    "Id": 1,
     "Name": "Solo",
     "TeamSize": 1
   },
   {
-    "Id": "2",
+    "Id": 2,
     "Name": "Duo",
     "TeamSize": 2
   },
   {
-    "Id": "3",
+    "Id": 3,
     "Name": "Trio",
     "TeamSize": 3
   },
   {
-    "Id": "4",
+    "Id": 4,
     "Name": "Quartet",
     "TeamSize": 4
   }

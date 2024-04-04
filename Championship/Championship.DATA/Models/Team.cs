@@ -6,7 +6,8 @@ namespace Championship.DATA.Models
     public class Team
     {
         [Key]
-        public string Id { get; set; } = default!;
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
 
         //
         [StringLength(255)]
@@ -14,7 +15,7 @@ namespace Championship.DATA.Models
 
         public byte[]? Logo { get; set; }
 
-        public string? TeamTypeId { get; set; }
+        public int? TeamTypeId { get; set; }
         [ForeignKey("TeamTypeId")]
         public virtual TeamType? TeamType { get; set; }
 

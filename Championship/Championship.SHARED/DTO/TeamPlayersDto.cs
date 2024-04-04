@@ -5,8 +5,8 @@ namespace Championship.SHARED.DTO
 {
     public class TeamPlayersDto
     {
-        [Key]
-        public string Id { get; set; } = default!;
+        
+        public int Id { get; set; }
 
         public string? PlayerName { get; set; }
         public virtual PlayerDto? Player { get; set; }

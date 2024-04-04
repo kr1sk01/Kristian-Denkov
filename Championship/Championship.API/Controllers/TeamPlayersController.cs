@@ -30,7 +30,7 @@ namespace Championship.API.Controllers
 
         // GET: api/TeamPlayers/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<TeamPlayers>> GetTeamPlayers(string id)
+        public async Task<ActionResult<TeamPlayers>> GetTeamPlayers(int id)
         {
             var teamPlayers = await _context.TeamPlayers.FindAsync(id);
 
@@ -45,7 +45,7 @@ namespace Championship.API.Controllers
         // PUT: api/TeamPlayers/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutTeamPlayers(string id, TeamPlayers teamPlayers)
+        public async Task<IActionResult> PutTeamPlayers(int id, TeamPlayers teamPlayers)
         {
             if (id != teamPlayers.Id)
             {
@@ -100,7 +100,7 @@ namespace Championship.API.Controllers
 
         // DELETE: api/TeamPlayers/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteTeamPlayers(string id)
+        public async Task<IActionResult> DeleteTeamPlayers(int id)
         {
             var teamPlayers = await _context.TeamPlayers.FindAsync(id);
             if (teamPlayers == null)
@@ -114,7 +114,7 @@ namespace Championship.API.Controllers
             return NoContent();
         }
 
-        private bool TeamPlayersExists(string id)
+        private bool TeamPlayersExists(int id)
         {
             return _context.TeamPlayers.Any(e => e.Id == id);
         }

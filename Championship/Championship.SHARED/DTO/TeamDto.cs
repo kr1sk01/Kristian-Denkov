@@ -6,7 +6,7 @@ namespace Championship.SHARED.DTO
     public class TeamDto
     {
         
-        public string Id { get; set; } = default!;
+        public int Id { get; set; }
 
         public string? Name { get; set; }
 

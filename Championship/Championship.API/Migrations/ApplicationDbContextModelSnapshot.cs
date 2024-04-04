@@ -24,14 +24,17 @@ namespace Championship.API.Migrations
 
             modelBuilder.Entity("Championship.DATA.Models.ChampionshipClass", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
 
-                    b.Property<string>("ChampionshipStatusId")
-                        .HasColumnType("text");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ChampionshipTypeId")
-                        .HasColumnType("text");
+                    b.Property<int?>("ChampionshipStatusId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("ChampionshipTypeId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("text");
@@ -42,8 +45,8 @@ namespace Championship.API.Migrations
                     b.Property<DateTime?>("Date")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("GameTypeId")
-                        .HasColumnType("text");
+                    b.Property<int?>("GameTypeId")
+                        .HasColumnType("integer");
 
                     b.Property<byte[]>("Logo")
                         .HasColumnType("bytea");
@@ -61,8 +64,8 @@ namespace Championship.API.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<string>("WinnerId")
-                        .HasColumnType("text");
+                    b.Property<int?>("WinnerId")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -79,8 +82,11 @@ namespace Championship.API.Migrations
 
             modelBuilder.Entity("Championship.DATA.Models.ChampionshipStatus", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .HasColumnType("text");
@@ -92,11 +98,14 @@ namespace Championship.API.Migrations
 
             modelBuilder.Entity("Championship.DATA.Models.ChampionshipTeams", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
 
-                    b.Property<string>("ChampionshipId")
-                        .HasColumnType("text");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("ChampionshipId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("text");
@@ -104,8 +113,8 @@ namespace Championship.API.Migrations
                     b.Property<DateTime?>("CreatedOn")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("TeamId")
-                        .HasColumnType("text");
+                    b.Property<int?>("TeamId")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -118,8 +127,11 @@ namespace Championship.API.Migrations
 
             modelBuilder.Entity("Championship.DATA.Models.ChampionshipType", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .HasMaxLength(255)
@@ -132,17 +144,20 @@ namespace Championship.API.Migrations
 
             modelBuilder.Entity("Championship.DATA.Models.Game", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int?>("BluePoints")
                         .HasColumnType("integer");
 
-                    b.Property<string>("BlueTeamId")
-                        .HasColumnType("text");
+                    b.Property<int?>("BlueTeamId")
+                        .HasColumnType("integer");
 
-                    b.Property<string>("ChampionshipId")
-                        .HasColumnType("text");
+                    b.Property<int?>("ChampionshipId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("text");
@@ -153,11 +168,11 @@ namespace Championship.API.Migrations
                     b.Property<DateTime?>("Date")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("GameStatusId")
-                        .HasColumnType("text");
+                    b.Property<int?>("GameStatusId")
+                        .HasColumnType("integer");
 
-                    b.Property<string>("GameTypeId")
-                        .HasColumnType("text");
+                    b.Property<int?>("GameTypeId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("ModifiedBy")
                         .HasColumnType("text");
@@ -172,11 +187,11 @@ namespace Championship.API.Migrations
                     b.Property<int?>("RedPoints")
                         .HasColumnType("integer");
 
-                    b.Property<string>("RedTeamId")
-                        .HasColumnType("text");
+                    b.Property<int?>("RedTeamId")
+                        .HasColumnType("integer");
 
-                    b.Property<string>("WinnerId")
-                        .HasColumnType("text");
+                    b.Property<int?>("WinnerId")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -197,8 +212,11 @@ namespace Championship.API.Migrations
 
             modelBuilder.Entity("Championship.DATA.Models.GameStatus", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .HasMaxLength(255)
@@ -211,8 +229,11 @@ namespace Championship.API.Migrations
 
             modelBuilder.Entity("Championship.DATA.Models.GameType", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int?>("MaxPoints")
                         .HasColumnType("integer");
@@ -221,8 +242,8 @@ namespace Championship.API.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<string>("TeamTypeId")
-                        .HasColumnType("text");
+                    b.Property<int?>("TeamTypeId")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -315,8 +336,11 @@ namespace Championship.API.Migrations
 
             modelBuilder.Entity("Championship.DATA.Models.Team", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<bool?>("Active")
                         .HasColumnType("boolean");
@@ -340,8 +364,8 @@ namespace Championship.API.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<string>("TeamTypeId")
-                        .HasColumnType("text");
+                    b.Property<int?>("TeamTypeId")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -352,8 +376,11 @@ namespace Championship.API.Migrations
 
             modelBuilder.Entity("Championship.DATA.Models.TeamPlayers", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("text");
@@ -364,8 +391,8 @@ namespace Championship.API.Migrations
                     b.Property<string>("PlayerId")
                         .HasColumnType("text");
 
-                    b.Property<string>("TeamId")
-                        .HasColumnType("text");
+                    b.Property<int?>("TeamId")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -378,8 +405,11 @@ namespace Championship.API.Migrations
 
             modelBuilder.Entity("Championship.DATA.Models.TeamType", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .HasMaxLength(255)
@@ -618,7 +648,7 @@ namespace Championship.API.Migrations
             modelBuilder.Entity("Championship.DATA.Models.Team", b =>
                 {
                     b.HasOne("Championship.DATA.Models.TeamType", "TeamType")
-                        .WithMany("Teams")
+                        .WithMany()
                         .HasForeignKey("TeamTypeId");
 
                     b.Navigation("TeamType");
@@ -707,11 +737,6 @@ namespace Championship.API.Migrations
                     b.Navigation("ChampionshipTeams");
 
                     b.Navigation("TeamPlayers");
-                });
-
-            modelBuilder.Entity("Championship.DATA.Models.TeamType", b =>
-                {
-                    b.Navigation("Teams");
                 });
 #pragma warning restore 612, 618
         }

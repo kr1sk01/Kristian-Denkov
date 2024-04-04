@@ -1,84 +1,84 @@
 [
   {
-    "Id": "1",
+    "Id": 1,
     "Name": "Championship1",
-    "ChampionshipTypeId": "1",
-    "ChampionshipStatusId": "1",
-    "GameTypeId": "2",
+    "ChampionshipTypeId": 1,
+    "ChampionshipStatusId": 1,
+    "GameTypeId": 2,
     "LotDate": "2024-03-29T00:00:00Z",
-    "WinnerId": "1"
+    "WinnerId": 1
   },
   {
-    "Id": "2",
+    "Id": 2,
     "Name": "Championship2",
-    "ChampionshipTypeId": "2",
-    "ChampionshipStatusId": "2",
-    "GameTypeId": "2",
+    "ChampionshipTypeId": 2,
+    "ChampionshipStatusId": 2,
+    "GameTypeId": 2,
     "LotDate": "2024-03-29T00:00:00Z",
-    "WinnerId": "2"
+    "WinnerId": 2
   },
   {
-    "Id": "3",
+    "Id": 3,
     "Name": "Championship3",
-    "ChampionshipTypeId": "1",
-    "ChampionshipStatusId": "1",
-    "GameTypeId": "2",
+    "ChampionshipTypeId": 1,
+    "ChampionshipStatusId": 1,
+    "GameTypeId": 2,
     "LotDate": "2024-03-29T00:00:00Z",
-    "WinnerId": "1"
+    "WinnerId": 1
   },
   {
-    "Id": "4",
+    "Id": 4,
     "Name": "Championship1",
-    "ChampionshipTypeId": "1",
-    "ChampionshipStatusId": "1",
-    "GameTypeId": "2",
+    "ChampionshipTypeId": 1,
+    "ChampionshipStatusId": 1,
+    "GameTypeId": 2,
     "LotDate": "2024-03-29T00:00:00Z",
-    "WinnerId": "1"
+    "WinnerId": 1
   },
   {
-    "Id": "5",
+    "Id": 5,
     "Name": "Championship2",
-    "ChampionshipTypeId": "2",
-    "ChampionshipStatusId": "2",
-    "GameTypeId": "2",
+    "ChampionshipTypeId": 2,
+    "ChampionshipStatusId": 2,
+    "GameTypeId": 2,
     "LotDate": "2024-03-29T00:00:00Z",
-    "WinnerId": "2"
+    "WinnerId": 2
   },
   {
-    "Id": "6",
+    "Id": 6,
     "Name": "Championship3",
-    "ChampionshipTypeId": "1",
-    "ChampionshipStatusId": "1",
-    "GameTypeId": "2",
+    "ChampionshipTypeId": 1,
+    "ChampionshipStatusId": 1,
+    "GameTypeId": 2,
     "LotDate": "2024-03-29T00:00:00Z",
-    "WinnerId": "1"
+    "WinnerId": 1
   },
   {
-    "Id": "7",
+    "Id": 7,
     "Name": "Championship1",
-    "ChampionshipTypeId": "1",
-    "ChampionshipStatusId": "1",
-    "GameTypeId": "2",
+    "ChampionshipTypeId": 1,
+    "ChampionshipStatusId": 1,
+    "GameTypeId": 2,
     "LotDate": "2024-03-29T00:00:00Z",
-    "WinnerId": "1"
+    "WinnerId": 1
   },
   {
-    "Id": "8",
+    "Id": 8,
     "Name": "Championship2",
-    "ChampionshipTypeId": "2",
-    "ChampionshipStatusId": "2",
-    "GameTypeId": "2",
+    "ChampionshipTypeId": 2,
+    "ChampionshipStatusId": 2,
+    "GameTypeId": 2,
     "LotDate": "2024-03-29T00:00:00Z",
-    "WinnerId": "2"
+    "WinnerId": 2
   },
   {
-    "Id": "9",
+    "Id": 9,
     "Name": "Championship3",
-    "ChampionshipTypeId": "1",
-    "ChampionshipStatusId": "1",
-    "GameTypeId": "2",
+    "ChampionshipTypeId": 1,
+    "ChampionshipStatusId": 1,
+    "GameTypeId": 2,
     "LotDate": "2024-03-29T00:00:00Z",
-    "WinnerId": "1"
+    "WinnerId": 1
   }
 ]
 

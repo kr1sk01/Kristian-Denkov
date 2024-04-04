@@ -1,16 +1,18 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Championship.DATA.Models
 {
     public class ChampionshipTeams
     {
         [Key]
-        public string Id { get; set; } = default!;
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
 
-        public string? ChampionshipId { get; set; }
+        public int? ChampionshipId { get; set; }
         public virtual ChampionshipClass? Championship { get; set; }
 
-        public string? TeamId { get; set; }
+        public int? TeamId { get; set; }
         public virtual Team? Team { get; set; }
 
         public string? CreatedBy { get; set; }

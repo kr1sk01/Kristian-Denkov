@@ -31,7 +31,7 @@ namespace Championship.API.Controllers
 
         // GET: api/GameStatus/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<GameStatus>> GetGameStatus(string id)
+        public async Task<ActionResult<GameStatus>> GetGameStatus(int id)
         {
             var gameStatus = await _context.GameStatuses.FindAsync(id);
 
@@ -46,7 +46,7 @@ namespace Championship.API.Controllers
         // PUT: api/GameStatus/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutGameStatus(string id, GameStatus gameStatus)
+        public async Task<IActionResult> PutGameStatus(int id, GameStatus gameStatus)
         {
             if (id != gameStatus.Id)
             {
@@ -101,7 +101,7 @@ namespace Championship.API.Controllers
 
         // DELETE: api/GameStatus/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteGameStatus(string id)
+        public async Task<IActionResult> DeleteGameStatus(int id)
         {
             var gameStatus = await _context.GameStatuses.FindAsync(id);
             if (gameStatus == null)
@@ -123,7 +123,7 @@ namespace Championship.API.Controllers
             return NoContent();
         }
 
-        private bool GameStatusExists(string id)
+        private bool GameStatusExists(int id)
         {
             return _context.GameStatuses.Any(e => e.Id == id);
         }

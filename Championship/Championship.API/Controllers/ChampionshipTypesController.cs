@@ -30,7 +30,7 @@ namespace Championship.API.Controllers
 
         // GET: ChampionshipTypes/Details/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<ChampionshipType>> Get(string id)
+        public async Task<ActionResult<ChampionshipType>> Get(int id)
         {
             var championshipType = await _context.ChampionshipTypes.FirstOrDefaultAsync(cs => cs.Id == id);
             if (championshipType == null)
@@ -55,7 +55,7 @@ namespace Championship.API.Controllers
 
         // PUT: ChampionshipTypes/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(string id, ChampionshipType championshipType)
+        public async Task<IActionResult> Put(int id, ChampionshipType championshipType)
         {
             var existingChampionshipType = await _context.ChampionshipTypes.FirstOrDefaultAsync(cs => cs.Id == id);
             if (existingChampionshipType == null)
@@ -72,7 +72,7 @@ namespace Championship.API.Controllers
 
         // DELETE: api/ChampionshipTypes/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> Delete(int id)
         {
 
             var championshipType = await _context.ChampionshipTypes.FirstOrDefaultAsync(cs => cs.Id == id);

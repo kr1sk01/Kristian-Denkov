@@ -37,7 +37,7 @@ namespace Championship.API.Controllers
 
         // GET: api/Teams/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<TeamDto>> GetTeam(string id)
+        public async Task<ActionResult<TeamDto>> GetTeam(int id)
         {
             var team = await _context.Teams
                 .Include(x => x.TeamType)
@@ -55,7 +55,7 @@ namespace Championship.API.Controllers
         }
 
         [HttpGet("{id}/Game_History")]
-        public async Task<ActionResult<TeamDto>> GameHistory(string id)
+        public async Task<ActionResult<TeamDto>> GameHistory(int id)
         {
             var team = await _context.Teams
                 .FirstOrDefaultAsync(x => x.Id == id);
@@ -80,7 +80,7 @@ namespace Championship.API.Controllers
         // PUT: api/Teams/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutTeam(string id, Team team)
+        public async Task<IActionResult> PutTeam(int id, Team team)
         {
             if (id != team.Id)
             {
@@ -135,7 +135,7 @@ namespace Championship.API.Controllers
 
         // DELETE: api/Teams/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteTeam(string id)
+        public async Task<IActionResult> DeleteTeam(int id)
         {
             var team = await _context.Teams.FindAsync(id);
             if (team == null)
@@ -152,7 +152,7 @@ namespace Championship.API.Controllers
             return NoContent();
         }
 
-        private bool TeamExists(string id)
+        private bool TeamExists(int id)
         {
             return _context.Teams.Any(e => e.Id == id);
         }

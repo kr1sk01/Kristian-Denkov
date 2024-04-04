@@ -6,7 +6,8 @@ namespace Championship.DATA.Models
     public class ChampionshipClass
     {
         [Key]
-        public string Id { get; set; } = default!;
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
 
         //
         [StringLength(255)]
@@ -14,19 +15,19 @@ namespace Championship.DATA.Models
 
         public byte[]? Logo { get; set; }
 
-        public string? ChampionshipTypeId { get; set; }
+        public int? ChampionshipTypeId { get; set; }
         [ForeignKey("ChampionshipTypeId")]
         public virtual ChampionshipType? ChampionshipType { get; set; }
 
-        public string? ChampionshipStatusId { get; set; }
+        public int? ChampionshipStatusId { get; set; }
         [ForeignKey("ChampionshipStatusId")]
         public virtual ChampionshipStatus? ChampionshipStatus { get; set; }
 
-        public string? GameTypeId { get; set; }
+        public int? GameTypeId { get; set; }
         [ForeignKey("GameTypeId")]
         public virtual GameType? GameType { get; set; }
 
-        public string? WinnerId { get; set; }
+        public int? WinnerId { get; set; }
         [ForeignKey("WinnerId")]
         public virtual Team? Winner { get; set; }
 
