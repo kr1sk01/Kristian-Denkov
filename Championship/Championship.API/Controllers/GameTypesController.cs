@@ -37,7 +37,7 @@ namespace Championship.API.Controllers
 
         // GET: api/GameTypes/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<GameType>> GetGameType(string id)
+        public async Task<ActionResult<GameType>> GetGameType(int id)
         {
             var gameType = await _context.GameTypes
                 .Include(x => x.TeamType)
@@ -55,7 +55,7 @@ namespace Championship.API.Controllers
         // PUT: api/GameTypes/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutGameType(string id, GameType gameType)
+        public async Task<IActionResult> PutGameType(int id, GameType gameType)
         {
             if (id != gameType.Id)
             {
@@ -110,7 +110,7 @@ namespace Championship.API.Controllers
 
         // DELETE: api/GameTypes/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteGameType(string id)
+        public async Task<IActionResult> DeleteGameType(int id)
         {
             var gameType = await _context.GameTypes.FindAsync(id);
             if (gameType == null)
@@ -132,7 +132,7 @@ namespace Championship.API.Controllers
             return NoContent();
         }
 
-        private bool GameTypeExists(string id)
+        private bool GameTypeExists(int id)
         {
             return _context.GameTypes.Any(e => e.Id == id);
         }

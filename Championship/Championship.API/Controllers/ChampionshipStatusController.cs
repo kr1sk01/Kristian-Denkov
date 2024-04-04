@@ -29,7 +29,7 @@ namespace Championship.API.Controllers
 
         // GET: api/ChampionshipStatus/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<ChampionshipStatus>> Get(string id)
+        public async Task<ActionResult<ChampionshipStatus>> Get(int id)
         {
             var championshipStatus = await _context.ChampionshipStatuses.FirstOrDefaultAsync(cs => cs.Id == id);
             if (championshipStatus == null)
@@ -52,7 +52,7 @@ namespace Championship.API.Controllers
 
         // PUT: api/ChampionshipStatus/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(string id, ChampionshipStatus championshipStatus)
+        public async Task<IActionResult> Put(int id, ChampionshipStatus championshipStatus)
         {
             var existingChampionshipStatus = await _context.ChampionshipStatuses.FirstOrDefaultAsync(cs => cs.Id == id);
             if (existingChampionshipStatus == null)
@@ -69,7 +69,7 @@ namespace Championship.API.Controllers
 
         // DELETE: api/ChampionshipStatus/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> Delete(int id)
         {
 
             var championshipStatus = await _context.ChampionshipStatuses.FirstOrDefaultAsync(cs => cs.Id == id);

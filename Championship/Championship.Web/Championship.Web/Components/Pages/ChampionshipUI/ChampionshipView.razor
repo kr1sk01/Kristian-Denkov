@@ -84,8 +84,8 @@ else
             championshipWithDetails = test;
     }
 
-    private void Details(string id)
+    private void Details(int id)
     {
-        nManager.NavigateTo($"/championshipDetails?id={Uri.EscapeDataString(id)}");
+        nManager.NavigateTo($"/championshipDetails?id={Uri.EscapeDataString(id.ToString())}");
     }
 }

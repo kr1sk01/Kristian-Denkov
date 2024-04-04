@@ -4,8 +4,8 @@ namespace Championship.SHARED.DTO
 {
     public class ChampionshipTeamsDto
     {
-        [Key]
-        public string Id { get; set; } = default!;
+        
+        public int Id { get; set; }
 
         public string? ChampionshipId { get; set; }
         public virtual ChampionshipClassDto? Championship { get; set; }

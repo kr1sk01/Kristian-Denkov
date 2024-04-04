@@ -61,7 +61,7 @@ namespace Championship.API.Controllers
 
         // GET: api/ChampionshipClass/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<ChampionshipClassDto>> GetChampionshipClass(string id)
+        public async Task<ActionResult<ChampionshipClassDto>> GetChampionshipClass(int id)
         {
             var championshipClass = await _context.Championships
                 .Include(x => x.ChampionshipStatus)
@@ -103,7 +103,7 @@ namespace Championship.API.Controllers
 
         // PUT: api/ChampionshipClass/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutChampionshipClass(string id, ChampionshipClass championshipClass)
+        public async Task<IActionResult> PutChampionshipClass(int id, ChampionshipClass championshipClass)
         {
             if (id != championshipClass.Id)
             {
@@ -133,7 +133,7 @@ namespace Championship.API.Controllers
 
         // DELETE: api/ChampionshipClass/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteChampionshipClass(string id)
+        public async Task<IActionResult> DeleteChampionshipClass(int id)
         {
             var championshipClass = await _context.Championships.FindAsync(id);
             if (championshipClass == null)
@@ -150,7 +150,7 @@ namespace Championship.API.Controllers
             return NoContent();
         }
 
-        private async Task<bool> ChampionshipClassExists(string id)
+        private async Task<bool> ChampionshipClassExists(int id)
         {
             return await _context.Championships.AnyAsync(e => e.Id == id);
         }

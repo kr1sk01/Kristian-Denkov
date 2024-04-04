@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Championship.API.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -61,7 +61,8 @@ namespace Championship.API.Migrations
                 name: "ChampionshipStatuses",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "text", nullable: false),
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
@@ -73,7 +74,8 @@ namespace Championship.API.Migrations
                 name: "ChampionshipTypes",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "text", nullable: false),
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true)
                 },
                 constraints: table =>
@@ -85,7 +87,8 @@ namespace Championship.API.Migrations
                 name: "GameStatuses",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "text", nullable: false),
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true)
                 },
                 constraints: table =>
@@ -97,7 +100,8 @@ namespace Championship.API.Migrations
                 name: "TeamTypes",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "text", nullable: false),
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     TeamSize = table.Column<int>(type: "integer", nullable: true)
                 },
@@ -216,10 +220,11 @@ namespace Championship.API.Migrations
                 name: "GameTypes",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "text", nullable: false),
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     MaxPoints = table.Column<int>(type: "integer", nullable: true),
-                    TeamTypeId = table.Column<string>(type: "text", nullable: true)
+                    TeamTypeId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -235,10 +240,11 @@ namespace Championship.API.Migrations
                 name: "Teams",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "text", nullable: false),
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     Logo = table.Column<byte[]>(type: "bytea", nullable: true),
-                    TeamTypeId = table.Column<string>(type: "text", nullable: true),
+                    TeamTypeId = table.Column<int>(type: "integer", nullable: true),
                     Active = table.Column<bool>(type: "boolean", nullable: true),
                     CreatedBy = table.Column<string>(type: "text", nullable: true),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -259,13 +265,14 @@ namespace Championship.API.Migrations
                 name: "Championships",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "text", nullable: false),
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     Logo = table.Column<byte[]>(type: "bytea", nullable: true),
-                    ChampionshipTypeId = table.Column<string>(type: "text", nullable: true),
-                    ChampionshipStatusId = table.Column<string>(type: "text", nullable: true),
-                    GameTypeId = table.Column<string>(type: "text", nullable: true),
-                    WinnerId = table.Column<string>(type: "text", nullable: true),
+                    ChampionshipTypeId = table.Column<int>(type: "integer", nullable: true),
+                    ChampionshipStatusId = table.Column<int>(type: "integer", nullable: true),
+                    GameTypeId = table.Column<int>(type: "integer", nullable: true),
+                    WinnerId = table.Column<int>(type: "integer", nullable: true),
                     LotDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CreatedBy = table.Column<string>(type: "text", nullable: true),
@@ -302,9 +309,10 @@ namespace Championship.API.Migrations
                 name: "TeamPlayers",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "text", nullable: false),
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     PlayerId = table.Column<string>(type: "text", nullable: true),
-                    TeamId = table.Column<string>(type: "text", nullable: true),
+                    TeamId = table.Column<int>(type: "integer", nullable: true),
                     CreatedBy = table.Column<string>(type: "text", nullable: true),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
@@ -327,9 +335,10 @@ namespace Championship.API.Migrations
                 name: "ChampionshipTeams",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "text", nullable: false),
-                    ChampionshipId = table.Column<string>(type: "text", nullable: true),
-                    TeamId = table.Column<string>(type: "text", nullable: true),
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    ChampionshipId = table.Column<int>(type: "integer", nullable: true),
+                    TeamId = table.Column<int>(type: "integer", nullable: true),
                     CreatedBy = table.Column<string>(type: "text", nullable: true),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
@@ -352,16 +361,17 @@ namespace Championship.API.Migrations
                 name: "Games",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "text", nullable: false),
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    GameTypeId = table.Column<string>(type: "text", nullable: true),
-                    GameStatusId = table.Column<string>(type: "text", nullable: true),
-                    BlueTeamId = table.Column<string>(type: "text", nullable: true),
-                    RedTeamId = table.Column<string>(type: "text", nullable: true),
+                    GameTypeId = table.Column<int>(type: "integer", nullable: true),
+                    GameStatusId = table.Column<int>(type: "integer", nullable: true),
+                    BlueTeamId = table.Column<int>(type: "integer", nullable: true),
+                    RedTeamId = table.Column<int>(type: "integer", nullable: true),
                     BluePoints = table.Column<int>(type: "integer", nullable: true),
                     RedPoints = table.Column<int>(type: "integer", nullable: true),
-                    WinnerId = table.Column<string>(type: "text", nullable: true),
-                    ChampionshipId = table.Column<string>(type: "text", nullable: true),
+                    WinnerId = table.Column<int>(type: "integer", nullable: true),
+                    ChampionshipId = table.Column<int>(type: "integer", nullable: true),
                     Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CreatedBy = table.Column<string>(type: "text", nullable: true),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
