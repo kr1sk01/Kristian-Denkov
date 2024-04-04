@@ -1,4 +1,6 @@
-﻿namespace ChampionshipMaster.API.Controllers;
+﻿using ChampionshipMaster.API.Services.Interfaces;
+
+namespace ChampionshipMaster.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -6,28 +8,20 @@ public class ChampionshipController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
 
-    public ChampionshipController(ApplicationDbContext context)
+    private readonly IChampionshipService _championshipService;
+
+    public ChampionshipController(ApplicationDbContext context, IChampionshipService championshipService)
     {
         _context = context;
+        _championshipService = championshipService;
     }
 
     // GET: api/Championship
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Championship>>> GetChampionshipes([FromQuery] string? championshipStatusName)
+    public async Task<ActionResult<IEnumerable<Championship>>> GetChampionshipes()
     {
-        var championships = await _context.Championships
-            .Include(x => x.ChampionshipStatus)
-            .Include(x => x.ChampionshipType)
-            .Include(x => x.Winner)
-            .Include(x => x.GameType)
-            .ToListAsync();
-
-        var dto = championships.Adapt<List<ChampionshipDto>>();
-        if (string.IsNullOrEmpty(championshipStatusName))
-            return Ok(dto);
-
-        var filteredDto = dto.Where(x => x.ChampionshipStatusName == championshipStatusName).ToList();
-        return Ok(filteredDto);
+        var result = await _championshipService.GetAllChampionships();
+        return Ok(result);
     }
     [HttpGet("details")]
     public async Task<ActionResult<IEnumerable<ChampionshipDto>>> GetChampionshipesDetails()

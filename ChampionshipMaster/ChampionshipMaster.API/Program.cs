@@ -40,6 +40,7 @@ public class Program
         builder.Services.AddSwaggerGen();
         builder.Services.AddScoped<DataSeeding>();
         builder.Services.ConfigureMappings();
+        builder.Services.RegisterControllerServices();
 
         var app = builder.Build();
 
