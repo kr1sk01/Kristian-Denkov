@@ -10,7 +10,7 @@ namespace ChampionshipMaster.DATA.Models
         public int Id { get; set; }
 
         public int? ChampionshipId { get; set; }
-        public virtual ChampionshipClass? Championship { get; set; }
+        public virtual Championship? Championship { get; set; }
 
         public int? TeamId { get; set; }
         public virtual Team? Team { get; set; }

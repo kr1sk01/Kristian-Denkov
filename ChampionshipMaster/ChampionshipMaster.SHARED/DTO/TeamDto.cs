@@ -15,6 +15,6 @@
 
         public virtual ICollection<PlayerDto> Players { get; set; } = new HashSet<PlayerDto>();
 
-        //public virtual ICollection<ChampionshipClassDto> Championships { get; set; } = new HashSet<ChampionshipClassDto>();
+        //public virtual ICollection<ChampionshipDto> Championships { get; set; } = new HashSet<ChampionshipDto>();
     }
 }

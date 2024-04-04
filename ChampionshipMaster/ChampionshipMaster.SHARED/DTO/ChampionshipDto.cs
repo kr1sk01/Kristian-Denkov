@@ -1,6 +1,6 @@
 ﻿namespace ChampionshipMaster.SHARED.DTO
 {
-    public class ChampionshipClassDto
+    public class ChampionshipDto
     {
 
         public int Id { get; set; }

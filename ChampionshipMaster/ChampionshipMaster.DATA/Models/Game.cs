@@ -38,7 +38,7 @@ namespace ChampionshipMaster.DATA.Models
 
         public int? ChampionshipId { get; set; }
         [ForeignKey("ChampionshipId")]
-        public virtual ChampionshipClass? Championship { get; set; }
+        public virtual Championship? Championship { get; set; }
 
         public DateTime? Date { get; set; }
 

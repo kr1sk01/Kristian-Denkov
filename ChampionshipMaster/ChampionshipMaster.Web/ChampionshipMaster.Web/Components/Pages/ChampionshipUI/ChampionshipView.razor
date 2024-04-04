@@ -75,11 +75,11 @@ else
             StateHasChanged();
         }
     }
-    private List<ChampionshipClassDto>? championshipWithDetails;
+    private List<ChampionshipDto>? championshipWithDetails;
 
     protected override async Task OnInitializedAsync()
     {
-        var test = await httpClient.GetFromJsonAsync<List<ChampionshipClassDto>>("api/championshipclass/details");
+        var test = await httpClient.GetFromJsonAsync<List<ChampionshipDto>>("api/championshipclass/details");
         if (test != null)
             championshipWithDetails = test;
     }

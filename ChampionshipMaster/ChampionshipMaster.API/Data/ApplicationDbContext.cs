@@ -16,7 +16,7 @@ namespace ChampionshipMaster.API.Data
         public DbSet<Game> Games { get; set; }
         public DbSet<GameType> GameTypes { get; set; }
         public DbSet<GameStatus> GameStatuses { get; set; }
-        public DbSet<ChampionshipClass> Championships { get; set; }
+        public DbSet<Championship> Championships { get; set; }
         public DbSet<ChampionshipType> ChampionshipTypes { get; set; }
         public DbSet<ChampionshipStatus> ChampionshipStatuses { get; set; }
         public DbSet<ChampionshipTeams> ChampionshipTeams { get; set; }

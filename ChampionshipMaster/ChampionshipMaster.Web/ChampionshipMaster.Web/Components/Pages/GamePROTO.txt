@@ -37,11 +37,11 @@
         }
     }
 
-    private ChampionshipClassDto championshipWithDetails;
+    private ChampionshipDto championshipWithDetails;
 
     protected override async Task OnInitializedAsync()
     {
-        var test = await httpClient.GetFromJsonAsync<ChampionshipClassDto>($"api/ChampionshipClass/{id}");
+        var test = await httpClient.GetFromJsonAsync<ChampionshipDto>($"api/Championship/{id}");
         if (test != null)
             championshipWithDetails = test;
     }

@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ChampionshipMaster.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240404085152_Initial-Create")]
+    [Migration("20240404124520_Initial-Create")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -25,7 +25,7 @@ namespace ChampionshipMaster.API.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("ChampionshipMaster.DATA.Models.ChampionshipClass", b =>
+            modelBuilder.Entity("ChampionshipMaster.DATA.Models.Championship", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -413,6 +413,7 @@ namespace ChampionshipMaster.API.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.HasIdentityOptions(b.Property<int>("Id"), 100L, null, null, null, null, null);
 
                     b.Property<string>("Name")
                         .HasMaxLength(255)
@@ -558,7 +559,7 @@ namespace ChampionshipMaster.API.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("ChampionshipMaster.DATA.Models.ChampionshipClass", b =>
+            modelBuilder.Entity("ChampionshipMaster.DATA.Models.Championship", b =>
                 {
                     b.HasOne("ChampionshipMaster.DATA.Models.ChampionshipStatus", "ChampionshipStatus")
                         .WithMany()
@@ -587,7 +588,7 @@ namespace ChampionshipMaster.API.Migrations
 
             modelBuilder.Entity("ChampionshipMaster.DATA.Models.ChampionshipTeams", b =>
                 {
-                    b.HasOne("ChampionshipMaster.DATA.Models.ChampionshipClass", "Championship")
+                    b.HasOne("ChampionshipMaster.DATA.Models.Championship", "Championship")
                         .WithMany("ChampionshipTeams")
                         .HasForeignKey("ChampionshipId");
 
@@ -606,7 +607,7 @@ namespace ChampionshipMaster.API.Migrations
                         .WithMany()
                         .HasForeignKey("BlueTeamId");
 
-                    b.HasOne("ChampionshipMaster.DATA.Models.ChampionshipClass", "Championship")
+                    b.HasOne("ChampionshipMaster.DATA.Models.Championship", "Championship")
                         .WithMany("Games")
                         .HasForeignKey("ChampionshipId");
 
@@ -723,7 +724,7 @@ namespace ChampionshipMaster.API.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ChampionshipMaster.DATA.Models.ChampionshipClass", b =>
+            modelBuilder.Entity("ChampionshipMaster.DATA.Models.Championship", b =>
                 {
                     b.Navigation("ChampionshipTeams");
 

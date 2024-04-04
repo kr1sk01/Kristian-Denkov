@@ -186,7 +186,7 @@ namespace ChampionshipMaster.API.Services
         private static async Task SeedChampionships(ApplicationDbContext context)
         {
             string jsonData = await File.ReadAllTextAsync("Services/JsonDataSeeds/Championships.json");
-            List<ChampionshipClass>? dataList = Deserialize<ChampionshipClass>(jsonData);
+            List<Championship>? dataList = Deserialize<Championship>(jsonData);
             if (dataList != null)
                 foreach (var item in dataList)
                 {

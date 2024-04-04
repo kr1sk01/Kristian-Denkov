@@ -6,7 +6,7 @@ namespace ChampionshipMaster.API.Data
     {
         public static void ConfigureMappings(this IServiceCollection services)
         {
-            TypeAdapterConfig<ChampionshipClass, ChampionshipClassDto>.NewConfig()
+            TypeAdapterConfig<Championship, ChampionshipDto>.NewConfig()
                 .Map(dest => dest.Teams, src => src.ChampionshipTeams.Select(sc => sc.Team).Adapt<List<TeamDto>>());
 
             TypeAdapterConfig<Team, TeamDto>.NewConfig()

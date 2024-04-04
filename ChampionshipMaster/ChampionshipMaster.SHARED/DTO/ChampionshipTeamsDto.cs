@@ -6,7 +6,7 @@
         public int Id { get; set; }
 
         public string? ChampionshipId { get; set; }
-        public virtual ChampionshipClassDto? Championship { get; set; }
+        public virtual ChampionshipDto? Championship { get; set; }
 
         public string? TeamId { get; set; }
         public virtual TeamDto? Team { get; set; }

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ChampionshipMaster.DATA.Models
 {
-    public class ChampionshipClass
+    public class Championship
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
