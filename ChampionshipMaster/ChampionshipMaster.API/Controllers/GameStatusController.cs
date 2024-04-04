@@ -1,0 +1,120 @@
+﻿namespace ChampionshipMaster.API.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class GameStatusController : ControllerBase
+    {
+        private readonly ApplicationDbContext _context;
+
+        public GameStatusController(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
+        // GET: api/GameStatus
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<GameStatus>>> GetGameStatuses()
+        {
+            return await _context.GameStatuses.ToListAsync();
+        }
+
+        // GET: api/GameStatus/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<GameStatus>> GetGameStatus(int id)
+        {
+            var gameStatus = await _context.GameStatuses.FindAsync(id);
+
+            if (gameStatus == null)
+            {
+                return NotFound();
+            }
+
+            return gameStatus;
+        }
+
+        // PUT: api/GameStatus/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutGameStatus(int id, GameStatus gameStatus)
+        {
+            if (id != gameStatus.Id)
+            {
+                return BadRequest();
+            }
+
+            _context.Entry(gameStatus).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!GameStatusExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        // POST: api/GameStatus
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPost]
+        public async Task<ActionResult<GameStatus>> PostGameStatus(GameStatus gameStatus)
+        {
+            _context.GameStatuses.Add(gameStatus);
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                if (GameStatusExists(gameStatus.Id))
+                {
+                    return Conflict();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return CreatedAtAction("GetGameStatus", new { id = gameStatus.Id }, gameStatus);
+        }
+
+        // DELETE: api/GameStatus/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteGameStatus(int id)
+        {
+            var gameStatus = await _context.GameStatuses.FindAsync(id);
+            if (gameStatus == null)
+            {
+                return NotFound();
+            }
+
+            var games = await _context.Games.Where(x => x.GameStatusId == id).ToListAsync();
+
+            foreach (var game in games)
+            {
+                game.GameStatusId = null;
+                _context.Entry(game).State = EntityState.Modified;
+            }
+
+            _context.GameStatuses.Remove(gameStatus);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        private bool GameStatusExists(int id)
+        {
+            return _context.GameStatuses.Any(e => e.Id == id);
+        }
+    }
+}
