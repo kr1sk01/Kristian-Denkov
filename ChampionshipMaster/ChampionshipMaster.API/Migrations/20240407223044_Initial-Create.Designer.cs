@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ChampionshipMaster.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240404124520_Initial-Create")]
+    [Migration("20240407223044_Initial-Create")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -32,6 +32,7 @@ namespace ChampionshipMaster.API.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.HasIdentityOptions(b.Property<int>("Id"), 100L, null, null, null, null, null);
 
                     b.Property<int?>("ChampionshipStatusId")
                         .HasColumnType("integer");

@@ -48,6 +48,10 @@ namespace ChampionshipMaster.API.Data
             builder.Entity<TeamType>()
                 .Property(x => x.Id)
                 .HasIdentityOptions(100);
+
+            builder.Entity<Championship>()
+                .Property(x => x.Id)
+                .HasIdentityOptions(100);
         }
     }
 }

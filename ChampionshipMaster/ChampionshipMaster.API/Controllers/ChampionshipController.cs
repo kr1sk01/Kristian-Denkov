@@ -6,98 +6,72 @@ namespace ChampionshipMaster.API.Controllers;
 [ApiController]
 public class ChampionshipController : ControllerBase
 {
-    private readonly ApplicationDbContext _context;
-
     private readonly IChampionshipService _championshipService;
-
-    public ChampionshipController(ApplicationDbContext context, IChampionshipService championshipService)
+    private readonly ApplicationDbContext _context;
+    public ChampionshipController(IChampionshipService championshipService, ApplicationDbContext context)
     {
-        _context = context;
         _championshipService = championshipService;
+        _context = context;
     }
 
     // GET: api/Championship
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Championship>>> GetChampionshipes()
+    public async Task<ActionResult<IEnumerable<Championship>>> GetChampionships()
     {
         var result = await _championshipService.GetAllChampionships();
         return Ok(result);
     }
-    [HttpGet("details")]
-    public async Task<ActionResult<IEnumerable<ChampionshipDto>>> GetChampionshipesDetails()
-    {
-        var championshipClassesWithDetails = await _context.Championships
-            .Include(x => x.ChampionshipStatus)
-            .Include(x => x.ChampionshipType)
-            .Include(x => x.Winner)
-            .Include(x => x.GameType)
-            .Include(x => x.Games)
-                .ThenInclude(g => g.GameStatus)
-            .Include(x => x.Games)
-                .ThenInclude(g => g.RedTeam)
-            .Include(x => x.Games)
-                .ThenInclude(g => g.BlueTeam)
-            .Include(x => x.Games)
-                .ThenInclude(g => g.Winner).ToListAsync();
 
-        var dtos = championshipClassesWithDetails.Adapt<List<ChampionshipDto>>();
-        return Ok(dtos);
+    [HttpGet("details")]
+    public async Task<ActionResult<IEnumerable<ChampionshipDto>>> GetChampionshipsDetails()
+    {
+        var result = await _championshipService.GetChampionshipsDetails();
+        return Ok(result);
     }
 
     // GET: api/Championship/5
     [HttpGet("{id}")]
     public async Task<ActionResult<ChampionshipDto>> GetChampionship(int id)
     {
-        var championshipClass = await _context.Championships
-            .Include(x => x.ChampionshipStatus)
-            .Include(x => x.ChampionshipType)
-            .Include(x => x.Winner)
-            .Include(x => x.GameType)
-            .Include(x => x.Games)
-                .ThenInclude(g => g.GameStatus)
-            .Include(x => x.Games)
-                .ThenInclude(g => g.RedTeam)
-            .Include(x => x.Games)
-                .ThenInclude(g => g.BlueTeam)
-            .Include(x => x.Games)
-                .ThenInclude(g => g.Winner)
-            .Include(x => x.ChampionshipTeams)
-                .ThenInclude(x => x.Team)
-            .FirstOrDefaultAsync(a => a.Id == id);
+        var championship = await _championshipService.GetChampionship(id);
 
-        if (championshipClass == null)
+        if (championship == null)
         {
             return NotFound();
         }
 
-        var dto = championshipClass.Adapt<ChampionshipDto>();
+        var dto = championship.Adapt<ChampionshipDto>();
         return Ok(dto);
     }
 
     // POST: api/Championship
     [HttpPost]
-    public async Task<ActionResult<Championship>> PostChampionship(Championship championshipClass)
+    public async Task<ActionResult<Championship>> PostChampionship(Championship championship)
     {
-        _context.Championships.Add(championshipClass);
-        await _context.SaveChangesAsync();
+        if (await _championshipService.ChampionshipNameExists(championship.Name))
+        {
+            return BadRequest("There is already a championship with that name");
+        }
+
+        await _championshipService.PostChampionship(championship);
 
         return CreatedAtAction(nameof(GetChampionship), new
         {
-            id = championshipClass.Id
+            id = championship.Id
         },
-            championshipClass);
+            championship);
     }
 
     // PUT: api/Championship/5
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutChampionship(int id, Championship championshipClass)
+    public async Task<IActionResult> PutChampionship(int id, Championship championship)
     {
-        if (id != championshipClass.Id)
+        if (id != championship.Id)
         {
             return BadRequest();
         }
 
-        _context.Entry(championshipClass).State = EntityState.Modified;
+        _context.Entry(championship).State = EntityState.Modified;
 
         try
         {
@@ -122,8 +96,8 @@ public class ChampionshipController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteChampionship(int id)
     {
-        var championshipClass = await _context.Championships.FindAsync(id);
-        if (championshipClass == null)
+        var championship = await _context.Championships.FindAsync(id);
+        if (championship == null)
         {
             return NotFound();
         }
@@ -131,7 +105,7 @@ public class ChampionshipController : ControllerBase
         var championshipTeamsToDelete = await _context.ChampionshipTeams.Where(c => c.ChampionshipId == id).ToListAsync();
 
         _context.ChampionshipTeams.RemoveRange(championshipTeamsToDelete);
-        _context.Championships.Remove(championshipClass);
+        _context.Championships.Remove(championship);
         await _context.SaveChangesAsync();
 
         return NoContent();
