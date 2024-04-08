@@ -1,6 +1,6 @@
 ﻿using ChampionshipMaster.DATA.Models;
 
-namespace ChampionshipMaster.API.Services.Interfaces.Services
+namespace ChampionshipMaster.API.Services.Interfaces.ControllerServices
 {
     public class ChampionshipService : ControllerBase, IChampionshipService
     {
@@ -76,7 +76,7 @@ namespace ChampionshipMaster.API.Services.Interfaces.Services
             _context.Championships.Add(championship);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetChampionship), new
+            return CreatedAtAction(nameof(PostChampionship), new
             {
                 id = championship.Id
             },

@@ -1,43 +1,33 @@
-﻿namespace ChampionshipMaster.API.Controllers;
+﻿using ChampionshipMaster.API.Services.Interfaces;
+using ChampionshipMaster.DATA.Models;
+
+namespace ChampionshipMaster.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
 public class GameTypesController : ControllerBase
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IGameTypeService _gameTypeService;
 
-    public GameTypesController(ApplicationDbContext context)
+    public GameTypesController(IGameTypeService gameTypeService)
     {
-        _context = context;
+        _gameTypeService = gameTypeService;
     }
 
     // GET: api/GameTypes
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<GameType>>> GetGameTypes()
+    public async Task<ActionResult<IEnumerable<GameTypeDto>>> GetGameTypes()
     {
-        var gameTypes = await _context.GameTypes
-            .Include(x => x.TeamType)
-            .ToListAsync();
-
-        var dto = gameTypes.Adapt<List<GameTypeDto>>();
-        return Ok(dto);
+        var result = await _gameTypeService.GetAllGameTypes();
+        return Ok(result);
     }
 
     // GET: api/GameTypes/5
     [HttpGet("{id}")]
-    public async Task<ActionResult<GameType>> GetGameType(int id)
+    public async Task<ActionResult<GameTypeDto?>> GetGameType(int id)
     {
-        var gameType = await _context.GameTypes
-            .Include(x => x.TeamType)
-            .FirstOrDefaultAsync(x => x.Id == id);
-
-        if (gameType == null)
-        {
-            return NotFound();
-        }
-
-        var dto = gameType.Adapt<GameTypeDto>();
-        return Ok(dto);
+        var result = await _gameTypeService.GetGameType(id);
+        return result;
     }
 
     // PUT: api/GameTypes/5
@@ -45,30 +35,8 @@ public class GameTypesController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> PutGameType(int id, GameType gameType)
     {
-        if (id != gameType.Id)
-        {
-            return BadRequest();
-        }
-
-        _context.Entry(gameType).State = EntityState.Modified;
-
-        try
-        {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!GameTypeExists(id))
-            {
-                return NotFound();
-            }
-            else
-            {
-                throw;
-            }
-        }
-
-        return NoContent();
+        var result = await _gameTypeService.EditGameType(id, gameType);
+        return result;
     }
 
     // POST: api/GameTypes
@@ -76,52 +44,15 @@ public class GameTypesController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<GameType>> PostGameType(GameType gameType)
     {
-        _context.GameTypes.Add(gameType);
-        try
-        {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateException)
-        {
-            if (GameTypeExists(gameType.Id))
-            {
-                return Conflict();
-            }
-            else
-            {
-                throw;
-            }
-        }
-
-        return CreatedAtAction("GetGameType", new { id = gameType.Id }, gameType);
+        var result = await _gameTypeService.PostGameType(gameType);
+        return result;
     }
 
     // DELETE: api/GameTypes/5
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteGameType(int id)
     {
-        var gameType = await _context.GameTypes.FindAsync(id);
-        if (gameType == null)
-        {
-            return NotFound();
-        }
-
-        var games = await _context.Games.Where(x => x.GameTypeId == id).ToListAsync();
-
-        foreach (var game in games)
-        {
-            game.GameTypeId = null;
-            _context.Entry(game).State = EntityState.Modified;
-        }
-
-        _context.GameTypes.Remove(gameType);
-        await _context.SaveChangesAsync();
-
-        return NoContent();
-    }
-
-    private bool GameTypeExists(int id)
-    {
-        return _context.GameTypes.Any(e => e.Id == id);
+        var result = await _gameTypeService.DeleteGameType(id);
+        return result;
     }
 }

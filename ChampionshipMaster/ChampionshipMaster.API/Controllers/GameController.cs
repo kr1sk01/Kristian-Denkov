@@ -1,53 +1,32 @@
-﻿namespace ChampionshipMaster.API.Controllers
+﻿using GameMaster.API.Services.Interfaces;
+
+namespace ChampionshipMaster.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class GameController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IGameService _gameService;
 
-        public GameController(ApplicationDbContext context)
+        public GameController(IGameService gameService)
         {
-            _context = context;
+            _gameService = gameService;
         }
 
         // GET: api/Game
         [HttpGet]
         public async Task<ActionResult<IEnumerable<GameDto>>> GetGames()
         {
-            var games = await _context.Games
-                .Include(x => x.GameType)
-                .Include(x => x.GameStatus)
-                .Include(x => x.BlueTeam)
-                .Include(x => x.RedTeam)
-                .Include(x => x.Winner)
-                .Include(x => x.Championship)
-                .ToListAsync();
-
-            var dto = games.Adapt<List<GameDto>>();
-            return Ok(dto);
+            var result = await _gameService.GetAllGames();
+            return Ok(result);
         }
 
         // GET: api/Game/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<GameDto>> GetGame(int id)
+        public async Task<ActionResult<GameDto?>> GetGame(int id)
         {
-            var game = await _context.Games
-                .Include(x => x.GameType)
-                .Include(x => x.GameStatus)
-                .Include(x => x.BlueTeam)
-                .Include(x => x.RedTeam)
-                .Include(x => x.Winner)
-                .Include(x => x.Championship)
-                .FirstOrDefaultAsync(x => x.Id == id);
-
-            if (game == null)
-            {
-                return NotFound();
-            }
-
-            var dto = game.Adapt<GameDto>();
-            return Ok(dto);
+            var result = await _gameService.GetGame(id);
+            return result;
         }
 
         // PUT: api/Game/5
@@ -55,30 +34,8 @@
         [HttpPut("{id}")]
         public async Task<IActionResult> PutGame(int id, Game game)
         {
-            if (id != game.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(game).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!GameExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            var result = await _gameService.EditGame(id, game);
+            return result;
         }
 
         // POST: api/Game
@@ -86,45 +43,16 @@
         [HttpPost]
         public async Task<ActionResult<Game>> PostGame(Game game)
         {
-            _context.Games.Add(game);
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                if (GameExists(game.Id))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return CreatedAtAction("GetGame", new { id = game.Id }, game);
+            var result = await _gameService.PostGame(game);
+            return result;
         }
 
         // DELETE: api/Game/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteGame(int id)
         {
-            var game = await _context.Games.FindAsync(id);
-            if (game == null)
-            {
-                return NotFound();
-            }
-
-            _context.Games.Remove(game);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool GameExists(int id)
-        {
-            return _context.Games.Any(e => e.Id == id);
+            var result = await _gameService.DeleteGame(id);
+            return result;
         }
     }
 }
