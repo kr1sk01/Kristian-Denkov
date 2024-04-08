@@ -7,11 +7,10 @@ namespace ChampionshipMaster.API.Controllers;
 public class ChampionshipController : ControllerBase
 {
     private readonly IChampionshipService _championshipService;
-    private readonly ApplicationDbContext _context;
-    public ChampionshipController(IChampionshipService championshipService, ApplicationDbContext context)
+
+    public ChampionshipController(IChampionshipService championshipService)
     {
         _championshipService = championshipService;
-        _context = context;
     }
 
     // GET: api/Championship
@@ -48,71 +47,23 @@ public class ChampionshipController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Championship>> PostChampionship(Championship championship)
     {
-        if (await _championshipService.ChampionshipNameExists(championship.Name))
-        {
-            return BadRequest("There is already a championship with that name");
-        }
-
-        await _championshipService.PostChampionship(championship);
-
-        return CreatedAtAction(nameof(GetChampionship), new
-        {
-            id = championship.Id
-        },
-            championship);
+        var result = await _championshipService.PostChampionship(championship);
+        return result;
     }
 
     // PUT: api/Championship/5
     [HttpPut("{id}")]
     public async Task<IActionResult> PutChampionship(int id, Championship championship)
     {
-        if (id != championship.Id)
-        {
-            return BadRequest();
-        }
-
-        _context.Entry(championship).State = EntityState.Modified;
-
-        try
-        {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!await ChampionshipExists(id))
-            {
-                return NotFound();
-            }
-            else
-            {
-                throw;
-            }
-        }
-
-        return NoContent();
+        var result = await _championshipService.EditChampionship(id, championship);
+        return result;
     }
 
     // DELETE: api/Championship/5
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteChampionship(int id)
     {
-        var championship = await _context.Championships.FindAsync(id);
-        if (championship == null)
-        {
-            return NotFound();
-        }
-
-        var championshipTeamsToDelete = await _context.ChampionshipTeams.Where(c => c.ChampionshipId == id).ToListAsync();
-
-        _context.ChampionshipTeams.RemoveRange(championshipTeamsToDelete);
-        _context.Championships.Remove(championship);
-        await _context.SaveChangesAsync();
-
-        return NoContent();
-    }
-
-    private async Task<bool> ChampionshipExists(int id)
-    {
-        return await _context.Championships.AnyAsync(e => e.Id == id);
+        var result = await _championshipService.DeleteChampionship(id);
+        return result;
     }
 }

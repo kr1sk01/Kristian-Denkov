@@ -1,8 +1,8 @@
-﻿using ChampionshipMaster.API.Services.Interfaces;
+﻿using ChampionshipMaster.DATA.Models;
 
-namespace ChampionshipMaster.API.Services.ControllerServices
+namespace ChampionshipMaster.API.Services.Interfaces.Services
 {
-    public class ChampionshipService : IChampionshipService
+    public class ChampionshipService : ControllerBase, IChampionshipService
     {
         private readonly ApplicationDbContext _context;
 
@@ -66,15 +66,76 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             return championshipClass;
         }
 
-        public async Task PostChampionship(Championship championship)
+        public async Task<ActionResult<Championship>> PostChampionship(Championship championship)
         {
+            if (await ChampionshipNameExists(championship.Name))
+            {
+                return BadRequest("There is already a championship with that name");
+            }
+
             _context.Championships.Add(championship);
             await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetChampionship), new
+            {
+                id = championship.Id
+            },
+                championship);
         }
 
-        public async Task<bool> ChampionshipNameExists(string name)
+        public async Task<bool> ChampionshipNameExists(string? name)
         {
             return await _context.Championships.AnyAsync(x => x.Name == name);
+        }
+
+        public async Task<IActionResult> EditChampionship(int id, Championship championship)
+        {
+            if (id != championship.Id)
+            {
+                return BadRequest();
+            }
+
+            _context.Entry(championship).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!await ChampionshipExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        public async Task<bool> ChampionshipExists(int id)
+        {
+            return await _context.Championships.AnyAsync(e => e.Id == id);
+        }
+
+        public async Task<IActionResult> DeleteChampionship(int id)
+        {
+            var championship = await _context.Championships.FindAsync(id);
+            if (championship == null)
+            {
+                return NotFound();
+            }
+
+            var championshipTeamsToDelete = await _context.ChampionshipTeams.Where(c => c.ChampionshipId == id).ToListAsync();
+
+            _context.ChampionshipTeams.RemoveRange(championshipTeamsToDelete);
+            _context.Championships.Remove(championship);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
     }
 }
