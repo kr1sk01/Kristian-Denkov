@@ -1,35 +1,33 @@
-﻿namespace ChampionshipMaster.API.Controllers
+﻿using ChampionshipMaster.API.Interfaces;
+using ChampionshipMaster.DATA.Models;
+
+namespace ChampionshipMaster.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class ChampionshipTeamsController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IChampionshipTeamsService _championshipTeamsService;
 
-        public ChampionshipTeamsController(ApplicationDbContext context)
+        public ChampionshipTeamsController(IChampionshipTeamsService championshipTeamsService)
         {
-            _context = context;
+            _championshipTeamsService = championshipTeamsService;
         }
 
         // GET: api/ChampionshipTeams
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ChampionshipTeams>>> GetChampionshipTeams()
+        public async Task<ActionResult<IEnumerable<ChampionshipTeamsDto>>> GetChampionshipTeams()
         {
-            return await _context.ChampionshipTeams.ToListAsync();
+            var result = await _championshipTeamsService.GetAllChampionshipTeams();
+            return Ok(result);
         }
 
         // GET: api/ChampionshipTeams/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<ChampionshipTeams>> GetChampionshipTeams(int id)
+        public async Task<ActionResult<ChampionshipTeamsDto?>> GetChampionshipTeams(int id)
         {
-            var championshipTeams = await _context.ChampionshipTeams.FindAsync(id);
-
-            if (championshipTeams == null)
-            {
-                return NotFound();
-            }
-
-            return championshipTeams;
+            var result = await _championshipTeamsService.GetChampionshipTeams(id);
+            return result;
         }
 
         // PUT: api/ChampionshipTeams/5
@@ -37,30 +35,8 @@
         [HttpPut("{id}")]
         public async Task<IActionResult> PutChampionshipTeams(int id, ChampionshipTeams championshipTeams)
         {
-            if (id != championshipTeams.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(championshipTeams).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ChampionshipTeamsExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            var result = await _championshipTeamsService.EditChampionshipTeams(id, championshipTeams);
+            return result;
         }
 
         // POST: api/ChampionshipTeams
@@ -68,45 +44,16 @@
         [HttpPost]
         public async Task<ActionResult<ChampionshipTeams>> PostChampionshipTeams(ChampionshipTeams championshipTeams)
         {
-            _context.ChampionshipTeams.Add(championshipTeams);
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                if (ChampionshipTeamsExists(championshipTeams.Id))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return CreatedAtAction("GetChampionshipTeams", new { id = championshipTeams.Id }, championshipTeams);
+            var result = await _championshipTeamsService.PostChampionshipTeams(championshipTeams);
+            return result;
         }
 
         // DELETE: api/ChampionshipTeams/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteChampionshipTeams(int id)
         {
-            var championshipTeams = await _context.ChampionshipTeams.FindAsync(id);
-            if (championshipTeams == null)
-            {
-                return NotFound();
-            }
-
-            _context.ChampionshipTeams.Remove(championshipTeams);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool ChampionshipTeamsExists(int id)
-        {
-            return _context.ChampionshipTeams.Any(e => e.Id == id);
+            var result = await _championshipTeamsService.DeleteChampionshipTeams(id);
+            return result;
         }
     }
 }

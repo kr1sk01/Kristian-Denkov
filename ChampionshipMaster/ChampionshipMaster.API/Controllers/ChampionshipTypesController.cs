@@ -1,92 +1,58 @@
 ﻿
 
+using ChampionshipMaster.API.Interfaces;
+using ChampionshipMaster.DATA.Models;
+
 namespace ChampionshipMaster.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
 public class ChampionshipTypesController : Controller
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IChampionshipTypeService _championshipTypeService;
 
-    public ChampionshipTypesController(ApplicationDbContext context)
+    public ChampionshipTypesController(IChampionshipTypeService championshipTypeService)
     {
-        _context = context;
+        _championshipTypeService = championshipTypeService;
     }
 
     // GET: ChampionshipTypes
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ChampionshipType>>> Get()
     {
-        return await _context.ChampionshipTypes.ToListAsync();
+        var result = await _championshipTypeService.GetAllChampionshipTypes();
+        return Ok(result);
     }
 
     // GET: ChampionshipTypes/Details/5
     [HttpGet("{id}")]
-    public async Task<ActionResult<ChampionshipType>> Get(int id)
+    public async Task<ActionResult<ChampionshipType?>> Get(int id)
     {
-        var championshipType = await _context.ChampionshipTypes.FirstOrDefaultAsync(cs => cs.Id == id);
-        if (championshipType == null)
-        {
-            return NotFound();
-        }
-        return championshipType;
+        var result = await _championshipTypeService.GetChampionshipType(id);
+        return result;
     }
 
     // POST: ChampionshipTypes
     [HttpPost]
     public async Task<ActionResult<ChampionshipType>> Post(ChampionshipType championshipType)
     {
-        await _context.ChampionshipTypes.AddAsync(championshipType);
-        await _context.SaveChangesAsync();
-        return CreatedAtAction(nameof(Get), new
-        {
-            id = championshipType.Id
-        },
-            championshipType);
+        var result = await _championshipTypeService.PostChampionshipType(championshipType);
+        return result;
     }
 
     // PUT: ChampionshipTypes/5
     [HttpPut("{id}")]
     public async Task<IActionResult> Put(int id, ChampionshipType championshipType)
     {
-        var existingChampionshipType = await _context.ChampionshipTypes.FirstOrDefaultAsync(cs => cs.Id == id);
-        if (existingChampionshipType == null)
-        {
-            return NotFound();
-        }
-
-        _context.Entry(championshipType).State = EntityState.Modified;
-
-        await _context.SaveChangesAsync();
-
-        return NoContent();
+        var result = await _championshipTypeService.EditChampionshipType(id, championshipType);
+        return result;
     }
 
     // DELETE: api/ChampionshipTypes/5
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-
-        var championshipType = await _context.ChampionshipTypes.FirstOrDefaultAsync(cs => cs.Id == id);
-
-        if (championshipType == null)
-        {
-            return NotFound();
-        }
-
-        var championship = await _context.Championships.Where(x => x.ChampionshipTypeId == id).ToListAsync();
-
-        foreach (var item in championship)
-        {
-            item.ChampionshipTypeId = null;
-
-            _context.Entry(item).State = EntityState.Modified;
-        }
-
-        _context.ChampionshipTypes.Remove(championshipType);
-
-        await _context.SaveChangesAsync();
-
-        return NoContent();
+        var result = await _championshipTypeService.DeleteChampionshipType(id);
+        return result;
     }
 }
