@@ -12,6 +12,12 @@ namespace ChampionshipMaster.API.Services
             services.AddTransient<IGameService, GameService>();
             services.AddTransient<IGameStatusService, GameStatusService>();
             services.AddTransient<IGameTypeService, GameTypeService>();
+            services.AddTransient<IChampionshipStatusService, ChampionshipStatusService>();
+            services.AddTransient<IChampionshipTeamsService, ChampionshipTeamsService>();
+            services.AddTransient<IChampionshipTypeService, ChampionshipTypeService>();
+            services.AddTransient<ITeamPlayersService, TeamPlayersService>();
+            services.AddTransient<ITeamService, TeamService>();
+            services.AddTransient<ITeamTypesService, TeamTypesService>();
         }
     }
 }

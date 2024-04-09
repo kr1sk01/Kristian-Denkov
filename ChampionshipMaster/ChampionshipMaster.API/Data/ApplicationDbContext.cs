@@ -64,6 +64,26 @@ namespace ChampionshipMaster.API.Data
             builder.Entity<GameType>()
                 .Property(x => x.Id)
                 .HasIdentityOptions(100);
+
+            builder.Entity<ChampionshipTeams>()
+                .Property(x => x.Id)
+                .HasIdentityOptions(100);
+
+            builder.Entity<ChampionshipStatus>()
+                .Property(x => x.Id)
+                .HasIdentityOptions(100);
+
+            builder.Entity<ChampionshipType>()
+                .Property(x => x.Id)
+                .HasIdentityOptions(100);
+
+            builder.Entity<TeamPlayers>()
+                .Property(x => x.Id)
+                .HasIdentityOptions(100);
+
+            builder.Entity<Team>()
+                .Property(x => x.Id)
+                .HasIdentityOptions(100);
         }
     }
 }

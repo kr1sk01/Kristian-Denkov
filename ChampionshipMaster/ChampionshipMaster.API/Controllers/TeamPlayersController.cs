@@ -1,35 +1,33 @@
-﻿namespace ChampionshipMaster.API.Controllers
+﻿using ChampionshipMaster.API.Interfaces;
+using ChampionshipMaster.DATA.Models;
+
+namespace ChampionshipMaster.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class TeamPlayersController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ITeamPlayersService _teamPLayersService;
 
-        public TeamPlayersController(ApplicationDbContext context)
+        public TeamPlayersController(ITeamPlayersService teamPlayersService)
         {
-            _context = context;
+            _teamPLayersService = teamPlayersService;
         }
 
         // GET: api/TeamPlayers
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<TeamPlayers>>> GetTeamPlayers()
+        public async Task<ActionResult<IEnumerable<TeamPlayersDto>>> GetTeamPlayers()
         {
-            return await _context.TeamPlayers.ToListAsync();
+            var result = await _teamPLayersService.GetAllTeamPlayers();
+            return Ok(result);
         }
 
         // GET: api/TeamPlayers/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<TeamPlayers>> GetTeamPlayers(int id)
+        public async Task<ActionResult<TeamPlayersDto?>> GetTeamPlayers(int id)
         {
-            var teamPlayers = await _context.TeamPlayers.FindAsync(id);
-
-            if (teamPlayers == null)
-            {
-                return NotFound();
-            }
-
-            return teamPlayers;
+            var result = await _teamPLayersService.GetTeamPlayers(id);
+            return result;
         }
 
         // PUT: api/TeamPlayers/5
@@ -37,30 +35,8 @@
         [HttpPut("{id}")]
         public async Task<IActionResult> PutTeamPlayers(int id, TeamPlayers teamPlayers)
         {
-            if (id != teamPlayers.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(teamPlayers).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!TeamPlayersExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            var result = await _teamPLayersService.EditTeamPlayers(id, teamPlayers);
+            return result;
         }
 
         // POST: api/TeamPlayers
@@ -68,45 +44,16 @@
         [HttpPost]
         public async Task<ActionResult<TeamPlayers>> PostTeamPlayers(TeamPlayers teamPlayers)
         {
-            _context.TeamPlayers.Add(teamPlayers);
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                if (TeamPlayersExists(teamPlayers.Id))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return CreatedAtAction("GetTeamPlayers", new { id = teamPlayers.Id }, teamPlayers);
+            var result = await _teamPLayersService.PostTeamPlayers(teamPlayers);
+            return result;
         }
 
         // DELETE: api/TeamPlayers/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTeamPlayers(int id)
         {
-            var teamPlayers = await _context.TeamPlayers.FindAsync(id);
-            if (teamPlayers == null)
-            {
-                return NotFound();
-            }
-
-            _context.TeamPlayers.Remove(teamPlayers);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool TeamPlayersExists(int id)
-        {
-            return _context.TeamPlayers.Any(e => e.Id == id);
+            var result = await _teamPLayersService.DeleteTeamPlayers(id);
+            return result;
         }
     }
 }

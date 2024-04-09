@@ -1,68 +1,40 @@
-﻿namespace ChampionshipMaster.API.Controllers
+﻿using ChampionshipMaster.API.Interfaces;
+using ChampionshipMaster.DATA.Models;
+
+namespace ChampionshipMaster.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class TeamsController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ITeamService _teamService;
 
-        public TeamsController(ApplicationDbContext context)
+        public TeamsController(ITeamService teamService)
         {
-            _context = context;
+            _teamService = teamService;
         }
 
         // GET: api/Teams
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Team>>> GetTeams()
+        public async Task<ActionResult<IEnumerable<TeamDto>>> GetTeams()
         {
-            var teams = await _context.Teams
-                .Include(x => x.TeamType)
-                .ToListAsync();
-
-            var dto = teams.Adapt<List<TeamDto>>();
-            return Ok(dto);
+            var result = await _teamService.GetAllTeams();
+            return Ok(result);
         }
 
         // GET: api/Teams/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<TeamDto>> GetTeam(int id)
+        public async Task<ActionResult<TeamDto?>> GetTeam(int id)
         {
-            var team = await _context.Teams
-                .Include(x => x.TeamType)
-                .Include(x => x.TeamPlayers)
-                    .ThenInclude(x => x.Player)
-                .FirstOrDefaultAsync(x => x.Id == id);
-
-            if (team == null)
-            {
-                return NotFound();
-            }
-
-            var dto = team.Adapt<TeamDto>();
-            return Ok(dto);
+            var result = await _teamService.GetTeam(id);
+            return result;
         }
 
         [HttpGet("{id}/Game_History")]
-        public async Task<ActionResult<TeamDto>> GameHistory(int id)
+        public async Task<ActionResult<List<GameDto>>> GameHistory(int id)
         {
-            var team = await _context.Teams
-                .FirstOrDefaultAsync(x => x.Id == id);
-
-            if (team == null)
-            {
-                return NotFound();
-            }
-
-            var games = await _context.Games
-                .Where(x => x.BlueTeamId == id || x.RedTeamId == id)
-                    .Include(x => x.GameType)
-                    .Include(x => x.GameStatus)
-                    .Include(x => x.RedTeam)
-                    .Include(x => x.BlueTeam)
-                    .Include(x => x.Championship)
-                .ToListAsync();
-            var dto = games.Adapt<List<GameDto>>();
-            return Ok(dto);
+            var result = await _teamService.GameHistory(id);
+            return result;
         }
 
         // PUT: api/Teams/5
@@ -70,30 +42,8 @@
         [HttpPut("{id}")]
         public async Task<IActionResult> PutTeam(int id, Team team)
         {
-            if (id != team.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(team).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!TeamExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            var result = await _teamService.EditTeam(id, team);
+            return result;
         }
 
         // POST: api/Teams
@@ -101,48 +51,16 @@
         [HttpPost]
         public async Task<ActionResult<Team>> PostTeam(Team team)
         {
-            _context.Teams.Add(team);
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                if (TeamExists(team.Id))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return CreatedAtAction("GetTeam", new { id = team.Id }, team);
+            var result = await _teamService.PostTeam(team);
+            return result;
         }
 
         // DELETE: api/Teams/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTeam(int id)
         {
-            var team = await _context.Teams.FindAsync(id);
-            if (team == null)
-            {
-                return NotFound();
-            }
-
-            var championshipTeamsToDelete = await _context.ChampionshipTeams.Where(c => c.TeamId == id).ToListAsync();
-
-            _context.ChampionshipTeams.RemoveRange(championshipTeamsToDelete);
-            _context.Teams.Remove(team);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool TeamExists(int id)
-        {
-            return _context.Teams.Any(e => e.Id == id);
+            var result = await _teamService.DeleteTeam(id);
+            return result;
         }
     }
 }

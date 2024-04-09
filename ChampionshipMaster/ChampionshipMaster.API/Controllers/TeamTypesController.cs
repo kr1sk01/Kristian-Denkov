@@ -1,35 +1,33 @@
-﻿namespace ChampionshipMaster.API.Controllers
+﻿using ChampionshipMaster.API.Interfaces;
+using ChampionshipMaster.DATA.Models;
+
+namespace ChampionshipMaster.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class TeamTypesController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ITeamTypesService _teamTypesService;
 
-        public TeamTypesController(ApplicationDbContext context)
+        public TeamTypesController(ITeamTypesService teamTypesService)
         {
-            _context = context;
+            _teamTypesService = teamTypesService;
         }
 
         // GET: api/TeamTypes
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TeamType>>> GetTeamTypes()
         {
-            return await _context.TeamTypes.ToListAsync();
+            var result = await _teamTypesService.GetAllTeamTypes();
+            return Ok(result);
         }
 
         // GET: api/TeamTypes/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<TeamType>> GetTeamType(int id)
+        public async Task<ActionResult<TeamType?>> GetTeamType(int id)
         {
-            var teamType = await _context.TeamTypes.FindAsync(id);
-
-            if (teamType == null)
-            {
-                return NotFound();
-            }
-
-            return teamType;
+            var result = await _teamTypesService.GetTeamType(id);
+            return result;
         }
 
         // PUT: api/TeamTypes/5
@@ -37,30 +35,8 @@
         [HttpPut("{id}")]
         public async Task<IActionResult> PutTeamType(int id, TeamType teamType)
         {
-            if (id != teamType.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(teamType).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!TeamTypeExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            var result = await _teamTypesService.EditTeamType(id, teamType);
+            return result;
         }
 
         // POST: api/TeamTypes
@@ -68,45 +44,16 @@
         [HttpPost]
         public async Task<ActionResult<TeamType>> PostTeamType(TeamType teamType)
         {
-            _context.TeamTypes.Add(teamType);
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                if (TeamTypeExists(teamType.Id))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return CreatedAtAction("GetTeamType", new { id = teamType.Id }, teamType);
+            var result = await _teamTypesService.PostTeamType(teamType);
+            return result;
         }
 
         // DELETE: api/TeamTypes/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTeamType(int id)
         {
-            var teamType = await _context.TeamTypes.FindAsync(id);
-            if (teamType == null)
-            {
-                return NotFound();
-            }
-
-            _context.TeamTypes.Remove(teamType);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool TeamTypeExists(int id)
-        {
-            return _context.TeamTypes.Any(e => e.Id == id);
+            var result = await _teamTypesService.DeleteTeamType(id);
+            return result;
         }
     }
 }
