@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace GameMaster.API.Services.Interfaces
+namespace ChampionshipMaster.API.Interfaces
 {
     public interface IGameService
     {

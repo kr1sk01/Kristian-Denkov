@@ -1,7 +1,7 @@
-﻿using GameMaster.API.Services.Interfaces;
+﻿using ChampionshipMaster.API.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ChampionshipMaster.API.Services.Interfaces.ControllerServices
+namespace ChampionshipMaster.API.Services.ControllerServices
 {
     public class GameService : ControllerBase, IGameService
     {

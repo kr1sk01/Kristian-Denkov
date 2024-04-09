@@ -1,7 +1,7 @@
-﻿using ChampionshipMaster.DATA.Models;
-using GameMaster.API.Services.Interfaces;
+﻿using ChampionshipMaster.API.Interfaces;
+using ChampionshipMaster.DATA.Models;
 
-namespace ChampionshipMaster.API.Services.Interfaces.ControllerServices
+namespace ChampionshipMaster.API.Services.ControllerServices
 {
     public class GameStatusService : ControllerBase, IGameStatusService
     {

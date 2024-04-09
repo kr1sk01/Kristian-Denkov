@@ -1,6 +1,5 @@
-﻿using ChampionshipMaster.API.Services.Interfaces;
-using ChampionshipMaster.API.Services.Interfaces.ControllerServices;
-using GameMaster.API.Services.Interfaces;
+﻿using ChampionshipMaster.API.Interfaces;
+using ChampionshipMaster.API.Services.ControllerServices;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace ChampionshipMaster.API.Services

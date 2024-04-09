@@ -1,4 +1,4 @@
-﻿namespace ChampionshipMaster.API.Services.Interfaces
+﻿namespace ChampionshipMaster.API.Interfaces
 {
     public interface IGameTypeService
     {

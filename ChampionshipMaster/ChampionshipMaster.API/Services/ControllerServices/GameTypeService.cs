@@ -1,8 +1,8 @@
-﻿
+﻿using ChampionshipMaster.API.Interfaces;
 using ChampionshipMaster.DATA.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace ChampionshipMaster.API.Services.Interfaces.ControllerServices
+namespace ChampionshipMaster.API.Services.ControllerServices
 {
     public class GameTypeService : ControllerBase, IGameTypeService
     {

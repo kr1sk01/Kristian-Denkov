@@ -1,4 +1,4 @@
-﻿using ChampionshipMaster.API.Services.Interfaces;
+﻿using ChampionshipMaster.API.Interfaces;
 using ChampionshipMaster.DATA.Models;
 
 namespace ChampionshipMaster.API.Controllers;

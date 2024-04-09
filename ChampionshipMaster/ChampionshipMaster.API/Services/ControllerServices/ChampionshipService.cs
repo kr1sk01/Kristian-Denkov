@@ -1,6 +1,7 @@
-﻿using ChampionshipMaster.DATA.Models;
+﻿using ChampionshipMaster.API.Interfaces;
+using ChampionshipMaster.DATA.Models;
 
-namespace ChampionshipMaster.API.Services.Interfaces.ControllerServices
+namespace ChampionshipMaster.API.Services.ControllerServices
 {
     public class ChampionshipService : ControllerBase, IChampionshipService
     {
