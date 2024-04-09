@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Collections Training Shopping LIst")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+94e694ca1e7bbeaf67d9e780a1eb348a00a54df4")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8f9ad0e3cf24d6b061fdf4b80eb2fe59fb9b84d9")]
 [assembly: System.Reflection.AssemblyProductAttribute("Collections Training Shopping LIst")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Collections Training Shopping LIst")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

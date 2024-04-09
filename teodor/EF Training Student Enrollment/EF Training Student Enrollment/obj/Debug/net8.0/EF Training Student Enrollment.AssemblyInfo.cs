@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("EF Training Student Enrollment")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3cf91bd57f27d2e1f87e3c5588512224316817c6")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8f9ad0e3cf24d6b061fdf4b80eb2fe59fb9b84d9")]
 [assembly: System.Reflection.AssemblyProductAttribute("EF Training Student Enrollment")]
 [assembly: System.Reflection.AssemblyTitleAttribute("EF Training Student Enrollment")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

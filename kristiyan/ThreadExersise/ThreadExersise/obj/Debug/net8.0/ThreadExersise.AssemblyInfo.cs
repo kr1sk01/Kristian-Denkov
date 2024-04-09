@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ThreadExersise")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4f472c3935bac6045f9049cde6baae22ee45d9a4")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8f9ad0e3cf24d6b061fdf4b80eb2fe59fb9b84d9")]
 [assembly: System.Reflection.AssemblyProductAttribute("ThreadExersise")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ThreadExersise")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
