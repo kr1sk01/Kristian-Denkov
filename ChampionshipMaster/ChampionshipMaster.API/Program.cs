@@ -37,6 +37,7 @@ public class Program
             options.Password.RequireLowercase = false;
             options.Password.RequiredUniqueChars = 0;
             options.SignIn.RequireConfirmedAccount = false;
+            options.User.RequireUniqueEmail = true;
 
         })
                 .AddRoles<IdentityRole>()

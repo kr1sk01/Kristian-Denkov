@@ -15,9 +15,16 @@ namespace ChampionshipMaster.API.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Regsiter(RegisterViewModel registerViewModel)
+        public async Task<IActionResult> Register(RegisterViewModel register)
         {
-            var result = await _playerService.Register(registerViewModel);
+            var result = await _playerService.Register(register);
+            return result;
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(LoginViewModel login)
+        {
+            var result = await _playerService.Login(login);
             return result;
         }
     }

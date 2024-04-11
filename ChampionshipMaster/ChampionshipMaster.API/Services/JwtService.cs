@@ -17,12 +17,12 @@ namespace ChampionshipMaster.API.Services
             _signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:Key"]));
         }
 
-        public string GenerateToken(RegisterViewModel request)
+        public string GenerateToken(Player request)
         {
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, request.UserName),
-                new Claim(ClaimTypes.Email, request.Email)
+                new Claim(ClaimTypes.Name, request.UserName ?? ""),
+                new Claim(ClaimTypes.Email, request.Email ?? "")
                 // Add other relevant user claims here
             };
 
