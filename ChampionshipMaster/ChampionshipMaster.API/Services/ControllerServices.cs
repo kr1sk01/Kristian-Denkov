@@ -1,5 +1,6 @@
 ﻿using ChampionshipMaster.API.Interfaces;
 using ChampionshipMaster.API.Services.ControllerServices;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace ChampionshipMaster.API.Services
@@ -18,7 +19,11 @@ namespace ChampionshipMaster.API.Services
             services.AddTransient<ITeamPlayersService, TeamPlayersService>();
             services.AddTransient<ITeamService, TeamService>();
             services.AddTransient<ITeamTypesService, TeamTypesService>();
+            services.AddHttpContextAccessor();
+            services.AddTransient<UserManager<Player>>();
+            services.AddTransient<SignInManager<Player>>();
             services.AddTransient<IPlayerService, PlayerService>();
+            services.AddSingleton<JwtService>();
         }
     }
 }

@@ -6,15 +6,15 @@ namespace ChampionshipMaster.API.Services.ControllerServices
 {
     public class PlayerService : ControllerBase, IPlayerService
     {
-        private readonly ApplicationDbContext _context;
         private readonly UserManager<Player> _userManager;
         private readonly SignInManager<Player> _signInManager;
+        private readonly JwtService _jwtService;
 
-        public PlayerService(ApplicationDbContext context, UserManager<Player> userManager, SignInManager<Player> signInManager)
+        public PlayerService(UserManager<Player> userManager, SignInManager<Player> signInManager, JwtService jwtService)
         {
-            _context = context;
             _userManager = userManager;
             _signInManager = signInManager;
+            _jwtService = jwtService;
         }
 
         public async Task<IActionResult> Register(RegisterViewModel registerViewModel)
@@ -24,13 +24,13 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                 return BadRequest(ModelState);
             }
 
-            var user = new Player { UserName = registerViewModel.Email, Email = registerViewModel.Email };
+            var user = new Player { UserName = registerViewModel.UserName, Email = registerViewModel.Email };
             var result = await _userManager.CreateAsync(user, registerViewModel.Password);
 
             if (result.Succeeded)
             {
-                await _signInManager.SignInAsync(user, isPersistent: false);
-                return Ok(new { message = "Registration successful" });
+                var token = _jwtService.GenerateToken(registerViewModel);
+                return Ok(new { message = "Registration successful", jwtToken = token });
             }
 
             return BadRequest(result.Errors);

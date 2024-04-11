@@ -2,6 +2,8 @@ using ChampionshipMaster.API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Identity.Web;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace ChampionshipMaster.API;
 public class Program
@@ -12,7 +14,14 @@ public class Program
 
         // Add services to the container.
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
+        .AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true, // Validate the signing key
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection("JwtSettings:Key").ToString()))
+            };
+        });
 
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
         {
@@ -21,7 +30,6 @@ public class Program
 
         builder.Services.AddIdentityCore<Player>(options =>
         {
-            options.SignIn.RequireConfirmedAccount = true;
             options.Password.RequireDigit = false;
             options.Password.RequireLowercase = false;
             options.Password.RequireUppercase = false;
@@ -69,6 +77,7 @@ public class Program
 
         app.UseHttpsRedirection();
 
+        app.UseAuthentication();
         app.UseAuthorization();
 
 
