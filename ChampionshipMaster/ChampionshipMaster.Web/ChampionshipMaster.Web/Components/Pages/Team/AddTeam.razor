@@ -1,0 +1,50 @@
+﻿@page "/addgametype"
+@using System.ComponentModel.DataAnnotations
+
+<EditForm Model="@gameType" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+
+    <div class="row justify-content-center">
+        <h3>Add Game Type</h3>
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <InputText id="name" class="form-control" @bind-Value="gameType.Name" />
+            <ValidationMessage For="@(() => gameType.Name)" />
+        </div>
+
+        <div class="form-group">
+            <label for="maxPoints">Max Points:</label>
+            <InputNumber id="maxPoints" class="form-control" @bind-Value="gameType.MaxPoints" />
+            <ValidationMessage For="@(() => gameType.MaxPoints)" />
+        </div>
+
+        <div class="form-group">
+            <label for="teamType">Team Type:</label>
+            <select id="teamType" class="form-control" @bind="@gameType.TeamTypeId">
+                <option value="">-- Select Team Type --</option>
+                @foreach (var teamType in teamTypes)
+                {
+                    <option value="@teamType.Id">@teamType.Name</option>
+                }
+            </select>
+            <ValidationMessage For="@(() => gameType.TeamTypeId)" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+</EditForm>
+
+@code {
+    private GameType gameType = new GameType();
+    private List<TeamType> teamTypes = new List<TeamType> // Assuming you have a list of TeamTypes to choose from
+    {
+        //Get all teamtypes to display when creating team
+    };
+
+    private async Task HandleValidSubmit()
+    {
+        // Submit form data to backend here (e.g., via WebAPI)
+        // You can use gameType object to access the entered data
+        // Example: await Http.PostAsJsonAsync("/api/GameType", gameType);
+    }
+}

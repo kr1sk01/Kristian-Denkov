@@ -1,0 +1,31 @@
+﻿@page "/addgametype"
+@inject HttpClient httpClient
+<EditForm Model="@gameType" OnValidSubmit="HandleValidSubmit" FormName="AddGameType">
+    <DataAnnotationsValidator />
+
+    <div class="container">
+        <h3>Add Game Type</h3>
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <InputText id="name" class="form-control" @bind-Value="gameType.Name" />
+            <ValidationMessage For="@(() => gameType.Name)" />
+        </div>
+
+        <div class="form-group">
+            <label for="maxPoints">Max Points:</label>
+            <InputNumber id="maxPoints" class="form-control" @bind-Value="gameType.MaxPoints" />
+            <ValidationMessage For="@(() => gameType.MaxPoints)" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+</EditForm>
+
+@code {
+    private GameType gameType = new GameType();
+
+    private async Task HandleValidSubmit()
+    {
+        await httpClient.PostAsJsonAsync("/api/GameTypes", gameType);
+    }
+}
