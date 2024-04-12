@@ -7,13 +7,11 @@ namespace ChampionshipMaster.API.Services.ControllerServices
     public class PlayerService : ControllerBase, IPlayerService
     {
         private readonly UserManager<Player> _userManager;
-        private readonly SignInManager<Player> _signInManager;
         private readonly JwtService _jwtService;
 
-        public PlayerService(UserManager<Player> userManager, SignInManager<Player> signInManager, JwtService jwtService)
+        public PlayerService(UserManager<Player> userManager, JwtService jwtService)
         {
             _userManager = userManager;
-            _signInManager = signInManager;
             _jwtService = jwtService;
         }
 
@@ -30,7 +28,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             if (result.Succeeded)
             {
                 var token = _jwtService.GenerateToken(user);
-                return Ok(new { message = "Registration successful", jwtToken = token });
+                return Ok(new { message = "Registration successful", jwtToken = token.Result });
             }
 
             return BadRequest(result.Errors);
@@ -62,7 +60,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             // Generate a JWT token on successful loginRequest
             var token = _jwtService.GenerateToken(user);
 
-            return Ok(new { message = "Login successful", jwtToken = token });
+            return Ok(new { message = "Login successful", jwtToken = token.Result });
         }
 
     }

@@ -1,4 +1,5 @@
 ﻿using ChampionshipMaster.API.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ChampionshipMaster.API.Controllers;
 
@@ -29,6 +30,7 @@ public class ChampionshipController : ControllerBase
     }
 
     // GET: api/Championship/5
+    [Authorize(Policy = "Admin")]
     [HttpGet("{id}")]
     public async Task<ActionResult<ChampionshipDto>> GetChampionship(int id)
     {

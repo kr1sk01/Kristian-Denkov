@@ -6,10 +6,12 @@ namespace ChampionshipMaster.API.Services
     public class DataSeeding
     {
         private readonly DbContextOptions<ApplicationDbContext> _options;
+        private readonly UserManager<Player> _userManager;
 
-        public DataSeeding(DbContextOptions<ApplicationDbContext> options)
+        public DataSeeding(DbContextOptions<ApplicationDbContext> options, UserManager<Player> userManager)
         {
             _options = options;
+            _userManager = userManager;
         }
 
         public static List<T>? Deserialize<T>(string jsonData)
@@ -39,6 +41,7 @@ namespace ChampionshipMaster.API.Services
                 await SeedGames(context);
                 await SeedTeamPlayers(context);
                 await SeedChampionshipTeams(context);
+                await SeedAdminAccount();
             }
         }
 
@@ -223,6 +226,34 @@ namespace ChampionshipMaster.API.Services
                 }
 
             await context.SaveChangesAsync();
+        }
+
+        private async Task SeedAdminAccount()
+        {
+            var UserName = "admin";
+            var Email = "admin@admin.com";
+            var Password = "admin4dm1n";
+
+            var admin = await _userManager.FindByNameAsync(UserName);
+            if (admin == null)
+            {
+                await _userManager.CreateAsync(new Player { UserName = UserName, Email = Email }, Password);
+                var hasAdminRole = await _userManager.IsInRoleAsync(admin!, "admin");
+                if (!hasAdminRole)
+                {
+                    await _userManager.AddToRoleAsync(admin!, "admin");
+                }
+
+                return;
+            }
+            else
+            {
+                var hasAdminRole = await _userManager.IsInRoleAsync(admin!, "admin");
+                if (!hasAdminRole)
+                {
+                    await _userManager.AddToRoleAsync(admin!, "admin");
+                }
+            }
         }
     }
 }

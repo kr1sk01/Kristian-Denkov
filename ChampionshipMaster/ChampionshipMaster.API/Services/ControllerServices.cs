@@ -23,7 +23,7 @@ namespace ChampionshipMaster.API.Services
             services.AddTransient<UserManager<Player>>();
             services.AddTransient<SignInManager<Player>>();
             services.AddTransient<IPlayerService, PlayerService>();
-            services.AddSingleton<JwtService>();
+            services.AddTransient<JwtService>();
         }
     }
 }
