@@ -1,0 +1,26 @@
+﻿@page "/addgamestatus"
+@using System.ComponentModel.DataAnnotations
+
+<EditForm Model="@gameStatus" OnValidSubmit="HandleValidSubmit" FormName="AddGameStatus">
+    <DataAnnotationsValidator />
+
+    <div class="row justify-content-center">
+        <h3>Add Game Status</h3>
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <InputText id="name" class="form-control" @bind-Value="gameStatus.Name" />
+            <ValidationMessage For="@(() => gameStatus.Name)" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+</EditForm>
+
+@code {
+    private GameStatus gameStatus = new GameStatus();
+
+    private async Task HandleValidSubmit()
+    {
+        // Example: await Http.PostAsJsonAsync("/api/GameStatus", gameStatus);
+    }
+}
