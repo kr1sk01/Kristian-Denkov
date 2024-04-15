@@ -4,9 +4,10 @@
 
 @rendermode InteractiveServer
 
-<div Class="rz-p-0 rz-p-md-12">
-
-    <RadzenTemplateForm TItem="LoginViewModel" Data=@model Submit=@OnSubmit InvalidSubmit=@OnInvalidSubmit>
+<center>
+    <h3>Log In</h3>
+    <div style="justify-content:center;text-align:left;width:75%;">
+    <RadzenTemplateForm Style="" TItem="LoginViewModel" Data=@model Submit=@OnSubmit InvalidSubmit=@OnInvalidSubmit>
         @if (showError)
         {
             <RadzenAlert Variant="@Variant.Filled" AlertStyle=@AlertStyle.Primary Size=@AlertSize.Small Shade="Shade.Lighter" AllowClose=false>
@@ -34,8 +35,10 @@
         </RadzenStack>
     </RadzenTemplateForm>
 
-</div>
+</div></center>
+
 @code {
+
     Variant variant = Variant.Outlined;
 
 

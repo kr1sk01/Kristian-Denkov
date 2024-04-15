@@ -1,4 +1,4 @@
-﻿@page "/addgamestatus"
+﻿@page "/addteamtype"
 @using System.ComponentModel.DataAnnotations
 @using System.Text.Json
 
@@ -7,9 +7,9 @@
 
 
 <center>
-    <h3>Add Game Status</h3>
+    <h3>Add Team Type</h3>
     <div style="justify-content:center;text-align:left;width:75%;">
-        <RadzenTemplateForm Style="" TItem="GameStatus" Data=@model Submit=@OnSubmit InvalidSubmit=@OnInvalidSubmit>
+        <RadzenTemplateForm Style="" TItem="TeamType" Data=@model Submit=@OnSubmit InvalidSubmit=@OnInvalidSubmit>
             @if (showError)
             {
                 <RadzenAlert Variant="@Variant.Filled" AlertStyle=@AlertStyle.Primary Size=@AlertSize.Small Shade="Shade.Lighter" AllowClose=false>
@@ -17,15 +17,15 @@
                 </RadzenAlert>
             }
             <RadzenStack Gap="1rem" Class="rz-p-sm-12">
-                <RadzenFormField Text="Game Status Name" Variant="@variant">
+                <RadzenFormField Text="Team Type Name" Variant="@variant">
                     <ChildContent>
                         <RadzenTextBox Name="Name" @bind-Value=@model.Name />
                     </ChildContent>
                     <Helper>
-                        <RadzenRequiredValidator Component="Name" Text="Game Status is required." />
+                        <RadzenRequiredValidator Component="Name" Text="Team Type Name is required." />
                     </Helper>
                 </RadzenFormField>
-                <RadzenButton ButtonType="ButtonType.Submit" Text="Add Game Status"></RadzenButton>
+                <RadzenButton ButtonType="ButtonType.Submit" Text="Add Team Type"></RadzenButton>
             </RadzenStack>
         </RadzenTemplateForm>
 
@@ -37,17 +37,16 @@
     Variant variant = Variant.Outlined;
 
 
-    private GameStatus model = new GameStatus();
+    private TeamType model = new TeamType();
+
     private string? errorMessage;
     private bool showError = false;
 
-    var gameTypes = 
 
-
-    void OnSubmit(GameStatus model)
+    void OnSubmit(TeamType model)
     {
 
-        if (model.Name.Length <= 3)
+        if (model.Name.Length <= 3 || model.Name == null)
         {
             showError = true;
             errorMessage = "Invalid Data!";
