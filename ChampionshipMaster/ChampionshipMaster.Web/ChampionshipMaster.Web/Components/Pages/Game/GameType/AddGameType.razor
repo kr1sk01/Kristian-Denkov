@@ -1,31 +1,61 @@
 ﻿@page "/addgametype"
 @inject HttpClient httpClient
-<EditForm Model="@gameType" OnValidSubmit="HandleValidSubmit" FormName="AddGameType">
-    <DataAnnotationsValidator />
+@rendermode InteractiveServer
 
-    <div class="container">
-        <h3>Add Game Type</h3>
-        <div class="form-group">
-            <label for="name">Name:</label>
-            <InputText id="name" class="form-control" @bind-Value="gameType.Name" />
-            <ValidationMessage For="@(() => gameType.Name)" />
-        </div>
 
-        <div class="form-group">
-            <label for="maxPoints">Max Points:</label>
-            <InputNumber id="maxPoints" class="form-control" @bind-Value="gameType.MaxPoints" />
-            <ValidationMessage For="@(() => gameType.MaxPoints)" />
-        </div>
+<center><RadzenTemplateForm Style="width:60%;" TItem="GameType" Data=@model Submit=@OnSubmit InvalidSubmit=@OnInvalidSubmit class="custom-form-style">
+        @if (showError)
+        {
+            <RadzenAlert Variant="@Variant.Filled" AlertStyle=@AlertStyle.Primary Size=@AlertSize.Small Shade="Shade.Lighter" AllowClose=false>
+                <RadzenText TagName="TagName.P">@errorMessage</RadzenText>
+                </RadzenAlert>
+        }
+        <RadzenStack Gap="1rem">
+            <RadzenFormField Text="Game Type Name" Variant="@variant">
+                <ChildContent>
+                    <RadzenTextBox Name="GameTypeName" @bind-Value=@model.Name />
+                </ChildContent>
+                <Helper>
+                    <RadzenRequiredValidator Component="GameTypeName" Text="Game Type Name is required." />
+                </Helper>
+            </RadzenFormField>
+            <RadzenFormField Text="Max Points" Variant="@variant">
+                <ChildContent>
+                    <RadzenNumeric Min="1" Max="10" @bind-Value=@model.MaxPoints InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "enter value" }})" />
+                </ChildContent>
+            </RadzenFormField>
+            <RadzenButton ButtonType="ButtonType.Submit" Text="Log In"></RadzenButton>
+        </RadzenStack>
+    </RadzenTemplateForm>
+</center>
 
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </div>
-</EditForm>
 
 @code {
-    private GameType gameType = new GameType();
+    Variant variant = Variant.Outlined;
+    private GameType model = new GameType();
+    private string? errorMessage;
+    private bool showError = false;
 
-    private async Task HandleValidSubmit()
+
+    void OnSubmit(GameType model)
     {
-        await httpClient.PostAsJsonAsync("/api/GameTypes", gameType);
+
+        if (model.Name.Length <= 3 || model.MaxPoints <= 0)
+        {
+            showError = true;
+            errorMessage = "Invalid Data!";
+        }
+        else
+        {
+            showError = false;
+            errorMessage = "";
+            //POST DATA
+        }
+    }
+
+    void OnInvalidSubmit(FormInvalidSubmitEventArgs args)
+    {
+        showError = true;
+        errorMessage = "Invalid Data!";
     }
 }

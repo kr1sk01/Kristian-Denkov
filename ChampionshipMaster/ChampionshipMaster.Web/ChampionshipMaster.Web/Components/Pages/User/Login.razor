@@ -1,46 +1,67 @@
 ﻿@page "/login"
 @using System.ComponentModel.DataAnnotations
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <h3 class="text-center">Login</h3>
+@using System.Text.Json
 
-        <EditForm Model="@loginModel" OnValidSubmit="@HandleValidSubmit" FormName="Login">
-            <DataAnnotationsValidator />
-            <ValidationSummary />
+@rendermode InteractiveServer
 
-            <div class="form-group">
-                <label for="email">Email</label>
-                <InputText id="email" class="form-control" @bind-Value="loginModel.Email" />
-                <ValidationMessage For="@(() => loginModel.Email)" />
-            </div>
+<div Class="rz-p-0 rz-p-md-12">
 
-            <div class="form-group">
-                <label for="password">Password</label>
-                <InputText id="password" type="password" class="form-control" @bind-Value="loginModel.Password" />
-                <ValidationMessage For="@(() => loginModel.Password)" />
-            </div>
-            <br />
-            <button type="submit" class="btn btn-primary btn-block">Login</button>
-        </EditForm>
-    </div>
+    <RadzenTemplateForm TItem="LoginViewModel" Data=@model Submit=@OnSubmit InvalidSubmit=@OnInvalidSubmit>
+        @if (showError)
+        {
+            <RadzenAlert Variant="@Variant.Filled" AlertStyle=@AlertStyle.Primary Size=@AlertSize.Small Shade="Shade.Lighter" AllowClose=false>
+                <RadzenText TagName="TagName.P">@errorMessage</RadzenText>
+                </RadzenAlert>
+        }
+        <RadzenStack Gap="1rem" Class="rz-p-sm-12">
+            <RadzenFormField Text="Email" Variant="@variant">
+                <ChildContent>
+                    <RadzenTextBox Name="email" @bind-Value=@model.Email />
+                </ChildContent>
+                <Helper>
+                    <RadzenRequiredValidator Component="email" Text="Email is required." />
+                </Helper>
+            </RadzenFormField>
+            <RadzenFormField Text="Password" Variant="@variant">
+                <ChildContent>
+                    <RadzenTextBox Name="Password" @bind-Value=@model.Password />
+                </ChildContent>
+                <Helper>
+                    <RadzenRequiredValidator Component="Password" Text="Password is required." />
+                </Helper>
+            </RadzenFormField>
+            <RadzenButton ButtonType="ButtonType.Submit" Text="Log In"></RadzenButton>
+        </RadzenStack>
+    </RadzenTemplateForm>
+
 </div>
-
-
 @code {
-    private LoginModel loginModel = new LoginModel();
+    Variant variant = Variant.Outlined;
 
-    public class LoginModel
+
+    private LoginViewModel model = new LoginViewModel();
+    private string? errorMessage;
+    private bool showError = false;
+
+
+    void OnSubmit(LoginViewModel model)
     {
-        [Required(ErrorMessage = "Email is required.")]
-        [EmailAddress(ErrorMessage = "Invalid email address.")]
-        public string? Email { get; set; }
 
-        [Required(ErrorMessage = "Password is required.")]
-        public string? Password { get; set; }
+        if (model.Password.Length <= 3 || !model.Email.Contains("@"))
+        {
+            showError = true;
+            errorMessage = "Invalid Data!";
+        }
+        else
+        {
+            showError = false;
+            errorMessage = "";
+            //POST DATA
+        }
     }
 
-    private void HandleValidSubmit()
+    void OnInvalidSubmit(FormInvalidSubmitEventArgs args)
     {
-        //Make user to login
+        
     }
 }

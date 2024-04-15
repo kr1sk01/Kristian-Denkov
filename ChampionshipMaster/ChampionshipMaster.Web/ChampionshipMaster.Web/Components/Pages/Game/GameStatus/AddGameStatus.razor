@@ -1,5 +1,6 @@
 ﻿@page "/addgamestatus"
 @using System.ComponentModel.DataAnnotations
+@rendermode InteractiveServer
 
 <EditForm Model="@gameStatus" OnValidSubmit="HandleValidSubmit" FormName="AddGameStatus">
     <DataAnnotationsValidator />
