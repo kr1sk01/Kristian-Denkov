@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Radzen.Blazor" Version="4.29.6" />
     <ProjectReference Include="..\..\ChampionshipMaster.DATA\ChampionshipMaster.DATA.csproj" />
     <ProjectReference Include="..\..\ChampionshipMaster.SHARED\ChampionshipMaster.SHARED.csproj" />
     <ProjectReference Include="..\ChampionshipMaster.Web.Client\ChampionshipMaster.Web.Client.csproj" />
