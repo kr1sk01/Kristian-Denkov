@@ -238,11 +238,8 @@ namespace ChampionshipMaster.API.Services
             if (admin == null)
             {
                 await _userManager.CreateAsync(new Player { UserName = UserName, Email = Email }, Password);
-                var hasAdminRole = await _userManager.IsInRoleAsync(admin!, "admin");
-                if (!hasAdminRole)
-                {
-                    await _userManager.AddToRoleAsync(admin!, "admin");
-                }
+                var createdAdmin = await _userManager.FindByNameAsync(UserName);
+                await _userManager.AddToRoleAsync(createdAdmin!, "admin");
 
                 return;
             }

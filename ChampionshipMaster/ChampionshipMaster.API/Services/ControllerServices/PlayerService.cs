@@ -1,6 +1,9 @@
 ﻿using ChampionshipMaster.API.Interfaces;
 using ChampionshipMaster.SHARED.ViewModels;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Primitives;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace ChampionshipMaster.API.Services.ControllerServices
 {
@@ -63,5 +66,32 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             return Ok(new { message = "Login successful", jwtToken = token.Result });
         }
 
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel changePassword, StringValues authHeader)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (string.IsNullOrEmpty(authHeader))
+            {
+                return BadRequest("Missing authorization");
+            }
+
+            var tokenString = authHeader.ToString().Split(' ')[1];
+            var token = new JwtSecurityToken(tokenString);
+
+            var userName = token.Claims.FirstOrDefault(c => c.Type == "unique_name")?.Value;
+            var user = await _userManager.FindByNameAsync(userName!);
+
+            var result = await _userManager.ChangePasswordAsync(user!, changePassword.Password, changePassword.NewPassword);
+
+            if (result.Succeeded)
+            {
+                return Ok("Password changed successfully");
+            }
+
+            return BadRequest("Something went wrong");
+        }
     }
 }
