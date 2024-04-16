@@ -42,6 +42,7 @@ namespace ChampionshipMaster.API.Services
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.UtcNow.AddHours(1),
                 SigningCredentials = credentials
             };
 
