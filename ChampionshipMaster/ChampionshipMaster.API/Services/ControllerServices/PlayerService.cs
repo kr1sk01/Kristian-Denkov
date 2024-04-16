@@ -1,19 +1,20 @@
 ﻿using ChampionshipMaster.API.Interfaces;
 using ChampionshipMaster.SHARED.ViewModels;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Primitives;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace ChampionshipMaster.API.Services.ControllerServices
 {
     public class PlayerService : ControllerBase, IPlayerService
     {
         private readonly UserManager<Player> _userManager;
-        private readonly SignInManager<Player> _signInManager;
         private readonly JwtService _jwtService;
 
-        public PlayerService(UserManager<Player> userManager, SignInManager<Player> signInManager, JwtService jwtService)
+        public PlayerService(UserManager<Player> userManager, JwtService jwtService)
         {
             _userManager = userManager;
-            _signInManager = signInManager;
             _jwtService = jwtService;
         }
 
@@ -30,7 +31,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             if (result.Succeeded)
             {
                 var token = _jwtService.GenerateToken(user);
-                return Ok(new { message = "Registration successful", jwtToken = token });
+                return Ok(new { message = "Registration successful", jwtToken = token.Result });
             }
 
             return BadRequest(result.Errors);
@@ -62,8 +63,35 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             // Generate a JWT token on successful loginRequest
             var token = _jwtService.GenerateToken(user);
 
-            return Ok(new { message = "Login successful", jwtToken = token });
+            return Ok(new { message = "Login successful", jwtToken = token.Result });
         }
 
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel changePassword, StringValues authHeader)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (string.IsNullOrEmpty(authHeader))
+            {
+                return BadRequest("Missing authorization");
+            }
+
+            var tokenString = authHeader.ToString().Split(' ')[1];
+            var token = new JwtSecurityToken(tokenString);
+
+            var userName = token.Claims.FirstOrDefault(c => c.Type == "unique_name")?.Value;
+            var user = await _userManager.FindByNameAsync(userName!);
+
+            var result = await _userManager.ChangePasswordAsync(user!, changePassword.Password, changePassword.NewPassword);
+
+            if (result.Succeeded)
+            {
+                return Ok("Password changed successfully");
+            }
+
+            return BadRequest("Something went wrong");
+        }
     }
 }
