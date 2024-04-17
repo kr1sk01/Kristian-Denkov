@@ -1,5 +1,6 @@
 ﻿using ChampionshipMaster.API.Interfaces;
 using ChampionshipMaster.SHARED.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ChampionshipMaster.API.Controllers
 {
@@ -25,6 +26,15 @@ namespace ChampionshipMaster.API.Controllers
         public async Task<IActionResult> Login(LoginViewModel login)
         {
             var result = await _playerService.Login(login);
+            return result;
+        }
+
+        [Authorize]
+        [HttpPost("changePassword")]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel changePassword)
+        {
+            var authHeader = HttpContext.Request.Headers.Authorization;
+            var result = await _playerService.ChangePassword(changePassword, authHeader);
             return result;
         }
     }

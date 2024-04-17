@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 using System.Text;
 
 namespace ChampionshipMaster.API;
@@ -19,8 +20,16 @@ public class Program
             options.TokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuerSigningKey = true, // Validate the signing key
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection("JwtSettings:Key").ToString()))
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection("JwtSettings:Key").Value!)),
+                ValidateAudience = false,
+                ValidateIssuer = false,
+                ValidateLifetime = true
             };
+        });
+
+        builder.Services.AddAuthorization(options =>
+        {
+            options.AddPolicy("Admin", policy => policy.RequireClaim(ClaimTypes.Role, "admin"));
         });
 
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
