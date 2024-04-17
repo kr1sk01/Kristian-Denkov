@@ -15,7 +15,7 @@ public class Program
             .AddInteractiveWebAssemblyComponents();
 
         builder.Services.AddRadzenComponents();
-        builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:64687/") });
+        builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:54241") });
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
