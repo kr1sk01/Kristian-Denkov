@@ -41,7 +41,7 @@ namespace ChampionshipMaster.API.Services
                 await SeedGames(context);
                 await SeedTeamPlayers(context);
                 await SeedChampionshipTeams(context);
-                await SeedAdminAccount();
+                //await SeedAdminAccount();
             }
         }
 
@@ -239,7 +239,7 @@ namespace ChampionshipMaster.API.Services
             {
                 await _userManager.CreateAsync(new Player { UserName = UserName, Email = Email }, Password);
                 var createdAdmin = await _userManager.FindByNameAsync(UserName);
-                await _userManager.AddToRoleAsync(createdAdmin!, "admin");
+                //await _userManager.AddToRoleAsync(createdAdmin!, "admin");
 
                 return;
             }

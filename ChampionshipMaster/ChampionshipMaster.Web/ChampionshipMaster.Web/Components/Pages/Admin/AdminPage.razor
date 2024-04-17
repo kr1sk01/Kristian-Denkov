@@ -1,7 +1,143 @@
-﻿@page "/admin"
-@inject DialogService DialogService
+﻿@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
 
-<div class="rz-p-12 rz-text-align-center">
-    <RadzenButton @rendermode="@RenderMode.InteractiveServer" Text="Confirm dialog" ButtonStyle="ButtonStyle.Secondary"
-                  Click=@(args => DialogService.Confirm("Are you sure?", "MyTitle", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" })) />
-</div>
+@inherits DbContextPage
+
+@inject HttpClient httpClient
+<style>
+    .rz-grid-table {
+        width: 100%;
+    }
+
+    .rz-grid-column {
+        width: 100%;
+    }
+</style>
+
+
+<RadzenDataGrid @ref="ordersGrid" AllowAlternatingRows="false" AllowFiltering="true" AllowPaging="true" PageSize="5" AllowSorting="true" EditMode="@editMode"
+                Data="@orders" TItem="Order" RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow" Sort="@Reset" Page="@Reset" Filter="@Reset">
+    <Columns>
+        <RadzenDataGridColumn TItem="Order" Property="Customer.CompanyName" Title="Customer" Class="rz-grid-column">
+            <EditTemplate Context="order">
+                <RadzenDropDown @bind-Value="order.CustomerID" Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID" Style="width:100%; display: block;" />
+            </EditTemplate>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    List<GameStatus> gStatuses = new List<GameStatus>();
+
+    RadzenDataGrid<Order> ordersGrid;
+    IEnumerable<Order> orders;
+    IEnumerable<Customer> customers;
+    IEnumerable<Employee> employees;
+
+    DataGridEditMode editMode = DataGridEditMode.Single;
+
+    List<GameStatus> gStatusesToInsert = new List<GameStatus>();
+    List<GameStatus> gStatusesToUpdate = new List<GameStatus>();
+
+    void Reset()
+    {
+        gStatusesToInsert.Clear();
+        gStatusesToUpdate.Clear();
+    }
+
+    void Reset(GameStatus order)
+    {
+        gStatusesToInsert.Remove(order);
+        gStatusesToUpdate.Remove(order);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        customers = dbContext.Customers;
+        employees = dbContext.Employees;
+
+        orders = dbContext.Orders.Include("Customer").Include("Employee");
+    }
+
+    async Task EditRow(GameStatus order)
+    {
+        if (editMode == DataGridEditMode.Single && ordersToInsert.Count() > 0)
+        {
+            Reset();
+        }
+
+        gStatusesToUpdate.Add(order);
+        await ordersGrid.EditRow(order);
+    }
+
+    void OnUpdateRow(GameStatus order)
+    {
+        Reset(order);
+
+        dbContext.Update(order);
+
+        dbContext.SaveChanges();
+    }
+
+    async Task SaveRow(GameStatus order)
+    {
+        await ordersGrid.UpdateRow(order);
+    }
+
+    void CancelEdit(GameStatus order)
+    {
+        Reset(order);
+
+        ordersGrid.CancelEditRow(order);
+
+        var orderEntry = dbContext.Entry(order);
+        if (orderEntry.State == EntityState.Modified)
+        {
+            orderEntry.CurrentValues.SetValues(orderEntry.OriginalValues);
+            orderEntry.State = EntityState.Unchanged;
+        }
+    }
+
+    async Task DeleteRow(GameStatus order)
+    {
+        Reset(order);
+
+        if (orders.Contains(order))
+        {
+            dbContext.Remove<Order>(order);
+
+            dbContext.SaveChanges();
+
+            await ordersGrid.Reload();
+        }
+        else
+        {
+            ordersGrid.CancelEditRow(order);
+            await ordersGrid.Reload();
+        }
+    }
+
+    async Task InsertRow()
+    {
+        if (editMode == DataGridEditMode.Single)
+        {
+            Reset();
+        }
+
+        var order = new GameStatus();
+        ordersToInsert.Add(order);
+        await ordersGrid.InsertRow(order);
+    }
+
+    void OnCreateRow(GameStatus order)
+    {
+        dbContext.Add(order);
+
+        dbContext.SaveChanges();
+
+        ordersToInsert.Remove(order);
+    }
+}
