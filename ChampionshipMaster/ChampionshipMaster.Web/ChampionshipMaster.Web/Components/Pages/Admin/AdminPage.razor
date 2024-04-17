@@ -1,8 +1,10 @@
 ﻿@using Microsoft.EntityFrameworkCore
+@using System.Text.Json
 
 @page "/admin"
 
 @inject HttpClient httpClient
+@inject NotificationService NotificationService
 
 @rendermode InteractiveServer
 
@@ -15,21 +17,21 @@
 
 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="10px" class="mt-2 mb-4">
     <RadzenButton Style="background-color:darkslategray"
-                    ButtonStyle="ButtonStyle.Success"
-                    Icon="add_circle_outline"
-                    Text="Add New Game Status"
-                    Click="@InsertRow"
-                    Disabled="@(editMode == DataGridEditMode.Single && ordersToInsert.Count() > 0)" />
+                  ButtonStyle="ButtonStyle.Success"
+                  Icon="add_circle_outline"
+                  Text="Add New Game Status"
+                  Click="@InsertRow"
+                  Disabled="@(gameStatusesToInsert.Count() > 0)" />
 </RadzenStack>
 
-<RadzenDataGrid @ref="ordersGrid"
+<RadzenDataGrid @ref="gameStatusGrid"
                 AllowAlternatingRows="false"
                 AllowFiltering="false"
                 AllowPaging="true"
                 AllowSorting="true"
-                EditMode="@editMode"
+                EditMode="@DataGridEditMode.Single"
                 PageSize="5"
-                Data="@orders"
+                Data="@gameStatusList"
                 TItem="GameStatus"
                 RowUpdate="@OnUpdateRow"
                 RowCreate="@OnCreateRow"
@@ -40,25 +42,25 @@
     <Columns>
 
         <RadzenDataGridColumn TItem="GameStatus" Property="Name" Title="Name">
-            <EditTemplate Context="order">
-                <RadzenTextBox @bind-Value="order.Name" Style="width:200px; display: block" Name="Name" />
-                <RadzenRequiredValidator Text="Name is required" Component="Name" Popup="true" />                
+            <EditTemplate Context="gameStatus">
+                <RadzenTextBox @bind-Value="gameStatus.Name" Style="width:200px; display: block" Name="Name" />
+                <RadzenRequiredValidator Text="Name is required" Component="Name" Popup="true" />
             </EditTemplate>
         </RadzenDataGridColumn>
 
-        <RadzenDataGridColumn Width="1%" TItem="GameStatus" Context="order" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Frozen="true" FrozenPosition="FrozenColumnPosition.Right">
-            <Template Context="order">
-                <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@(args => EditRow(order))" @onclick:stopPropagation="true">
+        <RadzenDataGridColumn Width="1%" TItem="GameStatus" Context="gameStatus" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Frozen="true" FrozenPosition="FrozenColumnPosition.Right">
+            <Template Context="gameStatus">
+                <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@(args => EditRow(gameStatus))" @onclick:stopPropagation="true">
                 </RadzenButton>
-                <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@(args => DeleteRow(order))" @onclick:stopPropagation="true">
+                <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@(args => DeleteRow(gameStatus))" @onclick:stopPropagation="true">
                 </RadzenButton>
             </Template>
-            <EditTemplate Context="order">
-                <RadzenButton Icon="check" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@((args) => SaveRow(order))">
+            <EditTemplate Context="gameStatus">
+                <RadzenButton Icon="check" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@((args) => SaveRow(gameStatus))">
                 </RadzenButton>
-                <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@((args) => CancelEdit(order))">
+                <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@((args) => CancelEdit(gameStatus))">
                 </RadzenButton>
-                <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@(args => DeleteRow(order))">
+                <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@(args => DeleteRow(gameStatus))">
                 </RadzenButton>
             </EditTemplate>
         </RadzenDataGridColumn>
@@ -66,99 +68,93 @@
     </Columns>
 </RadzenDataGrid>
 
-@inject NotificationService NotificationService
-
-<RadzenButton Text="Show notification with custom position" Style="margin-bottom: 20px;"
-              Click=@(args => 
-              ShowNotification(
-                  new NotificationMessage 
-                  { 
-                      Style = "position: absolute; left: -1000px;", 
-                      Severity = NotificationSeverity.Success, 
-                      Summary = "Success Summary", 
-                      Detail = "Success Detail", 
-                      Duration = 40000 
-                  }
-              )) />
-
 @code {
-    void ShowNotification(NotificationMessage message)
-    {
-        NotificationService.Notify(message);
-
-       
-    }
-}
-@code {
-    //Grid
     private bool dataLoaded = false;
 
-    RadzenDataGrid<GameStatus>? ordersGrid;
+    RadzenDataGrid<GameStatus> gameStatusGrid = default!;
 
-    static List<GameStatus>? gameStatusObjs;
+    List<GameStatus> gameStatusList = default!;
 
-
-    List<GameStatus>? orders = gameStatusObjs;
-
-    DataGridEditMode editMode = DataGridEditMode.Single;
-
-    List<GameStatus> ordersToInsert = new List<GameStatus>();
-    List<GameStatus> ordersToUpdate = new List<GameStatus>();
-
-
+    List<GameStatus> gameStatusesToInsert = new List<GameStatus>();
+    List<GameStatus> gameStatusesToUpdate = new List<GameStatus>();
 
     void Reset()
     {
-        ordersToInsert.Clear();
-        ordersToUpdate.Clear();
+        gameStatusesToInsert.Clear();
+        gameStatusesToUpdate.Clear();
     }
 
-    void Reset(GameStatus order)
+    void Reset(GameStatus gameStatus)
     {
-        ordersToInsert.Remove(order);
-        ordersToUpdate.Remove(order);
+        gameStatusesToInsert.Remove(gameStatus);
+        gameStatusesToUpdate.Remove(gameStatus);
     }
 
     protected override async Task OnInitializedAsync()
-    {       
+    {
         await base.OnInitializedAsync();
 
-        gameStatusObjs = await httpClient.GetFromJsonAsync<List<GameStatus>>("/api/GameStatus");
+        gameStatusList = await httpClient.GetFromJsonAsync<List<GameStatus>>("/api/GameStatus") ?? new List<GameStatus>();
     }
 
-    async Task EditRow(GameStatus order)
+    async Task EditRow(GameStatus gameStatus)
     {
 
-        if (editMode == DataGridEditMode.Single && ordersToInsert.Count() > 0)
+        if (gameStatusesToInsert.Count() > 0)
         {
             Reset();
         }
 
-        ordersToUpdate.Add(order);
-        await ordersGrid.EditRow(order);
+        gameStatusesToUpdate.Add(gameStatus);
+        await gameStatusGrid.EditRow(gameStatus);
     }
 
-    async Task OnUpdateRow(GameStatus order)
+    async Task OnUpdateRow(GameStatus gameStatus)
     {
-        Reset(order);
+        Reset(gameStatus);
 
-        var result = await httpClient.PutAsJsonAsync($"/api/GameStatus/{order.Id}", order);
+        var result = await httpClient.PutAsJsonAsync($"/api/GameStatus/{gameStatus.Id}", gameStatus);
 
     }
 
-    async Task SaveRow(GameStatus order)
+    async Task SaveRow(GameStatus gameStatus)
     {
-        await ordersGrid.UpdateRow(order);
-        await httpClient.PostAsJsonAsync("/api/GameStatus", order);
+        if (gameStatusList.Any(x => x.Name!.ToLower() == gameStatus.Name!.ToLower()))
+        {
+            var message = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Duplicate name",
+                    Detail = "Error Detail",
+                    Duration = 4000
+                };
+
+            NotificationService.Notify(message);
+
+            return;
+        }
+
+        var response = await httpClient.PostAsJsonAsync("/api/GameStatus", gameStatus);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var gameStatusResponse = JsonSerializer.Deserialize<Dictionary<string, object>>(content);
+            int id = int.Parse(gameStatusResponse!["id"].ToString()!);
+
+            gameStatus.Id = id;
+        }
+
+        await gameStatusGrid.UpdateRow(gameStatus);
     }
 
-    void CancelEdit(GameStatus order)
+    void CancelEdit(GameStatus gameStatus)
     {
-        Reset(order);
+        Reset(gameStatus);
 
-        ordersGrid.CancelEditRow(order);
+        gameStatusGrid.CancelEditRow(gameStatus);
 
-        //var orderEntry = dbContext.Entry(order);
+        //var orderEntry = dbContext.Entry(gameStatus);
         // if (orderEntry.State == EntityState.Modified)
         // {
         //     orderEntry.CurrentValues.SetValues(orderEntry.OriginalValues);
@@ -166,45 +162,42 @@
         // }
     }
 
-    async Task DeleteRow(GameStatus order)
+    async Task DeleteRow(GameStatus gameStatus)
     {
-        Reset(order);
+        Reset(gameStatus);
 
-        if (orders.Contains(order))
+        if (gameStatusList!.Contains(gameStatus))
         {
-            orders.Remove(order);
+            gameStatusList.Remove(gameStatus);
 
-            await httpClient.DeleteAsync($"/api/GameStatus/{order.Id}");
+            await httpClient.DeleteAsync($"/api/GameStatus/{gameStatus.Id}");
 
-            await ordersGrid.Reload();
+            await gameStatusGrid.Reload();
 
         }
         else
         {
-            ordersGrid.CancelEditRow(order);
-            await ordersGrid.Reload();
+            gameStatusGrid.CancelEditRow(gameStatus);
+            await gameStatusGrid.Reload();
         }
     }
 
     async Task InsertRow()
     {
-        if (editMode == DataGridEditMode.Single)
-        {
-            Reset();
-        }
+        Reset();
         // ??????????????????????????????????????????????????? check input data ?????????????????
-        var order = new GameStatus();
+        var gameStatus = new GameStatus();
 
-        ordersToInsert.Add(order);
+        gameStatusesToInsert.Add(gameStatus);
 
-        await ordersGrid.InsertRow(order);
-        
+        await gameStatusGrid.InsertRow(gameStatus);
+
 
     }
 
-    void OnCreateRow(GameStatus order)
-    {        
-        ordersToInsert.Remove(order);
+    void OnCreateRow(GameStatus gameStatus)
+    {
+        gameStatusesToInsert.Remove(gameStatus);
     }
-   
+
 }
