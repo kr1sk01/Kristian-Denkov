@@ -1,0 +1,7 @@
+﻿@page "/admin"
+@inject DialogService DialogService
+
+<div class="rz-p-12 rz-text-align-center">
+    <RadzenButton @rendermode="@RenderMode.InteractiveServer" Text="Confirm dialog" ButtonStyle="ButtonStyle.Secondary"
+                  Click=@(args => DialogService.Confirm("Are you sure?", "MyTitle", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" })) />
+</div>

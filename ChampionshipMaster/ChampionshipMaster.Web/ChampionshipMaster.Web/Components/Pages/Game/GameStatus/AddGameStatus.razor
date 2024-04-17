@@ -2,8 +2,8 @@
 @using System.ComponentModel.DataAnnotations
 @using System.Text.Json
 
+@inject DialogService dialogService
 @rendermode InteractiveServer
-
 
 
 <center>
@@ -40,8 +40,6 @@
     private GameStatus model = new GameStatus();
     private string? errorMessage;
     private bool showError = false;
-
-    var gameTypes = 
 
 
     void OnSubmit(GameStatus model)

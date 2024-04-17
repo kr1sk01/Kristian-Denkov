@@ -1,4 +1,6 @@
-using ChampionshipMaster.Web.Components;
+﻿using ChampionshipMaster.Web.Components;
+using Radzen;
+using Radzen.Blazor;
 
 namespace ChampionshipMaster.Web;
 public class Program
@@ -11,6 +13,12 @@ public class Program
         builder.Services.AddRazorComponents()
             .AddInteractiveServerComponents()
             .AddInteractiveWebAssemblyComponents();
+
+        builder.Services.AddScoped<DialogService>();
+        builder.Services.AddScoped<RadzenNotification>();
+        builder.Services.AddScoped<NotificationService>();
+        builder.Services.AddScoped<RadzenContextMenu>();
+
         builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:64687/") });
         var app = builder.Build();
 
