@@ -19,7 +19,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
 
         public async Task<bool> ChampionshipStatusNameExists(string? name)
         {
-            return await _context.ChampionshipStatuses.AnyAsync(x => x.Name == name);
+            return await _context.ChampionshipStatuses.AnyAsync(x => x.Name!.ToLower() == name!.ToLower());
         }
 
         public async Task<IActionResult> DeleteChampionshipStatus(int id)

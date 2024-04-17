@@ -1,25 +1,28 @@
-﻿@using RadzenBlazorDemos.Data
+﻿@* @using RadzenBlazorDemos.Data
 @using RadzenBlazorDemos.Models.Northwind
 @using Microsoft.EntityFrameworkCore
 
 @inherits DbContextPage
 
-@inject HttpClient httpClient
 <style>
     .rz-grid-table {
-        width: 100%;
-    }
-
-    .rz-grid-column {
-        width: 100%;
+        width: unset;
     }
 </style>
 
 
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="10px" class="mt-2 mb-4">
+    <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="add_circle_outline" Text="Add New Order" Click="@InsertRow" Disabled="@(editMode == DataGridEditMode.Single && ordersToInsert.Count() > 0)" />
+    <div style="white-space:nowrap; margin-left: 20px ">Edit Mode:</div>
+    <RadzenSelectBar @bind-Value="@editMode" TextProperty="Text" ValueProperty="Value" style="margin-right: 16px"
+                     Data="@(Enum.GetValues(typeof(DataGridEditMode)).Cast<DataGridEditMode>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small"
+                     Disabled="@(editMode == DataGridEditMode.Multiple && ordersToInsert.Count() > 1)" />
+</RadzenStack>
+
 <RadzenDataGrid @ref="ordersGrid" AllowAlternatingRows="false" AllowFiltering="true" AllowPaging="true" PageSize="5" AllowSorting="true" EditMode="@editMode"
-                Data="@orders" TItem="Order" RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow" Sort="@Reset" Page="@Reset" Filter="@Reset">
+                Data="@orders" TItem="Order" RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow" Sort="@Reset" Page="@Reset" Filter="@Reset" ColumnWidth="500px">
     <Columns>
-        <RadzenDataGridColumn TItem="Order" Property="Customer.CompanyName" Title="Customer" Class="rz-grid-column">
+        <RadzenDataGridColumn TItem="Order" Property="Customer.CompanyName" Title="Customer" Width="213213px">
             <EditTemplate Context="order">
                 <RadzenDropDown @bind-Value="order.CustomerID" Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID" Style="width:100%; display: block;" />
             </EditTemplate>
@@ -28,8 +31,6 @@
 </RadzenDataGrid>
 
 @code {
-    List<GameStatus> gStatuses = new List<GameStatus>();
-
     RadzenDataGrid<Order> ordersGrid;
     IEnumerable<Order> orders;
     IEnumerable<Customer> customers;
@@ -37,19 +38,19 @@
 
     DataGridEditMode editMode = DataGridEditMode.Single;
 
-    List<GameStatus> gStatusesToInsert = new List<GameStatus>();
-    List<GameStatus> gStatusesToUpdate = new List<GameStatus>();
+    List<Order> ordersToInsert = new List<Order>();
+    List<Order> ordersToUpdate = new List<Order>();
 
     void Reset()
     {
-        gStatusesToInsert.Clear();
-        gStatusesToUpdate.Clear();
+        ordersToInsert.Clear();
+        ordersToUpdate.Clear();
     }
 
-    void Reset(GameStatus order)
+    void Reset(Order order)
     {
-        gStatusesToInsert.Remove(order);
-        gStatusesToUpdate.Remove(order);
+        ordersToInsert.Remove(order);
+        ordersToUpdate.Remove(order);
     }
 
     protected override async Task OnInitializedAsync()
@@ -62,18 +63,18 @@
         orders = dbContext.Orders.Include("Customer").Include("Employee");
     }
 
-    async Task EditRow(GameStatus order)
+    async Task EditRow(Order order)
     {
         if (editMode == DataGridEditMode.Single && ordersToInsert.Count() > 0)
         {
             Reset();
         }
 
-        gStatusesToUpdate.Add(order);
+        ordersToUpdate.Add(order);
         await ordersGrid.EditRow(order);
     }
 
-    void OnUpdateRow(GameStatus order)
+    void OnUpdateRow(Order order)
     {
         Reset(order);
 
@@ -82,12 +83,12 @@
         dbContext.SaveChanges();
     }
 
-    async Task SaveRow(GameStatus order)
+    async Task SaveRow(Order order)
     {
         await ordersGrid.UpdateRow(order);
     }
 
-    void CancelEdit(GameStatus order)
+    void CancelEdit(Order order)
     {
         Reset(order);
 
@@ -101,7 +102,7 @@
         }
     }
 
-    async Task DeleteRow(GameStatus order)
+    async Task DeleteRow(Order order)
     {
         Reset(order);
 
@@ -127,12 +128,12 @@
             Reset();
         }
 
-        var order = new GameStatus();
+        var order = new Order();
         ordersToInsert.Add(order);
         await ordersGrid.InsertRow(order);
     }
 
-    void OnCreateRow(GameStatus order)
+    void OnCreateRow(Order order)
     {
         dbContext.Add(order);
 
@@ -141,3 +142,4 @@
         ordersToInsert.Remove(order);
     }
 }
+ *@

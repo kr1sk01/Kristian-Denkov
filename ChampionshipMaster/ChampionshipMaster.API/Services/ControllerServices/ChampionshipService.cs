@@ -86,7 +86,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
 
         public async Task<bool> ChampionshipNameExists(string? name)
         {
-            return await _context.Championships.AnyAsync(x => x.Name == name);
+            return await _context.Championships.AnyAsync(x => x.Name!.ToLower() == name!.ToLower());
         }
 
         public async Task<IActionResult> EditChampionship(int id, Championship championship)

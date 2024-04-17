@@ -69,7 +69,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
 
         public async Task<bool> GameStatusNameExists(string? name)
         {
-            return await _context.GameStatuses.AnyAsync(x => x.Name == name);
+            return await _context.GameStatuses.AnyAsync(x => x.Name!.ToLower() == name!.ToLower());
         }
 
         public async Task<List<GameStatus>> GetAllGameStatuses()

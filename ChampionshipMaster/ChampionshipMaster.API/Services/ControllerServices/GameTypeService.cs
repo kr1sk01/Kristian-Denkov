@@ -78,7 +78,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
 
         public async Task<bool> GameTypeNameExists(string? name)
         {
-            return await _context.GameTypes.AnyAsync(x => x.Name == name);
+            return await _context.GameTypes.AnyAsync(x => x.Name!.ToLower() == name!.ToLower());
         }
 
         public async Task<List<GameTypeDto>> GetAllGameTypes()
