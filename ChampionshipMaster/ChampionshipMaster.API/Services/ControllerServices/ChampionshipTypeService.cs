@@ -18,7 +18,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
 
         public async Task<bool> ChampionshipTypeNameExists(string? name)
         {
-            return await _context.ChampionshipTypes.AnyAsync(t => t.Name == name);
+            return await _context.ChampionshipTypes.AnyAsync(t => t.Name!.ToLower() == name!.ToLower());
         }
 
         public async Task<IActionResult> DeleteChampionshipType(int id)
