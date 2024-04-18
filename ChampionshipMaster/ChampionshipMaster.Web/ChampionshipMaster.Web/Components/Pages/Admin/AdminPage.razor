@@ -78,6 +78,8 @@
     List<GameStatus> gameStatusesToInsert = new List<GameStatus>();
     List<GameStatus> gameStatusesToUpdate = new List<GameStatus>();
 
+    GameStatus Original { get; set; } = new GameStatus();
+
     void Reset()
     {
         gameStatusesToInsert.Clear();
@@ -105,7 +107,10 @@
             Reset();
         }
 
+        Original = new GameStatus { Id = gameStatus.Id, Name = gameStatus.Name };
+
         gameStatusesToUpdate.Add(gameStatus);
+
         await gameStatusGrid.EditRow(gameStatus);
     }
 
@@ -151,19 +156,15 @@
         await gameStatusGrid.UpdateRow(gameStatus);
     }
 
-    void CancelEdit(GameStatus gameStatus)
+    async Task CancelEdit(GameStatus gameStatus)
     {
         Reset(gameStatus);
 
-        gameStatusGrid.CancelEditRow(gameStatus);
-        gameStatusGrid.Reload();
+        gameStatus.Name = Original.Name;
 
-        //var orderEntry = dbContext.Entry(gameStatus);
-        // if (orderEntry.State == EntityState.Modified)
-        // {
-        //     orderEntry.CurrentValues.SetValues(orderEntry.OriginalValues);
-        //     orderEntry.State = EntityState.Unchanged;
-        // }
+        gameStatusGrid.CancelEditRow(gameStatus);
+
+        await gameStatusGrid.Reload();
     }
 
     async Task DeleteRow(GameStatus gameStatus)
