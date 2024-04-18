@@ -1,0 +1,209 @@
+@using Microsoft.EntityFrameworkCore
+@using System.Text.Json
+
+@page "/championshipstatus"
+
+@inject HttpClient httpClient
+@inject NotificationService NotificationService
+
+@rendermode InteractiveServer
+
+<style>
+    .rz-grid-table {
+        width: unset;
+    }
+</style>
+
+
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="10px" class="mt-2 mb-4">
+    <RadzenButton Style="background-color:darkslategray"
+                  ButtonStyle="ButtonStyle.Success"
+                  Icon="add_circle_outline"
+                  Text="Add New Championship Status"
+                  Click="@InsertRow"
+                  Disabled="@(championshipStatusesToInsert.Count() > 0)" />
+</RadzenStack>
+
+<RadzenDataGrid @ref="championshipStatusGrid"
+                AllowAlternatingRows="false"
+                AllowFiltering="false"
+                AllowPaging="true"
+                AllowSorting="true"
+                EditMode="@DataGridEditMode.Single"
+                PageSize="5"
+                Data="@championshipStatusList"
+                TItem="ChampionshipStatus"
+                RowUpdate="@OnUpdateRow"
+                RowCreate="@OnCreateRow"
+                Sort="@Reset"
+                Page="@Reset"
+                Filter="@Reset"
+                ColumnWidth="20200202px">
+    <Columns>
+
+        <RadzenDataGridColumn TItem="ChampionshipStatus" Property="Name" Title="Name">
+            <EditTemplate Context="championshipStatus">
+                <RadzenTextBox @bind-Value="championshipStatus.Name" Style="width:200px; display: block" Name="Name" />
+                <RadzenRequiredValidator Text="Name is required" Component="Name" Popup="true" />
+            </EditTemplate>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn Width="1%" TItem="ChampionshipStatus" Context="championshipStatus" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Frozen="true" FrozenPosition="FrozenColumnPosition.Right">
+            <Template Context="championshipStatus">
+                <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@(args => EditRow(championshipStatus))" @onclick:stopPropagation="true">
+                </RadzenButton>
+                <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@(args => DeleteRow(championshipStatus))" @onclick:stopPropagation="true">
+                </RadzenButton>
+            </Template>
+            <EditTemplate Context="championshipStatus">
+                <RadzenButton Icon="check" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@((args) => SaveRow(championshipStatus))">
+                </RadzenButton>
+                <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@((args) => CancelEdit(championshipStatus))">
+                </RadzenButton>
+                <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@(args => DeleteRow(championshipStatus))">
+                </RadzenButton>
+            </EditTemplate>
+        </RadzenDataGridColumn>
+
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    private bool dataLoaded = false;
+
+    RadzenDataGrid<ChampionshipStatus> championshipStatusGrid = default!;
+
+    List<ChampionshipStatus> championshipStatusList = default!;
+
+    List<ChampionshipStatus> championshipStatusesToInsert = new List<ChampionshipStatus>();
+    List<ChampionshipStatus> championshipStatusesToUpdate = new List<ChampionshipStatus>();
+
+    ChampionshipStatus Original { get; set; } = new ChampionshipStatus();
+
+    void Reset()
+    {
+        championshipStatusesToInsert.Clear();
+        championshipStatusesToUpdate.Clear();
+    }
+
+    void Reset(ChampionshipStatus championshipStatus)
+    {
+        championshipStatusesToInsert.Remove(championshipStatus);
+        championshipStatusesToUpdate.Remove(championshipStatus);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        championshipStatusList = await httpClient.GetFromJsonAsync<List<ChampionshipStatus>>("/api/ChampionshipStatus") ?? new List<ChampionshipStatus>();
+    }
+
+    async Task EditRow(ChampionshipStatus championshipStatus)
+    {
+
+        if (championshipStatusesToInsert.Count() > 0)
+        {
+            Reset();
+        }
+
+        Original = new ChampionshipStatus { Id = championshipStatus.Id, Name = championshipStatus.Name };
+
+        championshipStatusesToUpdate.Add(championshipStatus);
+
+        await championshipStatusGrid.EditRow(championshipStatus);
+    }
+
+    async Task OnUpdateRow(ChampionshipStatus championshipStatus)
+    {
+        Reset(championshipStatus);
+
+        var result = await httpClient.PutAsJsonAsync($"/api/ChampionshipStatus/{championshipStatus.Id}", championshipStatus);
+
+    }
+
+    async Task SaveRow(ChampionshipStatus championshipStatus)
+    {
+        if (championshipStatusList.Any(x => x.Name!.ToLower() == championshipStatus.Name!.ToLower()
+            && x.Id != championshipStatus.Id))
+        {
+            var message = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Duplicate name",
+                    Detail = "There is already a championship status with that name",
+                    Duration = 4000,
+                    CloseOnClick = true
+                };
+
+            NotificationService.Notify(message);
+
+            return;
+        }
+
+        var response = await httpClient.PostAsJsonAsync("/api/ChampionshipStatus", championshipStatus);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var championshipStatusResponse = JsonSerializer.Deserialize<Dictionary<string, object>>(content);
+            int id = int.Parse(championshipStatusResponse!["id"].ToString()!);
+
+            championshipStatus.Id = id;
+
+            championshipStatusList.Add(championshipStatus);
+        }
+
+        await championshipStatusGrid.UpdateRow(championshipStatus);
+    }
+
+    async Task CancelEdit(ChampionshipStatus championshipStatus)
+    {
+        Reset(championshipStatus);
+
+        championshipStatus.Name = Original.Name;
+
+        championshipStatusGrid.CancelEditRow(championshipStatus);
+
+        await championshipStatusGrid.Reload();
+    }
+
+    async Task DeleteRow(ChampionshipStatus championshipStatus)
+    {
+        Reset(championshipStatus);
+
+        if (championshipStatusList!.Contains(championshipStatus))
+        {
+            championshipStatusList.Remove(championshipStatus);
+
+            await httpClient.DeleteAsync($"/api/ChampionshipStatus/{championshipStatus.Id}");
+
+            await championshipStatusGrid.Reload();
+
+        }
+        else
+        {
+            championshipStatusGrid.CancelEditRow(championshipStatus);
+            await championshipStatusGrid.Reload();
+        }
+    }
+
+    async Task InsertRow()
+    {
+        Reset();
+        // ??????????????????????????????????????????????????? check input data ?????????????????
+        var championshipStatus = new ChampionshipStatus();
+
+        championshipStatusesToInsert.Add(championshipStatus);
+
+        await championshipStatusGrid.InsertRow(championshipStatus);
+
+
+    }
+
+    void OnCreateRow(ChampionshipStatus championshipStatus)
+    {
+        championshipStatusesToInsert.Remove(championshipStatus);
+    }
+
+}
