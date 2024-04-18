@@ -123,9 +123,11 @@
         {
             var message = new NotificationMessage
                 {
+                    Severity = NotificationSeverity.Error,
                     Summary = "Duplicate name",
-                    Detail = "Error Detail",
-                    Duration = 4000
+                    Detail = "There is already a game status with that name",
+                    Duration = 4000,
+                    CloseOnClick = true
                 };
 
             NotificationService.Notify(message);
@@ -154,7 +156,8 @@
         Reset(gameStatus);
 
         gameStatusGrid.CancelEditRow(gameStatus);
-        
+        gameStatusGrid.Reload();
+
         //var orderEntry = dbContext.Entry(gameStatus);
         // if (orderEntry.State == EntityState.Modified)
         // {
