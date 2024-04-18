@@ -124,7 +124,8 @@
 
     async Task SaveRow(GameStatus gameStatus)
     {
-        if (gameStatusList.Any(x => x.Name!.ToLower() == gameStatus.Name!.ToLower()))
+        if (gameStatusList.Any(x => x.Name!.ToLower() == gameStatus.Name!.ToLower()
+            && x.Id != gameStatus.Id))
         {
             var message = new NotificationMessage
                 {
