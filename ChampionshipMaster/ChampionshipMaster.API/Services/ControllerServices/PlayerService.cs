@@ -45,7 +45,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             }
 
             // Find the user by username
-            var user = await _userManager.FindByEmailAsync(loginRequest.Email);
+            var user = await _userManager.FindByEmailAsync(loginRequest.Email!);
 
             if (user == null)
             {
@@ -53,7 +53,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             }
 
             // Validate the password
-            var validPassword = await _userManager.CheckPasswordAsync(user, loginRequest.Password);
+            var validPassword = await _userManager.CheckPasswordAsync(user, loginRequest.Password!);
 
             if (!validPassword)
             {

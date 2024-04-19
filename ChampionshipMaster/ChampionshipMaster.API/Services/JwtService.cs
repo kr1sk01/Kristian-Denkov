@@ -27,7 +27,6 @@ namespace ChampionshipMaster.API.Services
             {
                 new Claim(ClaimTypes.Name, request.UserName ?? ""),
                 new Claim(ClaimTypes.Email, request.Email ?? "")
-                // Add other relevant user claims here
             };
 
             var roles = await _userManager.GetRolesAsync(request);
