@@ -52,15 +52,29 @@ public class Program
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
+
         builder.Services.AddControllers();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
         builder.Services.AddScoped<DataSeeding>();
         builder.Services.ConfigureMappings();
+
+        builder.Services.AddSignalR();
+
+        builder.Services.AddHostedService<ServerTimeNotifier>();
+
+        builder.Services.AddCors();
+
         builder.Services.RegisterControllerServices();
 
+
+
+       
+
         var app = builder.Build();
+        
+
 
         //Creating Db if it hasn't created already
         using (var scope = app.Services.CreateScope())
@@ -85,6 +99,8 @@ public class Program
             app.UseSwaggerUI();
         }
 
+        app.UseCors(policy => policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
+
         app.UseHttpsRedirection();
 
         app.UseAuthentication();
@@ -92,6 +108,9 @@ public class Program
 
 
         app.MapControllers();
+
+        app.MapHub<NotificationsHub>("notifications");
+
         app.Run();
     }
 }

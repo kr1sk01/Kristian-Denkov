@@ -1,15 +1,9 @@
 ﻿@inherits LayoutComponentBase
 
 <div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
-
+   
     <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-        </div>
-
+        <NavMenu />
         <article class="content px-4">
             @Body
         </article>
@@ -23,5 +17,10 @@
 </div>
 
 
-<RadzenComponents />
+<RadzenComponents @rendermode="@RenderMode.InteractiveServer" />
 <RadzenNotification @rendermode="@RenderMode.InteractiveServer"/>
+
+<script src="_framework/blazor.server.js"></script>
+
+<!-- SignalR JavaScript library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.7/signalr.min.js"></script>
