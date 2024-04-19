@@ -16,6 +16,9 @@ public class Program
 
         builder.Services.AddRadzenComponents();
         builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:50397") });
+
+        builder.Services.AddSignalR();
+        
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
