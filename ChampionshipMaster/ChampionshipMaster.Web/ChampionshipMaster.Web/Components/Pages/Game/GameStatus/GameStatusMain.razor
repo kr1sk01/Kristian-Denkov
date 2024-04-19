@@ -1,7 +1,7 @@
 ﻿@using Microsoft.EntityFrameworkCore
 @using System.Text.Json
 
-@page "/gamestatus"
+@page "/gamestatusmain"
 
 @inject HttpClient httpClient
 @inject NotificationService NotificationService
@@ -13,7 +13,6 @@
         width: unset;
     }
 </style>
-
 
 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="10px" class="mt-2 mb-4">
     <RadzenButton Style="background-color:darkslategray"

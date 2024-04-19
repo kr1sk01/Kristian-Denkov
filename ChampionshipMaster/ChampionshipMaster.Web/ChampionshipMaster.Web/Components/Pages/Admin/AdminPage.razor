@@ -1,21 +1,16 @@
 ﻿@page "/admin"
+@inject NavigationManager Navigation
 
-@inject NotificationService NotificationService
+@rendermode InteractiveServer
+
 <h1>Adminceto BACE!</h1>
-<RadzenButton Click=@(args => OnClick("Secondary button")) Text="Secondary" ButtonStyle="ButtonStyle.Secondary" />
-<RadzenButton Click=@(args => OnClick("Secondary button")) Text="Secondary" ButtonStyle="ButtonStyle.Secondary" />
-<RadzenButton Click=@(args => OnClick("Secondary button")) Text="Secondary" ButtonStyle="ButtonStyle.Secondary" />
-<RadzenButton Click=@(args => OnClick("Secondary button")) Text="Secondary" ButtonStyle="ButtonStyle.Secondary" />
-<RadzenButton Click=@(args => OnClick("Secondary button")) Text="Secondary" ButtonStyle="ButtonStyle.Secondary" />
-<RadzenButton Click=@(args => OnClick("Secondary button")) Text="Secondary" ButtonStyle="ButtonStyle.Secondary" />
-<RadzenButton Click=@(args => OnClick("Secondary button")) Text="Secondary" ButtonStyle="ButtonStyle.Secondary" />
-<RadzenButton Click=@(args => OnClick("Secondary button")) Text="Secondary" ButtonStyle="ButtonStyle.Secondary" />
-<RadzenButton Click=@(args => OnClick("Secondary button")) Text="Secondary" ButtonStyle="ButtonStyle.Secondary" />
-<RadzenButton Click=@(args => OnClick("Secondary button")) Text="Secondary" ButtonStyle="ButtonStyle.Secondary" />
-<RadzenButton Click=@(args => OnClick("Secondary button")) Text="Secondary" ButtonStyle="ButtonStyle.Secondary" />
+<RadzenButton Click="@(() => RedirectToAnotherPage("gamestatusmain"))" Text="Manage Game Statuses" ButtonStyle="ButtonStyle.Secondary" />
+<RadzenButton Click="@(() => RedirectToAnotherPage("gametypemain"))" Text="Manage Game Types" ButtonStyle="ButtonStyle.Secondary" />
+<RadzenButton Click="@(() => RedirectToAnotherPage("TeamTypeMain"))" Text="Manage Team Types" ButtonStyle="ButtonStyle.Secondary" />
+
 @code {
-    private void OnClick(string text)
+    private void RedirectToAnotherPage(string url)
     {
-        NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Info, Summary = "Button Clicked", Detail = text });
+        Navigation.NavigateTo(url);
     }
 }
