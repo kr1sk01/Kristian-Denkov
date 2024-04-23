@@ -10,14 +10,12 @@ namespace ChampionshipMaster.API.Services
 {
     public class JwtService
     {
-        private readonly IConfiguration _configuration;
         private readonly SymmetricSecurityKey _signingKey;
         private readonly UserManager<Player> _userManager;
 
-        public JwtService(IConfiguration configuration, UserManager<Player> userManager)
+        public JwtService(UserManager<Player> userManager)
         {
-            _configuration = configuration;
-            _signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:Key"]!));
+            _signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("Jwt_Key")!));
             _userManager = userManager;
         }
 

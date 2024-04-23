@@ -9,10 +9,12 @@ namespace ChampionshipMaster.API.Controllers
     public class PlayerController : ControllerBase
     {
         private readonly IPlayerService _playerService;
+        private readonly IEmailSender _emailSender;
 
-        public PlayerController(IPlayerService playerService)
+        public PlayerController(IPlayerService playerService, IEmailSender emailSender)
         {
             _playerService = playerService;
+            _emailSender = emailSender;
         }
 
         [HttpPost("register")]
@@ -35,6 +37,13 @@ namespace ChampionshipMaster.API.Controllers
         {
             var authHeader = HttpContext.Request.Headers.Authorization;
             var result = await _playerService.ChangePassword(changePassword, authHeader);
+            return result;
+        }
+
+        [HttpPost("confirmEmail")]
+        public async Task<IActionResult> ConfirmEmail([FromQuery] string userId, [FromQuery] string token)
+        {
+            var result = await _playerService.ConfirmEmail(userId, token);
             return result;
         }
     }

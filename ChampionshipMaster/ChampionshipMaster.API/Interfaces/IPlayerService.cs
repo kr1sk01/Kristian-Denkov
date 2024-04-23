@@ -8,5 +8,6 @@ namespace ChampionshipMaster.API.Interfaces
         Task<IActionResult> Register(RegisterViewModel register);
         Task<IActionResult> Login(LoginViewModel login);
         Task<IActionResult> ChangePassword(ChangePasswordViewModel changePassword, StringValues authHeader);
+        Task<IActionResult> ConfirmEmail(string userId, string token);
     }
 }

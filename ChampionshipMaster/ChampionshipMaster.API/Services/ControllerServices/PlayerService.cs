@@ -11,11 +11,13 @@ namespace ChampionshipMaster.API.Services.ControllerServices
     {
         private readonly UserManager<Player> _userManager;
         private readonly JwtService _jwtService;
+        private readonly IEmailSender _emailSender;
 
-        public PlayerService(UserManager<Player> userManager, JwtService jwtService)
+        public PlayerService(UserManager<Player> userManager, JwtService jwtService, IEmailSender emailSender)
         {
             _userManager = userManager;
             _jwtService = jwtService;
+            _emailSender = emailSender;
         }
 
         public async Task<IActionResult> Register(RegisterViewModel registerRequest)
@@ -30,8 +32,13 @@ namespace ChampionshipMaster.API.Services.ControllerServices
 
             if (result.Succeeded)
             {
-                var token = _jwtService.GenerateToken(user);
-                return Ok(new { message = "Registration successful", jwtToken = token.Result });
+                var emailToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                var userId = user.Id;
+                var confirmationLink = $"https://localhost:50397/api/Player/confirmEmail?userId={userId}&token={emailToken}";
+                await _emailSender.SendAccountConfirmationEmail(user.Email, user.UserName, confirmationLink);
+
+                var jwtToken = _jwtService.GenerateToken(user);
+                return Ok(new { message = "Registration successful", jwtToken = jwtToken.Result });
             }
 
             return BadRequest(result.Errors);
@@ -92,6 +99,30 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             }
 
             return BadRequest("Something went wrong");
+        }
+
+        public async Task<IActionResult> ConfirmEmail(string userId, string token)
+        {
+            if (string.IsNullOrEmpty(token))
+            {
+                return BadRequest("Invalid confirmation link.");
+            }
+
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            var result = await _userManager.ConfirmEmailAsync(user, token);
+
+            if (result.Succeeded)
+            {
+                return Ok("Email confirmed successfully!");
+            }
+
+            return BadRequest(result.Errors);
         }
     }
 }
