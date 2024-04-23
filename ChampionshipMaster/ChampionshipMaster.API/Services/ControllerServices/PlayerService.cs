@@ -34,7 +34,10 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             {
                 var emailToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                 var userId = user.Id;
-                var confirmationLink = $"https://localhost:50397/api/Player/confirmEmail?userId={userId}&token={emailToken}";
+                var confirmationLink = $"https://localhost:50397/api/Player/confirmEmail?userId=" +
+                    Uri.EscapeDataString($"{userId}") +
+                    "&token=" +
+                    Uri.EscapeDataString($"{emailToken}");
                 await _emailSender.SendAccountConfirmationEmail(user.Email, user.UserName, confirmationLink);
 
                 var jwtToken = _jwtService.GenerateToken(user);
@@ -119,7 +122,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
 
             if (result.Succeeded)
             {
-                return Ok("Email confirmed successfully!");
+                return Redirect("https://localhost:56665/login");
             }
 
             return BadRequest(result.Errors);

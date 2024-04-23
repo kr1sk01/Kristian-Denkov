@@ -40,7 +40,7 @@ namespace ChampionshipMaster.API.Controllers
             return result;
         }
 
-        [HttpPost("confirmEmail")]
+        [HttpGet("confirmEmail")]
         public async Task<IActionResult> ConfirmEmail([FromQuery] string userId, [FromQuery] string token)
         {
             var result = await _playerService.ConfirmEmail(userId, token);
