@@ -1,12 +1,14 @@
 ﻿@page "/"
-@implements IAsyncDisposable
+@*implements IAsyncDisposable*@
+@inject NavigationManager NavigationManager
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
 
 @rendermode InteractiveServer
 
 <PageTitle>Home</PageTitle>
 
 
-<h1>Wellcome to championship master project!</h1>
+<h1>Wellcome to championship master project, </h1>
 <RadzenCard class="p-0">
     <RadzenStack Orientation="Orientation.Horizontal" Gap="10px" JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" Wrap="FlexWrap.NoWrap" Style="height: 600px">
         <RadzenImage class="p-1 rz-color-on-warning rz-text-align-center" Path="Images/foosball.png" AlternateText="community" />
@@ -15,44 +17,77 @@
     </RadzenStack>
 </RadzenCard>
 
+Wellcome to our app, @username
 
-Welcome to your new app.
 
-Messages from the server: 
-<ul>
+@* <ul>
     @foreach (var item in _messages)
     {
         <li>@item</li>
     }
 
-</ul>
-@code{
+</ul> *@
+
+
+@code {
+
 }
-@code{
+@code {
+    private bool loggedIn = false;
+
+    private string username = "";
+
     private HubConnection? _hubConnection;
 
     private readonly List<string> _messages = new();
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)// izpolzwam onrender za6toto na oninitialized
     {
-        _hubConnection = new HubConnectionBuilder()
-            .WithUrl("https://localhost:50397/notifications")
-            .Build();
 
-        _hubConnection.On<string>("ReceiveNotification", message =>
+        var tokenString = await localStorage.GetItemAsStringAsync("token");
+
+
+        var handler = new JwtSecurityTokenHandler();
+        var token = handler.ReadJwtToken(tokenString);
+        ;
+
+        var expirationTimeUnix = token.Claims.FirstOrDefault(c => c.Type == "exp")?.Value;
+
+        var expirationTime = DateTimeOffset.FromUnixTimeSeconds(long.Parse(expirationTimeUnix)).DateTime;
+        var currentTime = DateTime.UtcNow;
+
+        if (expirationTime < currentTime)
         {
-            _messages.Add(message);
-
-            InvokeAsync(StateHasChanged);
-        });
-
-        await _hubConnection.StartAsync();
-    }
-
-    public async ValueTask DisposeAsync(){
-        if(_hubConnection !=null)
-        {
-            await _hubConnection.DisposeAsync();
+            NavigationManager.NavigateTo("/login");
         }
+        else
+        {
+            username = token.Claims.FirstOrDefault(x => x.Type == "unique_name")?.Value!;
+        }
+
+
+
+        //     _hubConnection = new HubConnectionBuilder()
+        //         .WithUrl("https://localhost:50397/notifications")
+        //         .Build();
+
+        //     _hubConnection.On<string>("ReceiveNotification", message =>
+        //     {
+        //         _messages.Add(message);
+
+        //         InvokeAsync(StateHasChanged);
+        //     });
+
+        //     await _hubConnection.StartAsync();
+
     }
+
+
+    // public async ValueTask DisposeAsync(){
+    //     if(_hubConnection !=null)
+    //     {
+    //         await _hubConnection.DisposeAsync();
+    //     }
+    // }
+    
 }

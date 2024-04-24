@@ -10,6 +10,7 @@
     <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="8.0.4" />
     <PackageReference Include="Radzen.Blazor" Version="4.29.6" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.5.1" />
     <ProjectReference Include="..\..\ChampionshipMaster.DATA\ChampionshipMaster.DATA.csproj" />
     <ProjectReference Include="..\..\ChampionshipMaster.SHARED\ChampionshipMaster.SHARED.csproj" />
     <ProjectReference Include="..\ChampionshipMaster.Web.Client\ChampionshipMaster.Web.Client.csproj" />
