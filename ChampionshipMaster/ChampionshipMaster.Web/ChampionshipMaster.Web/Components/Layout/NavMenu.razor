@@ -1,6 +1,6 @@
 ﻿@rendermode InteractiveServer
 
-<div style="top:0px;left:0px;margin-bottom: 200px;">
+<div style="top:0px;left:0px;margin-bottom: 0px;">
     <RadzenMenu Click="OnParentClicked">
         <RadzenMenuItem Text="General" Icon="home">
             <RadzenMenuItem Text="Buttons" Path="buttons" Icon="account_circle"></RadzenMenuItem>
@@ -41,12 +41,9 @@
                 </RadzenMenuItem>
             </RadzenMenuItem>
         </RadzenMenuItem>
-        <div style="position:absolute;right:0px;">
-            <RadzenMenuItem Icon="account_box" Text="Profile" >
-            </RadzenMenuItem>
-        </div>
+        <RadzenMenuItem Icon="account_box" Text="Profile">
+        </RadzenMenuItem>
     </RadzenMenu>
-
 </div>
 
 @code {

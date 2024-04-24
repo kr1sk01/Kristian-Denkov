@@ -30,30 +30,46 @@
                 </RadzenFormField>
                 <RadzenFormField Text="Username" Variant="@variant">
                     <ChildContent>
-                        <RadzenTextBox Name="username" @bind-Value=@model.UserName />
+                        <RadzenTextBox Name="Username" @bind-Value=@model.UserName />
                     </ChildContent>
                     <Helper>
-                        <RadzenRequiredValidator Component="username" Text="Username is required." />
-                        <RadzenLengthValidator Component="username" Min="4" Max="50" Text="Username should be between 4 and 50 characters" />
+                        <RadzenRequiredValidator Component="Username" Text="Username is required." />
+                        <RadzenLengthValidator Component="Username" Min="4" Max="50" Text="Username should be between 4 and 50 characters" />
                     </Helper>
                 </RadzenFormField>
+
+
+
+
                 <RadzenFormField Text="Password" Variant="@variant">
                     <ChildContent>
-                        <RadzenPassword Name="Password" @bind-Value=@model.Password />
+                        <RadzenTextBox Name="Password" @bind-Value="@model.Password" Visible="@(!password)" />
+                        <RadzenPassword Name="Password" @bind-Value="@model.Password" Visible="@password" />
                     </ChildContent>
+                    <End>
+                        <RadzenButton Icon="@(password ? "visibility" : "visibility_off")" Click="TogglePassword" Variant="Variant.Text" Size="ButtonSize.Small" />
+                    </End>
                     <Helper>
                         <RadzenRequiredValidator Component="Password" Text="Password is required." />
                         <RadzenLengthValidator Component="Password" Min="8" Max="100" Text="Password should be between 8 and 100 characters" />
                     </Helper>
                 </RadzenFormField>
+
+
+
                 <RadzenFormField Text="Confirm Password" Variant="@variant">
                     <ChildContent>
-                        <RadzenPassword Name="confirmPassword" @bind-Value=@model.ConfirmPassword />
+                        <RadzenTextBox Name="confirmPassword" @bind-Value=@model.ConfirmPassword Visible="@(!confirmPassword)" />
+                        <RadzenPassword Name="confirmPassword" @bind-Value=@model.ConfirmPassword Visible="@confirmPassword" />
                     </ChildContent>
+                    <End>
+                        <RadzenButton Icon="@(confirmPassword ? "visibility" : "visibility_off")" Click="ToggleConfirmPassword" Variant="Variant.Text" Size="ButtonSize.Small" />
+                    </End>
                     <Helper>
                         <RadzenRequiredValidator Component="confirmPassword" Text="Confirm Password is required." />
                         <RadzenCompareValidator Component="confirmPassword" Visible=@(!string.IsNullOrEmpty(model.ConfirmPassword)) Value=@model.Password Text="Passwords should be the same." />
                     </Helper>
+
                 </RadzenFormField>
                 <RadzenButton ButtonType="ButtonType.Submit" Text="Register"></RadzenButton>
             </RadzenStack>
@@ -71,6 +87,8 @@
     private string? errorMessage;
     private bool showError = false;
 
+    bool password = true;
+    bool confirmPassword = true;
 
     async Task OnSubmit(RegisterViewModel register)
     {
@@ -90,5 +108,14 @@
     void OnInvalidSubmit(FormInvalidSubmitEventArgs args)
     {
         showError = false;
+    }
+
+    void TogglePassword()
+    {
+        password = !password;
+    }
+    void ToggleConfirmPassword()
+    {
+        confirmPassword = !confirmPassword;
     }
 }

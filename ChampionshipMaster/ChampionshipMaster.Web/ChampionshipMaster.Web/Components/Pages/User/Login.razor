@@ -4,13 +4,13 @@
 
 @inject HttpClient httpClient
 @inject NavigationManager NavigationManager
-
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
 @rendermode InteractiveServer
 
 <center>
     <h3>Log In</h3>
     <div style="justify-content:center;text-align:left;width:45%;">
-        <RadzenTemplateForm Style="" TItem="LoginViewModel" Data=@model Submit=@OnSubmit InvalidSubmit=@OnInvalidSubmit>
+        <RadzenTemplateForm TItem="LoginViewModel" Data=@model Submit=@OnSubmit InvalidSubmit=@OnInvalidSubmit>
             @if (showError)
             {
                 <RadzenAlert Variant="@Variant.Filled" AlertStyle=@AlertStyle.Primary Size=@AlertSize.Small Shade="Shade.Lighter" AllowClose=false>
@@ -30,17 +30,25 @@
                 </RadzenFormField>
                 <RadzenFormField Text="Password" Variant="@variant">
                     <ChildContent>
-                        <RadzenTextBox Name="Password" @bind-Value=@model.Password />
+                        <RadzenTextBox Name="Password" @bind-Value="@model.Password" Visible="@(!password)" />
+                        <RadzenPassword Name="Password" @bind-Value="@model.Password" Visible="@password" />
                     </ChildContent>
+                    <End>
+                        <RadzenButton Icon="@(password ? "visibility" : "visibility_off")" Click="TogglePassword" Variant="Variant.Text" Size="ButtonSize.Small" />
+                    </End>
                     <Helper>
                         <RadzenRequiredValidator Component="Password" Text="Password is required." />
                         <RadzenLengthValidator Component="Password" Min="8" Max="100" Text="Password should be between 8 and 100 characters" />
                     </Helper>
                 </RadzenFormField>
-                <RadzenButton ButtonType="ButtonType.Submit" Text="Log In"></RadzenButton>
+                <RadzenButton ButtonType="ButtonType.Submit" Text="Log In"></RadzenButton>              
             </RadzenStack>
+                   
         </RadzenTemplateForm>
-
+         <RadzenStack Orientation="Orientation.Horizontal" Gap="10px" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Normal" Wrap="FlexWrap.NoWrap">
+                <RadzenText Style="color:black;">New to Championship Master?</RadzenText>
+                <RadzenLink Path="/register" Text="Create account" />
+          </RadzenStack>
     </div>
 </center>
 
@@ -53,6 +61,7 @@
     private string? errorMessage;
     private bool showError = false;
 
+    bool password = true;
 
     async Task OnSubmit(LoginViewModel login)
     {
@@ -66,14 +75,21 @@
             return;
         }
 
-        // var successfulLogin = await request.Content.ReadAsStringAsync();
-        // var token = JsonSerializer.Deserialize<Dictionary<string, string>>(successfulLogin)!["jwtToken"];
-        // window.local
+
+
+        var successfulLogin = await request.Content.ReadAsStringAsync();
+        var token = JsonSerializer.Deserialize<Dictionary<string, string>>(successfulLogin)!["jwtToken"];
+        await localStorage.SetItemAsStringAsync("token", token);
+
         NavigationManager.NavigateTo("/");
     }
 
     void OnInvalidSubmit(FormInvalidSubmitEventArgs args)
     {
         showError = false;
+    }
+    void TogglePassword()
+    {
+        password = !password;
     }
 }

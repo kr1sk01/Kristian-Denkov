@@ -29,7 +29,6 @@ namespace ChampionshipMaster.API.Controllers
             return result;
         }
 
-        [Authorize]
         [HttpPost("changePassword")]
         public async Task<IActionResult> ChangePassword(ChangePasswordViewModel changePassword)
         {

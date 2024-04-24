@@ -1,4 +1,5 @@
-﻿using ChampionshipMaster.Web.Components;
+﻿using Blazored.LocalStorage;
+using ChampionshipMaster.Web.Components;
 using Radzen;
 using Radzen.Blazor;
 
@@ -18,7 +19,8 @@ public class Program
         builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:50397") });
 
         builder.Services.AddSignalR();
-        
+        builder.Services.AddBlazoredLocalStorage();
+
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
