@@ -28,7 +28,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             }
 
             var user = new Player { UserName = registerRequest.UserName, Email = registerRequest.Email };
-            var result = await _userManager.CreateAsync(user, registerRequest.Password);
+            var result = await _userManager.CreateAsync(user, registerRequest.Password!);
 
             if (result.Succeeded)
             {
@@ -38,7 +38,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                     Uri.EscapeDataString($"{userId}") +
                     "&token=" +
                     Uri.EscapeDataString($"{emailToken}");
-                await _emailSender.SendAccountConfirmationEmail(user.Email, user.UserName, confirmationLink);
+                await _emailSender.SendAccountConfirmationEmail(user.Email!, user.UserName!, confirmationLink);
 
                 var jwtToken = _jwtService.GenerateToken(user);
                 return Ok(new { message = "Registration successful", jwtToken = jwtToken.Result });

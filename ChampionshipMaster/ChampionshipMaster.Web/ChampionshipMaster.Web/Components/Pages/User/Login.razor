@@ -2,40 +2,47 @@
 @using System.ComponentModel.DataAnnotations
 @using System.Text.Json
 
+@inject HttpClient httpClient
+@inject NavigationManager NavigationManager
+
 @rendermode InteractiveServer
 
 <center>
     <h3>Log In</h3>
-    <div style="justify-content:center;text-align:left;width:75%;">
-    <RadzenTemplateForm Style="" TItem="LoginViewModel" Data=@model Submit=@OnSubmit InvalidSubmit=@OnInvalidSubmit>
-        @if (showError)
-        {
-            <RadzenAlert Variant="@Variant.Filled" AlertStyle=@AlertStyle.Primary Size=@AlertSize.Small Shade="Shade.Lighter" AllowClose=false>
-                <RadzenText TagName="TagName.P">@errorMessage</RadzenText>
+    <div style="justify-content:center;text-align:left;width:45%;">
+        <RadzenTemplateForm Style="" TItem="LoginViewModel" Data=@model Submit=@OnSubmit InvalidSubmit=@OnInvalidSubmit>
+            @if (showError)
+            {
+                <RadzenAlert Variant="@Variant.Filled" AlertStyle=@AlertStyle.Primary Size=@AlertSize.Small Shade="Shade.Lighter" AllowClose=false>
+                    <RadzenText TagName="TagName.P">@errorMessage</RadzenText>
                 </RadzenAlert>
-        }
-        <RadzenStack Gap="1rem" Class="rz-p-sm-12">
-            <RadzenFormField Text="Email" Variant="@variant">
-                <ChildContent>
-                    <RadzenTextBox Name="email" @bind-Value=@model.Email />
-                </ChildContent>
-                <Helper>
-                    <RadzenRequiredValidator Component="email" Text="Email is required." />
-                </Helper>
-            </RadzenFormField>
-            <RadzenFormField Text="Password" Variant="@variant">
-                <ChildContent>
-                    <RadzenTextBox Name="Password" @bind-Value=@model.Password />
-                </ChildContent>
-                <Helper>
-                    <RadzenRequiredValidator Component="Password" Text="Password is required." />
-                </Helper>
-            </RadzenFormField>
-            <RadzenButton ButtonType="ButtonType.Submit" Text="Log In"></RadzenButton>
-        </RadzenStack>
-    </RadzenTemplateForm>
+            }
+            <RadzenStack Gap="1rem" Class="rz-p-sm-12">
+                <RadzenFormField Text="Email" Variant="@variant">
+                    <ChildContent>
+                        <RadzenTextBox Name="email" @bind-Value=@model.Email />
+                    </ChildContent>
+                    <Helper>
+                        <RadzenRequiredValidator Component="email" Text="Email is required." />
+                        <RadzenEmailValidator Component="email" Text="Email is not valid." />
+                        <RadzenLengthValidator Component="email" Max="256" Text="Email can be a maximum of 256 characters" />
+                    </Helper>
+                </RadzenFormField>
+                <RadzenFormField Text="Password" Variant="@variant">
+                    <ChildContent>
+                        <RadzenTextBox Name="Password" @bind-Value=@model.Password />
+                    </ChildContent>
+                    <Helper>
+                        <RadzenRequiredValidator Component="Password" Text="Password is required." />
+                        <RadzenLengthValidator Component="Password" Min="8" Max="100" Text="Password should be between 8 and 100 characters" />
+                    </Helper>
+                </RadzenFormField>
+                <RadzenButton ButtonType="ButtonType.Submit" Text="Log In"></RadzenButton>
+            </RadzenStack>
+        </RadzenTemplateForm>
 
-</div></center>
+    </div>
+</center>
 
 @code {
 
@@ -47,24 +54,23 @@
     private bool showError = false;
 
 
-    void OnSubmit(LoginViewModel model)
+    async Task OnSubmit(LoginViewModel login)
     {
+        var request = await httpClient.PostAsJsonAsync("api/Player/login", login);
 
-        if (model.Password.Length <= 3 || !model.Email.Contains("@"))
+        if (!request.IsSuccessStatusCode)
         {
+            var responseBody = await request.Content.ReadAsStringAsync();
+            errorMessage = responseBody;
             showError = true;
-            errorMessage = "Invalid Data!";
+            return;
         }
-        else
-        {
-            showError = false;
-            errorMessage = "";
-            //POST DATA
-        }
+
+        NavigationManager.NavigateTo("/");
     }
 
     void OnInvalidSubmit(FormInvalidSubmitEventArgs args)
     {
-        
+        showError = false;
     }
 }

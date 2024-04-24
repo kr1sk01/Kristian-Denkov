@@ -9,12 +9,10 @@ namespace ChampionshipMaster.API.Controllers
     public class PlayerController : ControllerBase
     {
         private readonly IPlayerService _playerService;
-        private readonly IEmailSender _emailSender;
 
-        public PlayerController(IPlayerService playerService, IEmailSender emailSender)
+        public PlayerController(IPlayerService playerService)
         {
             _playerService = playerService;
-            _emailSender = emailSender;
         }
 
         [HttpPost("register")]
