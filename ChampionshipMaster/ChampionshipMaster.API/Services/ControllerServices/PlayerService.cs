@@ -29,6 +29,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
 
             var user = new Player { UserName = registerRequest.UserName, Email = registerRequest.Email };
             var result = await _userManager.CreateAsync(user, registerRequest.Password!);
+            await _userManager.AddToRoleAsync(user, "user");
 
             if (result.Succeeded)
             {
