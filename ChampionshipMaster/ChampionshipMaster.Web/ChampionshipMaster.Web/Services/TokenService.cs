@@ -5,41 +5,42 @@ using System.IdentityModel.Tokens.Jwt;
 
 namespace ChampionshipMaster.Web.Services
 {
-    public class TokenValidationService : ITokenValidation
+    public class TokenService : ITokenService
     {
         private readonly ProtectedLocalStorage _localStorage;
 
-        public TokenValidationService(ProtectedLocalStorage localStorage)
+        public TokenService(ProtectedLocalStorage localStorage)
         {
             _localStorage = localStorage;
+        }
+
+        public async Task<string> GetToken()
+        {
+            var result = await _localStorage.GetAsync<string>("jwtToken");
+            if (result.Success && !string.IsNullOrEmpty(result.Value))
+            {
+                return result.Value;
+            }
+            throw new Exception();
         }
 
         public async Task<bool> ValidateToken(bool requireAdmin = false)
         {
             try
             {
-                var result = await _localStorage.GetAsync<string>("jwtToken");
+                var handler = new JwtSecurityTokenHandler();
+                var token = handler.ReadJwtToken(await GetToken());
 
-                if (result.Success && !string.IsNullOrEmpty(result.Value))
+                List<bool> validatorsList = new List<bool>();
+
+                validatorsList.Add(ValidateTokenLifetime(token));
+
+                if (requireAdmin == true)
                 {
-                    var tokenString = result.Value;
-
-                    var handler = new JwtSecurityTokenHandler();
-                    var token = handler.ReadJwtToken(tokenString);
-
-                    List<bool> validatorsList = new List<bool>();
-
-                    validatorsList.Add(ValidateTokenLifetime(token));
-
-                    if (requireAdmin == true) 
-                    {
-                        validatorsList.Add(ValidateTokenAdmin(token));
-                    }
-
-                    return !validatorsList.Any(x => x == false);
+                    validatorsList.Add(ValidateTokenAdmin(token));
                 }
 
-                return false;
+                return !validatorsList.Any(x => x == false);
             }
             catch (Exception ex)
             {

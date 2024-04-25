@@ -3,7 +3,8 @@
 
 @*implements IAsyncDisposable*@
 @inject NavigationManager NavigationManager
-@inject ITokenValidation tokenValidation
+@inject ITokenService tokenService
+@inject HttpClient httpClient
 
 @rendermode InteractiveServer
 
@@ -47,12 +48,26 @@
     {
         if (firstRender)
         {
-            if (await tokenValidation.ValidateToken())
+            if (await tokenService.ValidateToken())
             {
                 loggedIn = true;
                 StateHasChanged();
             }
             else { NavigationManager.NavigateTo("/login"); }
+        }
+
+        
+        var result = await httpClient.PostAsJsonAsync<ChangePasswordViewModel>("api/Player/changePassword", new ChangePasswordViewModel
+            {
+                Password = "1aB#bruh",
+                NewPassword = "1aB#bruh!",
+                ConfirmPassword = "1aB#bruh!"
+            });
+
+        var body = await result.Content.ReadAsStringAsync();
+        if (!result.IsSuccessStatusCode)
+        {
+            Console.WriteLine(body);
         }
     }
 

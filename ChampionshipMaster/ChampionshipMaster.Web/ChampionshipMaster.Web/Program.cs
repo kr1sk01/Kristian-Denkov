@@ -18,11 +18,13 @@ public class Program
             .AddInteractiveWebAssemblyComponents();
 
         builder.Services.AddRadzenComponents();
+        builder.Services.AddTransient<ITokenService, TokenService>();
+        builder.Services.AddTransient<CustomDelegatingHandler>();
         builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:50397") });
 
         builder.Services.AddSignalR();
         builder.Services.AddBlazoredLocalStorage();
-        builder.Services.AddTransient<ITokenValidation, TokenValidationService>();
+        
 
         var app = builder.Build();
 
