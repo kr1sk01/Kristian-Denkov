@@ -68,6 +68,7 @@ Welcome to our app, @username
             {
                 username = token.Claims.FirstOrDefault(x => x.Type == "unique_name")?.Value!;
             }
+            ;
         }
 
         
