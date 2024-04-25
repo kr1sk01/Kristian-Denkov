@@ -1,23 +1,28 @@
 ﻿@page "/"
+
+
 @*implements IAsyncDisposable*@
 @inject NavigationManager NavigationManager
-@inject ProtectedLocalStorage _localStorage
+@inject ITokenValidation tokenValidation
 
 @rendermode InteractiveServer
 
 <PageTitle>Home</PageTitle>
 
+@if (loggedIn)
+{
+    <h1>Welcome to championship master project, </h1>
+    <RadzenCard class="p-0">
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="10px" JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" Wrap="FlexWrap.NoWrap" Style="height: 600px">
+            <RadzenImage class="p-1 rz-color-on-warning rz-text-align-center" Path="Images/foosball.png" AlternateText="community" />
+            <RadzenImage class="p-1 rz-color-on-warning rz-text-align-center" Path="Images/foosball.png" AlternateText="community" />
+            <RadzenImage class="p-1 rz-color-on-warning rz-text-align-center" Path="Images/foosball.png" AlternateText="community" />
+        </RadzenStack>
+    </RadzenCard>
 
-<h1>Welcome to championship master project, </h1>
-<RadzenCard class="p-0">
-    <RadzenStack Orientation="Orientation.Horizontal" Gap="10px" JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" Wrap="FlexWrap.NoWrap" Style="height: 600px">
-        <RadzenImage class="p-1 rz-color-on-warning rz-text-align-center" Path="Images/foosball.png" AlternateText="community" />
-        <RadzenImage class="p-1 rz-color-on-warning rz-text-align-center" Path="Images/foosball.png" AlternateText="community" />
-        <RadzenImage class="p-1 rz-color-on-warning rz-text-align-center" Path="Images/foosball.png" AlternateText="community" />
-    </RadzenStack>
-</RadzenCard>
+    <p>Welcome to our app, @username</p>
+}
 
-Welcome to our app, @username
 
 
 @* <ul>
@@ -30,9 +35,6 @@ Welcome to our app, @username
 
 
 @code {
-
-}
-@code {
     private bool loggedIn = false;
 
     private string username = "";
@@ -41,54 +43,31 @@ Welcome to our app, @username
 
     private readonly List<string> _messages = new();
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)// izpolzwam onrender za6toto na oninitialized
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-
-        var result = await _localStorage.GetAsync<string>("jwtToken");
-        string? tokenString = null;
-        if (result.Success)
+        if (firstRender)
         {
-            tokenString = result.Value;  
-        }
-
-        if (tokenString != null)
-        {
-            var handler = new JwtSecurityTokenHandler();
-            var token = handler.ReadJwtToken(tokenString);
-            var expirationTimeUnix = token.Claims.FirstOrDefault(c => c.Type == "exp")?.Value;
-
-            var expirationTime = DateTimeOffset.FromUnixTimeSeconds(long.Parse(expirationTimeUnix)).DateTime;
-            var currentTime = DateTime.UtcNow;
-
-            if (expirationTime < currentTime)
+            if (await tokenValidation.ValidateToken())
             {
-                NavigationManager.NavigateTo("/login");
+                loggedIn = true;
+                StateHasChanged();
             }
-            else
-            {
-                username = token.Claims.FirstOrDefault(x => x.Type == "unique_name")?.Value!;
-            }
-            ;
+            else { NavigationManager.NavigateTo("/login"); }
         }
-
-        
-
-
-
-        //     _hubConnection = new HubConnectionBuilder()
-        //         .WithUrl("https://localhost:50397/notifications")
-        //         .Build();
-
-        //     _hubConnection.On<string>("ReceiveNotification", message =>
-        //     {
-        //         _messages.Add(message);
-
-        //         InvokeAsync(StateHasChanged);
-        //     });
-
-        //     await _hubConnection.StartAsync();
-
     }
+
+    //     _hubConnection = new HubConnectionBuilder()
+    //         .WithUrl("https://localhost:50397/notifications")
+    //         .Build();
+
+    //     _hubConnection.On<string>("ReceiveNotification", message =>
+    //     {
+    //         _messages.Add(message);
+
+    //         InvokeAsync(StateHasChanged);
+    //     });
+
+    //     await _hubConnection.StartAsync();
 
 
     // public async ValueTask DisposeAsync(){
@@ -97,5 +76,5 @@ Welcome to our app, @username
     //         await _hubConnection.DisposeAsync();
     //     }
     // }
-    
+
 }

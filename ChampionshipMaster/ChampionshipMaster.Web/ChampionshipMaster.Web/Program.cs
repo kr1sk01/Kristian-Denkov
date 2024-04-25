@@ -1,5 +1,6 @@
 ﻿using Blazored.LocalStorage;
 using ChampionshipMaster.Web.Components;
+using ChampionshipMaster.Web.Services;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Radzen;
 using Radzen.Blazor;
@@ -21,6 +22,7 @@ public class Program
 
         builder.Services.AddSignalR();
         builder.Services.AddBlazoredLocalStorage();
+        builder.Services.AddTransient<ITokenValidation, TokenValidationService>();
 
         var app = builder.Build();
 
