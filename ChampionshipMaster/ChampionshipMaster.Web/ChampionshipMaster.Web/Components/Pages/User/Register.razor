@@ -37,10 +37,6 @@
                         <RadzenLengthValidator Component="Username" Min="4" Max="50" Text="Username should be between 4 and 50 characters" />
                     </Helper>
                 </RadzenFormField>
-
-
-
-
                 <RadzenFormField Text="Password" Variant="@variant">
                     <ChildContent>
                         <RadzenTextBox Name="Password" @bind-Value="@model.Password" Visible="@(!password)" />
@@ -54,9 +50,6 @@
                         <RadzenLengthValidator Component="Password" Min="8" Max="100" Text="Password should be between 8 and 100 characters" />
                     </Helper>
                 </RadzenFormField>
-
-
-
                 <RadzenFormField Text="Confirm Password" Variant="@variant">
                     <ChildContent>
                         <RadzenTextBox Name="confirmPassword" @bind-Value=@model.ConfirmPassword Visible="@(!confirmPassword)" />

@@ -1,5 +1,6 @@
 ﻿using Blazored.LocalStorage;
 using ChampionshipMaster.Web.Components;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Radzen;
 using Radzen.Blazor;
 
