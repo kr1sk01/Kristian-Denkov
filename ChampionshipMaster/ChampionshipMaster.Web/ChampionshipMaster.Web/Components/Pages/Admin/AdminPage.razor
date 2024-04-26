@@ -1,16 +1,35 @@
 ﻿@page "/admin"
-@inject NavigationManager Navigation
+@inject NavigationManager NavigationManager
+@inject ITokenService tokenService
 
 @rendermode InteractiveServer
 
-<h1>Adminceto BACE!</h1>
-<RadzenButton Click="@(() => RedirectToAnotherPage("gamestatusmain"))" Text="Manage Game Statuses" ButtonStyle="ButtonStyle.Secondary" />
-<RadzenButton Click="@(() => RedirectToAnotherPage("gametypemain"))" Text="Manage Game Types" ButtonStyle="ButtonStyle.Secondary" />
-<RadzenButton Click="@(() => RedirectToAnotherPage("TeamTypeMain"))" Text="Manage Team Types" ButtonStyle="ButtonStyle.Secondary" />
+@if (isAdmin)
+{
+    <h1>Adminceto BACE!</h1>
+    <RadzenButton Click="@(() => RedirectToAnotherPage("gamestatusmain"))" Text="Manage Game Statuses" ButtonStyle="ButtonStyle.Secondary" />
+    <RadzenButton Click="@(() => RedirectToAnotherPage("gametypemain"))" Text="Manage Game Types" ButtonStyle="ButtonStyle.Secondary" />
+    <RadzenButton Click="@(() => RedirectToAnotherPage("TeamTypeMain"))" Text="Manage Team Types" ButtonStyle="ButtonStyle.Secondary" />
+}
 
 @code {
+    bool isAdmin = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (await tokenService.ValidateToken(true))
+            {
+                isAdmin = true;
+                StateHasChanged();
+            }
+            else { NavigationManager.NavigateTo("/login"); }
+        }
+    }
+
     private void RedirectToAnotherPage(string url)
     {
-        Navigation.NavigateTo(url);
+        NavigationManager.NavigateTo(url);
     }
 }

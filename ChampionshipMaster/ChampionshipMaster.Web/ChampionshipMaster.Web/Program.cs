@@ -19,8 +19,10 @@ public class Program
 
         builder.Services.AddRadzenComponents();
         builder.Services.AddTransient<ITokenService, TokenService>();
-        builder.Services.AddTransient<CustomDelegatingHandler>();
-        builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:50397") });
+        builder.Services.AddHttpClient(builder.Configuration["ClientName"]!, client =>
+        {
+            client.BaseAddress = new Uri(builder.Configuration["ApiBaseAddress"]!);
+        });
 
         builder.Services.AddSignalR();
         builder.Services.AddBlazoredLocalStorage();

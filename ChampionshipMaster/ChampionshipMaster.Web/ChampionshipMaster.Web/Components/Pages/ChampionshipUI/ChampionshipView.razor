@@ -1,7 +1,8 @@
 ﻿@page "/championshipview"
 @using System.Net.Http
-@inject HttpClient httpClient
+@inject IHttpClientFactory httpClient
 @inject NavigationManager nManager
+@inject IConfiguration configuration
 
 @rendermode InteractiveServer
 
@@ -79,7 +80,8 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        var test = await httpClient.GetFromJsonAsync<List<ChampionshipDto>>("api/championshipclass/details");
+        using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+        var test = await client.GetFromJsonAsync<List<ChampionshipDto>>("api/championshipclass/details");
         if (test != null)
             championshipWithDetails = test;
     }

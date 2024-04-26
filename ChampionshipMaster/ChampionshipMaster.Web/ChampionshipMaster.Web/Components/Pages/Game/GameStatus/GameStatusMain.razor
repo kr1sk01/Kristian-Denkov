@@ -3,8 +3,9 @@
 
 @page "/gamestatusmain"
 
-@inject HttpClient httpClient
+@inject IHttpClientFactory httpClient
 @inject NotificationService NotificationService
+@inject IConfiguration configuration
 
 @rendermode InteractiveServer
 
@@ -95,7 +96,8 @@
     {
         await base.OnInitializedAsync();
 
-        gameStatusList = await httpClient.GetFromJsonAsync<List<GameStatus>>("/api/GameStatus") ?? new List<GameStatus>();
+        using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+        gameStatusList = await client.GetFromJsonAsync<List<GameStatus>>("/api/GameStatus") ?? new List<GameStatus>();
     }
 
     async Task EditRow(GameStatus gameStatus)
@@ -117,7 +119,8 @@
     {
         Reset(gameStatus);
 
-        var result = await httpClient.PutAsJsonAsync($"/api/GameStatus/{gameStatus.Id}", gameStatus);
+        using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+        var result = await client.PutAsJsonAsync($"/api/GameStatus/{gameStatus.Id}", gameStatus);
 
     }
 
@@ -140,7 +143,8 @@
             return;
         }
 
-        var response = await httpClient.PostAsJsonAsync("/api/GameStatus", gameStatus);
+        using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+        var response = await client.PostAsJsonAsync("/api/GameStatus", gameStatus);
 
         if (response.IsSuccessStatusCode)
         {
@@ -175,7 +179,8 @@
         {
             gameStatusList.Remove(gameStatus);
 
-            await httpClient.DeleteAsync($"/api/GameStatus/{gameStatus.Id}");
+            using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+            await client.DeleteAsync($"/api/GameStatus/{gameStatus.Id}");
 
             await gameStatusGrid.Reload();
 

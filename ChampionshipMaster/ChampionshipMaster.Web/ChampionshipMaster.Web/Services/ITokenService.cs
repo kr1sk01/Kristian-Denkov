@@ -7,6 +7,6 @@ namespace ChampionshipMaster.Web.Services
         Task<bool> ValidateToken(bool requireAdmin = false);
         bool ValidateTokenLifetime(JwtSecurityToken token);
         bool ValidateTokenAdmin(JwtSecurityToken token);
-        Task<string> GetToken();
+        Task<string?> GetToken();
     }
 }

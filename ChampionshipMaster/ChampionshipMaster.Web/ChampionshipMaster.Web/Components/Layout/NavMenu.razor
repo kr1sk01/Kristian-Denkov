@@ -1,4 +1,7 @@
-﻿@rendermode InteractiveServer
+﻿@inject ITokenService tokenService
+@inject NavigationManager NavigationManager
+
+@rendermode InteractiveServer
 
 <div style="top:0px;left:0px;margin-bottom: 0px;">
     <RadzenMenu Click="OnParentClicked">
@@ -43,10 +46,25 @@
         </RadzenMenuItem>
         <RadzenMenuItem Icon="account_box" Text="Profile">
         </RadzenMenuItem>
+        <RadzenMenuItem Icon="build" Text="Admin Panel" Visible=@isAdmin Path="admin"></RadzenMenuItem>
     </RadzenMenu>
 </div>
 
-@code {
+    @code {
+    bool isAdmin = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (await tokenService.ValidateToken(true))
+            {
+                isAdmin = true;
+                StateHasChanged();
+            }
+            else { NavigationManager.NavigateTo("/login"); }
+        }
+    }
 
     void OnParentClicked(MenuItemEventArgs args)
     {

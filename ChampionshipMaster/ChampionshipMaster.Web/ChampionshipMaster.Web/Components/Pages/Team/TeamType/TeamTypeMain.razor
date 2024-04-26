@@ -3,8 +3,9 @@
 
 @page "/TeamTypeMain"
 
-@inject HttpClient httpClient
+@inject IHttpClientFactory httpClient
 @inject NotificationService NotificationService
+@inject IConfiguration configuration
 
 @rendermode InteractiveServer
 
@@ -95,7 +96,8 @@
     {
         await base.OnInitializedAsync();
 
-        TeamTypeList = await httpClient.GetFromJsonAsync<List<TeamType>>("/api/TeamTypes") ?? new List<TeamType>();
+        using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+        TeamTypeList = await client.GetFromJsonAsync<List<TeamType>>("/api/TeamTypes") ?? new List<TeamType>();
     }
 
     async Task EditRow(TeamType TeamType)
@@ -117,7 +119,8 @@
     {
         Reset(TeamType);
 
-        var result = await httpClient.PutAsJsonAsync($"/api/TeamTypes/{TeamType.Id}", TeamType);
+        using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+        var result = await client.PutAsJsonAsync($"/api/TeamTypes/{TeamType.Id}", TeamType);
 
     }
 
@@ -140,7 +143,8 @@
             return;
         }
 
-        var response = await httpClient.PostAsJsonAsync("/api/TeamTypes", TeamType);
+        using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+        var response = await client.PostAsJsonAsync("/api/TeamTypes", TeamType);
 
         if (response.IsSuccessStatusCode)
         {
@@ -175,7 +179,8 @@
         {
             TeamTypeList.Remove(TeamType);
 
-            await httpClient.DeleteAsync($"/api/TeamTypes/{TeamType.Id}");
+            using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+            await client.DeleteAsync($"/api/TeamTypes/{TeamType.Id}");
 
             await TeamTypeGrid.Reload();
 

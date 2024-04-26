@@ -3,8 +3,9 @@
 
 @page "/gametypemain"
 
-@inject HttpClient httpClient
+@inject IHttpClientFactory httpClient
 @inject NotificationService NotificationService
+@inject IConfiguration configuration
 
 @rendermode InteractiveServer
 
@@ -95,7 +96,8 @@
     {
         await base.OnInitializedAsync();
 
-        GameTypeList = await httpClient.GetFromJsonAsync<List<GameType>>("/api/GameTypes") ?? new List<GameType>();
+        using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+        GameTypeList = await client.GetFromJsonAsync<List<GameType>>("/api/GameTypes") ?? new List<GameType>();
     }
 
     async Task EditRow(GameType GameType)
@@ -117,7 +119,8 @@
     {
         Reset(GameType);
 
-        var result = await httpClient.PutAsJsonAsync($"/api/GameTypes/{GameType.Id}", GameType);
+        using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+        var result = await client.PutAsJsonAsync($"/api/GameTypes/{GameType.Id}", GameType);
 
     }
 
@@ -140,7 +143,8 @@
             return;
         }
 
-        var response = await httpClient.PostAsJsonAsync("/api/GameTypes", GameType);
+        using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+        var response = await client.PostAsJsonAsync("/api/GameTypes", GameType);
 
         if (response.IsSuccessStatusCode)
         {
@@ -175,7 +179,8 @@
         {
             GameTypeList.Remove(GameType);
 
-            await httpClient.DeleteAsync($"/api/GameTypes/{GameType.Id}");
+            using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+            await client.DeleteAsync($"/api/GameTypes/{GameType.Id}");
 
             await GameTypeGrid.Reload();
 

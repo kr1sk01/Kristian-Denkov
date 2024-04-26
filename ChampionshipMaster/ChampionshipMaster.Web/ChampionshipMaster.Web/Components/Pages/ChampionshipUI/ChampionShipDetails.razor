@@ -1,7 +1,8 @@
 @page "/championshipDetails"
 @using Microsoft.AspNetCore.WebUtilities
-@inject HttpClient httpClient
+@inject IHttpClientFactory httpClient
 @inject NavigationManager nManager
+@inject IConfiguration configuration
 <PageTitle>Championship Info</PageTitle>
 
 @if (championshipWithDetails != null)
@@ -50,7 +51,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var test = await httpClient.GetFromJsonAsync<ChampionshipDto>($"api/Championship/{id}");
+        using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+        var test = await client.GetFromJsonAsync<ChampionshipDto>($"api/Championship/{id}");
         if (test != null)
             championshipWithDetails = test;
     }

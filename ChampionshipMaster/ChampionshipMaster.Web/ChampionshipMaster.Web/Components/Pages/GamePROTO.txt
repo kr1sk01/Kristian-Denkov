@@ -1,6 +1,6 @@
 @page "/championshipDetails"
 @using Microsoft.AspNetCore.WebUtilities
-@inject HttpClient httpClient
+@inject IHttpClientFactory httpClient
 @inject NavigationManager nManager
 <PageTitle>Championship Info</PageTitle>
 

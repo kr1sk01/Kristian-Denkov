@@ -3,8 +3,9 @@
 
 @page "/championshipstatus"
 
-@inject HttpClient httpClient
+@inject IHttpClientFactory httpClient
 @inject NotificationService NotificationService
+@inject IConfiguration configuration
 
 @rendermode InteractiveServer
 
@@ -96,7 +97,8 @@
     {
         await base.OnInitializedAsync();
 
-        championshipStatusList = await httpClient.GetFromJsonAsync<List<ChampionshipStatus>>("/api/ChampionshipStatus") ?? new List<ChampionshipStatus>();
+        using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+        championshipStatusList = await client.GetFromJsonAsync<List<ChampionshipStatus>>("/api/ChampionshipStatus") ?? new List<ChampionshipStatus>();
     }
 
     async Task EditRow(ChampionshipStatus championshipStatus)
@@ -118,7 +120,8 @@
     {
         Reset(championshipStatus);
 
-        var result = await httpClient.PutAsJsonAsync($"/api/ChampionshipStatus/{championshipStatus.Id}", championshipStatus);
+        using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+        var result = await client.PutAsJsonAsync($"/api/ChampionshipStatus/{championshipStatus.Id}", championshipStatus);
 
     }
 
@@ -141,7 +144,8 @@
             return;
         }
 
-        var response = await httpClient.PostAsJsonAsync("/api/ChampionshipStatus", championshipStatus);
+        using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+        var response = await client.PostAsJsonAsync("/api/ChampionshipStatus", championshipStatus);
 
         if (response.IsSuccessStatusCode)
         {
@@ -176,7 +180,8 @@
         {
             championshipStatusList.Remove(championshipStatus);
 
-            await httpClient.DeleteAsync($"/api/ChampionshipStatus/{championshipStatus.Id}");
+            using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+            await client.DeleteAsync($"/api/ChampionshipStatus/{championshipStatus.Id}");
 
             await championshipStatusGrid.Reload();
 

@@ -2,9 +2,10 @@
 @using System.ComponentModel.DataAnnotations
 @using System.Text.Json
 
-@inject HttpClient httpClient
+@inject IHttpClientFactory httpClient
 @inject NavigationManager NavigationManager
 @inject ProtectedLocalStorage _localStorage
+@inject IConfiguration configuration
 @rendermode InteractiveServer
 
 <center>
@@ -67,7 +68,8 @@
 
     async Task OnSubmit(LoginViewModel login)
     {
-        var request = await httpClient.PostAsJsonAsync("api/Player/login", login);
+        using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+        var request = await client.PostAsJsonAsync("api/Player/login", login);
 
         if (!request.IsSuccessStatusCode)
         {

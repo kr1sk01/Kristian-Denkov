@@ -14,14 +14,14 @@ namespace ChampionshipMaster.Web.Services
             _localStorage = localStorage;
         }
 
-        public async Task<string> GetToken()
+        public async Task<string?> GetToken()
         {
             var result = await _localStorage.GetAsync<string>("jwtToken");
             if (result.Success && !string.IsNullOrEmpty(result.Value))
             {
                 return result.Value;
             }
-            throw new Exception();
+            return null;
         }
 
         public async Task<bool> ValidateToken(bool requireAdmin = false)
@@ -29,7 +29,7 @@ namespace ChampionshipMaster.Web.Services
             try
             {
                 var handler = new JwtSecurityTokenHandler();
-                var token = handler.ReadJwtToken(await GetToken());
+                var token = handler.ReadJwtToken(await GetToken() ?? throw new Exception("Couldn't retrieve token"));
 
                 List<bool> validatorsList = new List<bool>();
 

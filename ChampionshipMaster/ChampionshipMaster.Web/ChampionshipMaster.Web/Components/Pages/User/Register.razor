@@ -2,8 +2,9 @@
 @using System.ComponentModel.DataAnnotations
 @using System.Text.Json
 
-@inject HttpClient httpClient
+@inject IHttpClientFactory httpClient
 @inject NavigationManager NavigationManager
+@inject IConfiguration configuration
 
 @rendermode InteractiveServer
 
@@ -85,7 +86,8 @@
 
     async Task OnSubmit(RegisterViewModel register)
     {
-        var request = await httpClient.PostAsJsonAsync("api/Player/register", register);
+        using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+        var request = await client.PostAsJsonAsync("api/Player/register", register);
 
         if (!request.IsSuccessStatusCode)
         {
