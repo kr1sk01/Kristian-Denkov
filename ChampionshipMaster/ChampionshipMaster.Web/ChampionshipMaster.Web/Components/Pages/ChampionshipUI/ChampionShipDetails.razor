@@ -3,16 +3,25 @@
 @inject IHttpClientFactory httpClient
 @inject NavigationManager nManager
 @inject IConfiguration configuration
+
+
+@rendermode InteractiveServer
+
+
 <PageTitle>Championship Info</PageTitle>
 
+@if(championshipWithDetails != null)
+{
+    <center><h1>@championshipWithDetails.Name</h1></center>
+}
 
-<RadzenDataGrid @ref="championshipWithDetailsGrid"
+<RadzenDataGrid @ref="gamesList"
                 AllowFiltering="true"
                 FilterPopupRenderMode="PopupRenderMode.OnDemand"
                 AllowPaging="true"
                 PageSize="8"
                 AllowSorting="true"
-                Data="@gameList"
+                Data="@games"
                 TItem="GameDto">
     <Columns>
         <RadzenDataGridColumn TItem="GameDto" Property="Name" Title="Name">
@@ -43,10 +52,10 @@
     </Columns>
 </RadzenDataGrid>
 
-@if (championshipWithDetailsList != null)
+@if (championshipWithDetails != null)
 {
     <div class="container">
-        @foreach (var game in championshipWithDetailsList.Games)
+        @foreach (var game in championshipWithDetails.Games)
         {
             <div class="box">
                 <center><p>Game name: @game.Name</p></center>
@@ -67,15 +76,17 @@
 }
 
 @code {
-    RadzenDataGrid<GameDto> championshipWithDetailsGrid;
+    RadzenDataGrid<GameDto>? gamesList;
 
     public string? id;
 
     private string? data;
 
-    protected override void OnInitialized()
-    {
+    private ChampionshipDto? championshipWithDetails;
+    private IEnumerable<GameDto>? games;
 
+    protected override async Task OnInitializedAsync()
+    {
         // Get the query parameters from the URL
         var uri = nManager.ToAbsoluteUri(nManager.Uri);
         var queryParams = QueryHelpers.ParseQuery(uri.Query);
@@ -83,25 +94,15 @@
         // Extract the data parameter from the query parameters
         if (queryParams.TryGetValue("id", out var data))
         {
-            id = Uri.UnescapeDataString(data);
+            id = Uri.UnescapeDataString(data!);
         }
-    }
 
-    private ChampionshipDto? championshipWithDetailsList;
-    private IEnumerable<GameDto>? gameList;
-
-
-    protected override async Task OnInitializedAsync()
-    {
         using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
         var test = await client.GetFromJsonAsync<ChampionshipDto>($"api/Championship/{id}");
         if (test != null)
         {
-            championshipWithDetailsList = test;
-            gameList = championshipWithDetailsList.Games;
-        }
-        
-
-        
+            championshipWithDetails = test;
+            games = championshipWithDetails.Games;
+        }     
     }
 }
