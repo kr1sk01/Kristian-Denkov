@@ -1,4 +1,5 @@
 ﻿@page "/"
+@inherits LayoutComponentBase
 
 @*implements IAsyncDisposable*@
 @inject NavigationManager NavigationManager
@@ -6,10 +7,11 @@
 @inject IHttpClientFactory httpClient
 @inject ProtectedLocalStorage _localStorage
 
+
 @rendermode InteractiveServer
 
 <PageTitle>Home</PageTitle>
-
+<ChampionshipMaster.Web.Components.Layout.NavMenu/>
 
 <h1>Welcome to championship master project, </h1>
 <RadzenCard class="p-0">
@@ -48,7 +50,13 @@
         {
             if (await tokenService.ValidateToken())
             {
-                var token = new JwtSecurityTokenHandler().ReadJwtToken(await tokenService.GetToken());
+                var tokenString = await tokenService.GetToken();
+                if (tokenString == null)
+                {
+                    NavigationManager.NavigateTo("/login");
+                }
+                var token = new JwtSecurityTokenHandler().ReadJwtToken(tokenString);
+
                 username = token.Claims.FirstOrDefault(x => x.Type == "unique_name")?.Value ?? "";
 
                 StateHasChanged();

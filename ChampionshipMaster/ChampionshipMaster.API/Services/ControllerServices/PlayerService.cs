@@ -1,6 +1,8 @@
 ﻿using ChampionshipMaster.API.Interfaces;
+using ChampionshipMaster.DATA.Models;
 using ChampionshipMaster.SHARED.ViewModels;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.Extensions.Primitives;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -83,11 +85,32 @@ namespace ChampionshipMaster.API.Services.ControllerServices
 
             var activeUser = await _context.Users.FirstOrDefaultAsync(x=>x.NormalizedEmail == loginRequest.Email!.ToUpper());
 
-            activeUser!.Active = true;
+            activeUser!.Online = true;
 
             _context.SaveChanges();
 
             return Ok(new { message = "Login successful", jwtToken = token.Result });
+        }
+
+        public async Task<IActionResult> LogOut(string username, StringValues authHeader)
+        {
+            if (string.IsNullOrEmpty(authHeader) || string.IsNullOrEmpty(username))
+            {
+                return BadRequest("Missing authorization");
+            }
+
+            var userToLogOut = await _context.Users.FirstOrDefaultAsync(x => x.UserName == username);
+
+            if (userToLogOut == null) 
+            { 
+                return BadRequest("User not found!"); 
+            
+            }
+            userToLogOut.Online = false;
+
+            await _context.SaveChangesAsync();
+
+            return Ok("User logged out successfully!");
         }
 
         public async Task<IActionResult> ChangePassword(ChangePasswordViewModel changePassword, StringValues authHeader)

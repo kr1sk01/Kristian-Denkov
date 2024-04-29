@@ -8,6 +8,8 @@ namespace ChampionshipMaster.DATA.Models
 
         public bool? Active { get; set; } = null;
 
+        public bool? Online { get; set; } = null;
+
         public string? CreatedBy { get; set; }
 
         public DateTime? CreatedOn { get; set; } = null;

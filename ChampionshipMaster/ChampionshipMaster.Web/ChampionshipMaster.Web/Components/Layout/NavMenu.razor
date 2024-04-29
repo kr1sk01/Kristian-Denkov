@@ -1,7 +1,11 @@
 ﻿@inject ITokenService tokenService
 @inject NavigationManager NavigationManager
+@inject IHttpClientFactory httpClient
+@inject IConfiguration configuration
+@inject ProtectedLocalStorage _localStorage
 
 @rendermode InteractiveServer
+
 
 <div style="top:0px;left:0px;margin-bottom: 0px;">
     <RadzenMenu Click="OnParentClicked">
@@ -43,17 +47,37 @@
         </RadzenMenuItem>
         <RadzenMenuItem Icon="account_box" Text="Profile" Path="profile">
         </RadzenMenuItem>
+        <RadzenMenuItem Icon="exit_to_app" Visible=@isLogged Text="Log Out" Click="()=> LogOut(username)">
+        </RadzenMenuItem>
         <RadzenMenuItem Icon="build" Text="Admin Panel" Visible=@isAdmin Path="admin"></RadzenMenuItem>
     </RadzenMenu>
 </div>
 
+
+
 @code {
     bool isAdmin = false;
+    [Parameter] public bool isLogged { get; set; }
+    string username = "";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
+            var tokenString = await tokenService.GetToken();
+            if (tokenString != null)
+            {
+                var token = new JwtSecurityTokenHandler().ReadJwtToken(tokenString);
+                username = token.Claims.FirstOrDefault(x => x.Type == "unique_name")?.Value ?? "";
+                isLogged = true;
+                StateHasChanged();
+            }
+            else
+            {
+                isLogged = false;
+                StateHasChanged();
+            }
+
             if (await tokenService.ValidateToken(true))
             {
                 isAdmin = true;
@@ -61,18 +85,31 @@
             }
             else
             {
-                isAdmin = false;    
+                isAdmin = false;
             }
         }
     }
-
-    void OnParentClicked(MenuItemEventArgs args)
+    void OnParentClicked()
     {
-        
+
     }
-
-    void OnChildClicked(MenuItemEventArgs args)
+    private async Task LogOut(string username)
     {
-       
+
+        HttpContent httpContent = new StringContent(username, System.Text.Encoding.UTF8, "text/plain");
+        var tokenString = await tokenService.GetToken();
+
+        using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {tokenString}");
+        await client.GetAsync($"api/Player/logout/{username}");
+
+        await _localStorage.DeleteAsync("jwtToken");
+
+        isLogged = false;
+        StateHasChanged();
+
+        NavigationManager.NavigateTo("/login");
+
+
     }
 }

@@ -29,6 +29,14 @@ namespace ChampionshipMaster.API.Controllers
             return result;
         }
 
+        [HttpGet("logout/{username}")]
+        public async Task<IActionResult> LogOut(string username)
+        {
+            var authHeader = HttpContext.Request.Headers.Authorization;
+            var result = await _playerService.LogOut(username, authHeader);
+            return result;
+        }
+
         [HttpPost("changePassword")]
         public async Task<IActionResult> ChangePassword(ChangePasswordViewModel changePassword)
         {

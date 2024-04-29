@@ -65,6 +65,8 @@
     private string? errorMessage;
     private bool showError = false;
 
+    private bool isLogged = false;
+
     bool hidePassword = true;
 
     async Task OnSubmit(LoginViewModel login)
@@ -83,7 +85,8 @@
         var successfulLogin = await request.Content.ReadAsStringAsync();
         var jwtToken = JsonSerializer.Deserialize<Dictionary<string, string>>(successfulLogin)!["jwtToken"];
         await _localStorage.SetAsync("jwtToken", jwtToken);
-
+        isLogged = true;
+        StateHasChanged();
         notifier.SendSuccessNotification("Logged in successfully!");
         NavigationManager.NavigateTo("/");
     }
@@ -96,4 +99,5 @@
     {
         hidePassword = !hidePassword;
     }
+
 }
