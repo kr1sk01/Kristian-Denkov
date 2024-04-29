@@ -8,9 +8,9 @@
 @if (isAdmin)
 {
     <h1>Adminceto BACE!</h1>
-    <RadzenButton Click="@(() => RedirectToAnotherPage("gamestatusmain"))" Text="Manage Game Statuses" ButtonStyle="ButtonStyle.Secondary" />
-    <RadzenButton Click="@(() => RedirectToAnotherPage("gametypemain"))" Text="Manage Game Types" ButtonStyle="ButtonStyle.Secondary" />
-    <RadzenButton Click="@(() => RedirectToAnotherPage("TeamTypeMain"))" Text="Manage Team Types" ButtonStyle="ButtonStyle.Secondary" />
+    <RadzenButton Click="@(() => NavigationManager.NavigateTo("/gamestatusmain"))" Text="Manage Game Statuses" ButtonStyle="ButtonStyle.Secondary" />
+    <RadzenButton Click="@(() => NavigationManager.NavigateTo("/gametypemain"))" Text="Manage Game Types" ButtonStyle="ButtonStyle.Secondary" />
+    <RadzenButton Click="@(() => NavigationManager.NavigateTo("/TeamTypeMain"))" Text="Manage Team Types" ButtonStyle="ButtonStyle.Secondary" />
 }
 
 @code {
@@ -30,12 +30,8 @@
                 notifier.SendErrorNotification("Access denied!");
                 notifier.SendWarningNotification("If you believe there is an error, please contact administrator!", 10);
                 NavigationManager.NavigateTo("/"); 
+                
             }
         }
-    }
-
-    private void RedirectToAnotherPage(string url)
-    {
-        NavigationManager.NavigateTo(url);
     }
 }
