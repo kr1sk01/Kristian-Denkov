@@ -18,7 +18,12 @@ public class Program
             .AddInteractiveWebAssemblyComponents();
 
         builder.Services.AddRadzenComponents();
+
+
         builder.Services.AddTransient<ITokenService, TokenService>();
+
+
+
         builder.Services.AddHttpClient(builder.Configuration["ClientName"]!, client =>
         {
             client.BaseAddress = new Uri(builder.Configuration["ApiBaseAddress"]!);
