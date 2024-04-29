@@ -1,15 +1,80 @@
-﻿@page "/championshipview"
+﻿@page "/championshipsmain"
 @using System.Net.Http
 @inject IHttpClientFactory httpClient
 @inject NavigationManager nManager
 @inject IConfiguration configuration
+@using Microsoft.EntityFrameworkCore
+@using System.Linq
 
 @rendermode InteractiveServer
 
 <PageTitle>Championships</PageTitle>
-<button @onclick="Sort">Sort</button>
 
-@if (championshipWithDetails != null)
+
+@inject DialogService DialogService
+
+<RadzenDataGrid @ref="championshipList"
+                AllowFiltering="true"
+                FilterPopupRenderMode="PopupRenderMode.OnDemand"
+                AllowPaging="true"
+                PageSize="5"
+                AllowSorting="true"
+                Data="@championships"
+                TItem="ChampionshipDto">
+    <Columns>
+        <RadzenDataGridColumn TItem="ChampionshipDto" Property="Name" Title="Name">
+            <Template Context="championship">
+                @championship.Name
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="ChampionshipDto" Property="GameTypeName" Title="Game Type Name">
+            <Template Context="championship">
+                @championship.GameTypeName
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="ChampionshipDto" Property="Date" Title="Date">
+            <Template Context="championship">
+                @championship.Date
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="ChampionshipDto" Property="Winner" Title="Championship Winner">
+            <Template Context="championship">
+                @championship.WinnerName              
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="ChampionshipDto" Property="ChampionshipStatusName" Title="Status">
+            <Template Context="championship">
+                @switch (championship.ChampionshipStatusName)
+                {
+                    case "Finished":
+                        StatusColor = "blue";
+                        break;
+                    case "Coming":
+                        StatusColor = "red";
+                        break;
+                    case "Live":
+                        StatusColor = "green";
+                        break;
+                    case "Cancelled":
+                        StatusColor = "darkgray";
+                        break;
+                    default:
+                        break;
+                }
+                <span style="color:@StatusColor">@championship.ChampionshipStatusName</span>
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="ChampionshipDto" Property="ChampionshipTypeName" Title="Championship Type">
+            <Template Context="championship">
+                @championship.ChampionshipTypeName
+            </Template>
+        </RadzenDataGridColumn>
+
+    </Columns>
+</RadzenDataGrid>
+
+
+@if (championships != null)
 {
     <table class="table">
         <thead>
@@ -24,7 +89,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in championshipWithDetails)
+            @foreach (var item in championships)
             {
                 <tr class="table-row">
                     <td>@item.Id</td>
@@ -66,24 +131,26 @@ else
 
 
 @code {
-    string StatusColor = "black";
+    RadzenDataGrid<ChampionshipDto> championshipList;
+
+    string StatusColor = "white";
 
     private void Sort()
     {
-        if (championshipWithDetails != null)
+        if (championships != null)
         {
-            championshipWithDetails = championshipWithDetails.OrderBy(x => x.Name).ToList();
+            championships = championships.OrderBy(x => x.Name).ToList();
             StateHasChanged();
         }
     }
-    private List<ChampionshipDto>? championshipWithDetails;
+    private List<ChampionshipDto>? championships;
 
     protected override async Task OnInitializedAsync()
     {
         using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
-        var test = await client.GetFromJsonAsync<List<ChampionshipDto>>("api/championshipclass/details");
+        var test = await client.GetFromJsonAsync<List<ChampionshipDto>>("api/championship/details");
         if (test != null)
-            championshipWithDetails = test;
+            championships = test;
     }
 
     private void Details(int id)

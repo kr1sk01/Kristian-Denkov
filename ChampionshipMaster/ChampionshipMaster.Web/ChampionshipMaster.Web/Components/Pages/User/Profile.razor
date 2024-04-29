@@ -1,7 +1,116 @@
 ﻿@page "/profile"
+@using System
+@using System.IO
+@using Microsoft.AspNetCore.Hosting
 
-<center><h3>Profile</h3></center>
+@inject ITokenService tokenService
+@inject IHttpClientFactory httpClient
+@inject IWebHostEnvironment Environment
+
+@inject ProtectedLocalStorage _localStorage
+@inject NavigationManager NavigationManager
+
+<PageTitle>Profile</PageTitle>
+
+<h1>@username 's profile</h1>
+
+<p>
+    <label>
+        Max file size:
+        <input type="number" @bind="maxFileSize" />
+    </label>
+</p>
+
+<p>
+    <label>
+        Max allowed files:
+        <input type="number" @bind="maxAllowedFiles" />
+    </label>
+</p>
+
+<p>
+    <label>
+        Upload up to @maxAllowedFiles of up to @maxFileSize bytes:
+        <InputFile OnChange="LoadFiles" multiple />
+    </label>
+</p>
+
+@if (isLoading)
+{
+    <p>Uploading...</p>
+}
+else
+{
+    <ul>
+        @foreach (var file in loadedFiles)
+        {
+            <li>
+                <ul>
+                    <li>Name: @file.Name</li>
+                    <li>Last modified: @file.LastModified.ToString()</li>
+                    <li>Size (bytes): @file.Size</li>
+                    <li>Content type: @file.ContentType</li>
+                </ul>
+            </li>
+        }
+    </ul>
+}
 
 @code {
+    private bool loggedIn = false;
 
+    private string username = "";
+
+    private HubConnection? _hubConnection;
+
+    private readonly List<string> _messages = new();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+
+            if (await tokenService.ValidateToken())
+            {
+                loggedIn = true;
+                var token = new JwtSecurityTokenHandler().ReadJwtToken(await tokenService.GetToken());
+                username = token.Claims.FirstOrDefault(x => x.Type == "unique_name")?.Value ?? "";
+
+                StateHasChanged();
+            }
+            else { NavigationManager.NavigateTo("/login"); }
+        
+    }
+}
+@code {
+    private List<IBrowserFile> loadedFiles = new();
+    private long maxFileSize = 1024 * 15;
+    private int maxAllowedFiles = 3;
+    private bool isLoading;
+
+    private async Task LoadFiles(InputFileChangeEventArgs e)
+    {
+        isLoading = true;
+        loadedFiles.Clear();
+
+        foreach (var file in e.GetMultipleFiles(maxAllowedFiles))
+        {
+            try
+            {
+                var trustedFileName = Path.GetRandomFileName();
+                var path = Path.Combine(Environment.ContentRootPath,
+                    Environment.EnvironmentName, "unsafe_uploads",
+                    trustedFileName);
+
+                await using FileStream fs = new(path, FileMode.Create);
+                await file.OpenReadStream(maxFileSize).CopyToAsync(fs);
+
+                loadedFiles.Add(file);
+
+            }
+            catch (Exception ex)
+            {
+            }
+        }
+
+        isLoading = false;
+    }
 }

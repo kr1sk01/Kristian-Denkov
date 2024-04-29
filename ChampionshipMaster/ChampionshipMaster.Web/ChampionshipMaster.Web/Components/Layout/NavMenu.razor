@@ -5,12 +5,9 @@
 
 <div style="top:0px;left:0px;margin-bottom: 0px;">
     <RadzenMenu Click="OnParentClicked">
-        <RadzenMenuItem Text="General" Icon="home">
-            <RadzenMenuItem Text="Buttons" Path="buttons" Icon="account_circle"></RadzenMenuItem>
-            <RadzenMenuItem Text="Menu" Path="menu" Icon="line_weight" Disabled="true"></RadzenMenuItem>
-            <RadzenMenuItem Click="OnChildClicked" Text="ChildClick" Icon="attach_file" Disabled="true"></RadzenMenuItem>
-            <RadzenMenuItem Text="Dialog" Path="dialog" Icon="perm_media"></RadzenMenuItem>
-            <RadzenMenuItem Text="Notification" Path="notification" Icon="announcement"></RadzenMenuItem>
+        <RadzenMenuItem Text="Home" Icon="home" Path="">
+        </RadzenMenuItem>
+        <RadzenMenuItem Text="Championships" Icon="assignment" Path="championshipsmain">
         </RadzenMenuItem>
         <RadzenMenuItem Text="Inputs" Icon="payment" Disabled="true">
             <RadzenMenuItem Text="CheckBox" Path="checkbox" Icon="check_circle"></RadzenMenuItem>
@@ -44,13 +41,13 @@
                 </RadzenMenuItem>
             </RadzenMenuItem>
         </RadzenMenuItem>
-        <RadzenMenuItem Icon="account_box" Text="Profile">
+        <RadzenMenuItem Icon="account_box" Text="Profile" Path="profile">
         </RadzenMenuItem>
         <RadzenMenuItem Icon="build" Text="Admin Panel" Visible=@isAdmin Path="admin"></RadzenMenuItem>
     </RadzenMenu>
 </div>
 
-    @code {
+@code {
     bool isAdmin = false;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -62,7 +59,10 @@
                 isAdmin = true;
                 StateHasChanged();
             }
-            else { NavigationManager.NavigateTo("/login"); }
+            else
+            {
+                isAdmin = false;    
+            }
         }
     }
 
