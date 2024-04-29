@@ -2,9 +2,9 @@
 {
     public interface INotifier
     {
-        void SendErrorMessage(string message);
-        void SendWarningMessage(string message);
-        void SendInformationalMessage(string message);
-        void SendSuccessMessage(string message);
+        void SendErrorNotification(string message, int duration = 3);
+        void SendWarningNotification(string message, int duration = 3);
+        void SendInformationalNotification(string message, int duration = 3);
+        void SendSuccessNotification(string message, int duration = 3);
     }
 }

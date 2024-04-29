@@ -5,7 +5,7 @@
 @inject IHttpClientFactory httpClient
 @inject NavigationManager NavigationManager
 @inject IConfiguration configuration
-
+@inject INotifier notifier
 @rendermode InteractiveServer
 
 <center>
@@ -96,7 +96,8 @@
             showError = true;
             return;
         }
-
+        notifier.SendSuccessNotification("Registered successfully!");
+        notifier.SendInformationalNotification("In order to use the app you need to confirmyour email and sing in!", 10);
         NavigationManager.NavigateTo("/login");
     }
 

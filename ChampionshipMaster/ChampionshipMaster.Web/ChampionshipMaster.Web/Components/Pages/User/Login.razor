@@ -84,7 +84,7 @@
         var jwtToken = JsonSerializer.Deserialize<Dictionary<string, string>>(successfulLogin)!["jwtToken"];
         await _localStorage.SetAsync("jwtToken", jwtToken);
 
-        notifier.SendSuccessMessage("Logged in successfully!");
+        notifier.SendSuccessNotification("Logged in successfully!");
         NavigationManager.NavigateTo("/");
     }
 

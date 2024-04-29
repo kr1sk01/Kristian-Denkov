@@ -12,37 +12,42 @@ namespace ChampionshipMaster.Web.Services
             _notificationService = notificationService;
         }
 
-        public void SendErrorMessage(string message)
+        public void SendErrorNotification(string message, int duration = 3)
         {        
             _notificationService.Notify(new NotificationMessage
             {
                 Detail = message,
-                Severity = NotificationSeverity.Error
+                Severity = NotificationSeverity.Error,
+                Duration = duration * 1000
+                
             });
         }
-        public void SendWarningMessage(string message)
-        {
+        public void SendWarningNotification(string message, int duration = 3)
+{
             _notificationService.Notify(new NotificationMessage
             {
                 Detail = message,
-                Severity = NotificationSeverity.Warning
+                Severity = NotificationSeverity.Warning,
+                Duration = duration * 1000
             });
         }
-        public void SendInformationalMessage(string message)
-        {
+        public void SendInformationalNotification(string message, int duration = 3)
+{
             _notificationService.Notify(new NotificationMessage
             {
                 Detail = message,
-                Severity = NotificationSeverity.Info
+                Severity = NotificationSeverity.Info,
+                Duration = duration * 1000
             });
             
         }
-        public void SendSuccessMessage(string message)
-        {
+        public void SendSuccessNotification(string message, int duration = 3)
+{
             _notificationService.Notify(new NotificationMessage
             {
                 Detail = message,
-                Severity = NotificationSeverity.Success
+                Severity = NotificationSeverity.Success,
+                Duration = duration * 1000
             });
 
         }
