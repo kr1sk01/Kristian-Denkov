@@ -1,10 +1,10 @@
 ﻿@page "/"
 
-
 @*implements IAsyncDisposable*@
 @inject NavigationManager NavigationManager
 @inject ITokenService tokenService
 @inject IHttpClientFactory httpClient
+@inject ProtectedLocalStorage _localStorage
 
 @rendermode InteractiveServer
 
@@ -53,6 +53,7 @@
                 loggedIn = true;
                 var token = new JwtSecurityTokenHandler().ReadJwtToken(await tokenService.GetToken());
                 username = token.Claims.FirstOrDefault(x => x.Type == "unique_name")?.Value ?? "";
+
                 StateHasChanged();
             }
             else { NavigationManager.NavigateTo("/login"); }

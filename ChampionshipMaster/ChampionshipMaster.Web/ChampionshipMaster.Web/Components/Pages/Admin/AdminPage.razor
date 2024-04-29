@@ -28,7 +28,7 @@
             else 
             {
                 notifier.SendErrorNotification("Access denied!");
-                notifier.SendWarningNotification("If you believe there is an error, please contact administrator!");
+                notifier.SendWarningNotification("If you believe there is an error, please contact administrator!", 10);
                 NavigationManager.NavigateTo("/"); 
             }
         }
