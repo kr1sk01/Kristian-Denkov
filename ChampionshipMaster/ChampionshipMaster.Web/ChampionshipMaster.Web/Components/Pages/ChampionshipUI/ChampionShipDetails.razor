@@ -5,10 +5,48 @@
 @inject IConfiguration configuration
 <PageTitle>Championship Info</PageTitle>
 
-@if (championshipWithDetails != null)
+
+<RadzenDataGrid @ref="championshipWithDetailsGrid"
+                AllowFiltering="true"
+                FilterPopupRenderMode="PopupRenderMode.OnDemand"
+                AllowPaging="true"
+                PageSize="8"
+                AllowSorting="true"
+                Data="@gameList"
+                TItem="GameDto">
+    <Columns>
+        <RadzenDataGridColumn TItem="GameDto" Property="Name" Title="Name">
+            <Template Context="game">
+                @game.Name
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="GameDto" Property="Date" Title="Date">
+            <Template Context="game">
+                @game.Date
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="GameDto" Property="BlueTeamName" Title="Blue Team Name">
+            <Template Context="game">
+                @game.BlueTeamName
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="GameDto" Property="RedTeamName" Title="Red Team Name">
+            <Template Context="game">
+                @game.RedTeamName
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="GameDto" Property="WinnerName" Title="Winner">
+            <Template Context="game">
+                @game.WinnerName
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@if (championshipWithDetailsList != null)
 {
     <div class="container">
-        @foreach (var game in championshipWithDetails.Games)
+        @foreach (var game in championshipWithDetailsList.Games)
         {
             <div class="box">
                 <center><p>Game name: @game.Name</p></center>
@@ -21,7 +59,7 @@
                 <center><p>Game name: @game.Name</p></center>
                 <p>Game Type: @game.GameTypeName</p>
                 <p>Blue Team: @game.BlueTeamName</p>
-                <p>Red name: @game.RedTeamName</p>
+                <p>Red name: @game.RedTeamName</p>               
             </div>
         }
     </div>
@@ -29,6 +67,8 @@
 }
 
 @code {
+    RadzenDataGrid<GameDto> championshipWithDetailsGrid;
+
     public string? id;
 
     private string? data;
@@ -43,17 +83,25 @@
         // Extract the data parameter from the query parameters
         if (queryParams.TryGetValue("id", out var data))
         {
-                id = Uri.UnescapeDataString(data);
+            id = Uri.UnescapeDataString(data);
         }
     }
 
-    private ChampionshipDto? championshipWithDetails;
+    private ChampionshipDto? championshipWithDetailsList;
+    private IEnumerable<GameDto>? gameList;
+
 
     protected override async Task OnInitializedAsync()
     {
         using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
         var test = await client.GetFromJsonAsync<ChampionshipDto>($"api/Championship/{id}");
         if (test != null)
-            championshipWithDetails = test;
+        {
+            championshipWithDetailsList = test;
+            gameList = championshipWithDetailsList.Games;
+        }
+        
+
+        
     }
 }

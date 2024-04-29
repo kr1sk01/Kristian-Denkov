@@ -30,7 +30,7 @@ public class ChampionshipController : ControllerBase
     }
 
     // GET: api/Championship/5
-    
+
     [HttpGet("{id}")]
     public async Task<ActionResult<ChampionshipDto>> GetChampionship(int id)
     {
