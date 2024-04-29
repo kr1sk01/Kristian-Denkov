@@ -6,7 +6,7 @@
 @inject IHttpClientFactory httpClient
 @inject NotificationService NotificationService
 @inject IConfiguration configuration
-
+@inject INotifier notifier
 @rendermode InteractiveServer
 
 <style>
@@ -138,7 +138,7 @@
                     CloseOnClick = true
                 };
 
-            NotificationService.Notify(message);
+            notifier.SendSuccessNotification("Changes made successfully!");
 
             return;
         }

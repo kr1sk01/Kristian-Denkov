@@ -1,10 +1,11 @@
-@page "/championshipDetails"
+@page "/championshipDetails/{id}"
 @using Microsoft.AspNetCore.WebUtilities
+@using Microsoft.AspNetCore.Components
 @inject IHttpClientFactory httpClient
 @inject NavigationManager nManager
 @inject IConfiguration configuration
-
-
+@using Microsoft.EntityFrameworkCore
+@inject Radzen.DialogService dialogService
 @rendermode InteractiveServer
 
 
@@ -12,14 +13,14 @@
 
 @if(championshipWithDetails != null)
 {
-    <center><h1>@championshipWithDetails.Name</h1></center>
+    <center><h1 style="color:white;">@championshipWithDetails.Name</h1></center>
 }
 
 <RadzenDataGrid @ref="gamesList"
                 AllowFiltering="true"
                 FilterPopupRenderMode="PopupRenderMode.OnDemand"
                 AllowPaging="true"
-                PageSize="8"
+                PageSize="6"
                 AllowSorting="true"
                 Data="@games"
                 TItem="GameDto">
@@ -49,36 +50,20 @@
                 @game.WinnerName
             </Template>
         </RadzenDataGridColumn>
+
     </Columns>
-</RadzenDataGrid>
 
-@if (championshipWithDetails != null)
-{
-    <div class="container">
-        @foreach (var game in championshipWithDetails.Games)
-        {
-            <div class="box">
-                <center><p>Game name: @game.Name</p></center>
-                <p>Game Type: @game.GameTypeName</p>
-                <p>Blue Team: @game.BlueTeamName</p>
-                <p>Red name: @game.RedTeamName</p>
-            </div>
-
-            <div class="box">
-                <center><p>Game name: @game.Name</p></center>
-                <p>Game Type: @game.GameTypeName</p>
-                <p>Blue Team: @game.BlueTeamName</p>
-                <p>Red name: @game.RedTeamName</p>               
-            </div>
-        }
-    </div>
-
-}
+</RadzenDataGrid><br />
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem">
+    <RadzenButton Click="@((args) => dialogService.Close(true))" Variant="Variant.Flat" Text="Close" Style="width: 120px" />
+</RadzenStack>
 
 @code {
-    RadzenDataGrid<GameDto>? gamesList;
 
-    public string? id;
+    [Parameter] public string? id { get; set; }
+    [Parameter] public string? name { get; set; }
+
+    RadzenDataGrid<GameDto>? gamesList;    
 
     private string? data;
 
@@ -90,12 +75,6 @@
         // Get the query parameters from the URL
         var uri = nManager.ToAbsoluteUri(nManager.Uri);
         var queryParams = QueryHelpers.ParseQuery(uri.Query);
-
-        // Extract the data parameter from the query parameters
-        if (queryParams.TryGetValue("id", out var data))
-        {
-            id = Uri.UnescapeDataString(data!);
-        }
 
         using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
         var test = await client.GetFromJsonAsync<ChampionshipDto>($"api/Championship/{id}");

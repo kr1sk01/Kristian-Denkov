@@ -71,7 +71,7 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Filterable=false Sortable=false Width="150px;" TItem="ChampionshipDto" Title="Details">
             <Template Context="championship">
-                <RadzenButton ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" Icon="info" class="m-1" Click="() => Details(championship.Id)" />
+                <RadzenButton ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" Icon="info" class="m-1" Click="() => OpenChampionship(championship.Id.ToString())" />
             </Template>
         </RadzenDataGridColumn>
     </Columns>
@@ -160,5 +160,12 @@ else
     private void Details(int id)
     {
         nManager.NavigateTo($"/championshipDetails?id={Uri.EscapeDataString(id.ToString())}");
+    }
+
+    async Task OpenChampionship(string id)
+    {
+        await DialogService.OpenAsync<ChampionShipDetails>($"",
+              new Dictionary<string, object>() { { "id", id } },
+              new DialogOptions() { Width = "75%", Height = "75%" });
     }
 }
