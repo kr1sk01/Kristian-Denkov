@@ -57,7 +57,7 @@
 
 @code {
     bool isAdmin = false;
-    [Parameter] public bool isLogged { get; set; }
+    bool isLogged = false;
     string username = "";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -68,24 +68,15 @@
             if (tokenString != null)
             {
                 var token = new JwtSecurityTokenHandler().ReadJwtToken(tokenString);
-                username = token.Claims.FirstOrDefault(x => x.Type == "unique_name")?.Value ?? "";
-                isLogged = true;
-                StateHasChanged();
-            }
-            else
-            {
-                isLogged = false;
-                StateHasChanged();
-            }
 
-            if (await tokenService.ValidateToken(true))
-            {
-                isAdmin = true;
-                StateHasChanged();
-            }
-            else
-            {
-                isAdmin = false;
+                if (await tokenService.ValidateToken())
+                {
+                    isAdmin = tokenService.ValidateTokenAdmin(token);
+                    username = token.Claims.FirstOrDefault(x => x.Type == "unique_name")?.Value ?? "";
+                    isLogged = true;
+                    StateHasChanged();
+                }
+
             }
         }
     }
@@ -106,6 +97,7 @@
         await _localStorage.DeleteAsync("jwtToken");
 
         isLogged = false;
+        isAdmin = false;
         StateHasChanged();
 
         NavigationManager.NavigateTo("/login");

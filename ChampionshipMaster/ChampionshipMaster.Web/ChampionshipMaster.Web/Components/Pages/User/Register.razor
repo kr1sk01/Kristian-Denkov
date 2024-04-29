@@ -40,11 +40,11 @@
                 </RadzenFormField>
                 <RadzenFormField Text="Password" Variant="@variant">
                     <ChildContent>
-                        <RadzenTextBox Name="Password" @bind-Value="@model.Password" Visible="@(!password)" />
-                        <RadzenPassword Name="Password" @bind-Value="@model.Password" Visible="@password" />
+                        <RadzenTextBox Name="Password" @bind-Value="@model.Password" Visible="@(!hidePassword)" />
+                        <RadzenPassword Name="Password" @bind-Value="@model.Password" Visible="@hidePassword" />
                     </ChildContent>
                     <End>
-                        <RadzenButton Icon="@(password ? "visibility" : "visibility_off")" Click="TogglePassword" Variant="Variant.Text" Size="ButtonSize.Small" />
+                        <RadzenButton Icon="@(hidePassword ? "visibility" : "visibility_off")" Click="TogglePassword" Variant="Variant.Text" Size="ButtonSize.Small" />
                     </End>
                     <Helper>
                         <RadzenRequiredValidator Component="Password" Text="Password is required." />
@@ -53,11 +53,11 @@
                 </RadzenFormField>
                 <RadzenFormField Text="Confirm Password" Variant="@variant">
                     <ChildContent>
-                        <RadzenTextBox Name="confirmPassword" @bind-Value=@model.ConfirmPassword Visible="@(!confirmPassword)" />
-                        <RadzenPassword Name="confirmPassword" @bind-Value=@model.ConfirmPassword Visible="@confirmPassword" />
+                        <RadzenTextBox Name="confirmPassword" @bind-Value=@model.ConfirmPassword Visible="@(!hideConfirmPassword)" />
+                        <RadzenPassword Name="confirmPassword" @bind-Value=@model.ConfirmPassword Visible="@hideConfirmPassword" />
                     </ChildContent>
                     <End>
-                        <RadzenButton Icon="@(confirmPassword ? "visibility" : "visibility_off")" Click="ToggleConfirmPassword" Variant="Variant.Text" Size="ButtonSize.Small" />
+                        <RadzenButton Icon="@(hideConfirmPassword ? "visibility" : "visibility_off")" Click="ToggleConfirmPassword" Variant="Variant.Text" Size="ButtonSize.Small" />
                     </End>
                     <Helper>
                         <RadzenRequiredValidator Component="confirmPassword" Text="Confirm Password is required." />
@@ -80,8 +80,8 @@
     private string? errorMessage;
     private bool showError = false;
 
-    bool password = true;
-    bool confirmPassword = true;
+    bool hidePassword = true;
+    bool hideConfirmPassword = true;
 
     async Task OnSubmit(RegisterViewModel register)
     {
@@ -112,10 +112,10 @@
 
     void TogglePassword()
     {
-        password = !password;
+        hidePassword = !hidePassword;
     }
     void ToggleConfirmPassword()
     {
-        confirmPassword = !confirmPassword;
+        hideConfirmPassword = !hideConfirmPassword;
     }
 }

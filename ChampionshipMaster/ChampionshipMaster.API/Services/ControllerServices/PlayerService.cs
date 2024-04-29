@@ -120,25 +120,37 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                 return BadRequest(ModelState);
             }
 
-            if (string.IsNullOrEmpty(authHeader))
+            if (string.IsNullOrEmpty(authHeader) || authHeader.ToString() == "Bearer ")
             {
                 return BadRequest("Missing authorization");
             }
 
-            var tokenString = authHeader.ToString().Split(' ')[1];
-            var token = new JwtSecurityToken(tokenString);
-
-            var userName = token.Claims.FirstOrDefault(c => c.Type == "unique_name")?.Value;
-            var user = await _userManager.FindByNameAsync(userName!);
-
-            var result = await _userManager.ChangePasswordAsync(user!, changePassword.Password, changePassword.NewPassword);
-
-            if (result.Succeeded)
+            try
             {
-                return Ok("Password changed successfully");
-            }
+                var tokenString = authHeader.ToString().Split(' ')[1];
+                var token = new JwtSecurityToken(tokenString);
 
-            return BadRequest("Something went wrong");
+                var userName = token.Claims.First(c => c.Type == "unique_name").Value;
+                var user = await _userManager.FindByNameAsync(userName) ?? throw new Exception($"Unable to find user - {userName}");
+
+                var result = await _userManager.ChangePasswordAsync(user, changePassword.Password!, changePassword.NewPassword!);
+
+                if (result.Succeeded)
+                {
+                    user.ModifiedOn = DateTime.UtcNow;
+                    user.ModifiedBy = user.UserName;
+
+                    await _context.SaveChangesAsync();
+                    return Ok("Password changed successfully");
+                }
+
+                return BadRequest("Something went wrong");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return BadRequest("Something went wrong");
+            }
         }
 
         public async Task<IActionResult> ConfirmEmail(string userId, string token)

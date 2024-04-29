@@ -3,10 +3,12 @@
 @using System.Text.Json
 
 @inject IHttpClientFactory httpClient
-@inject NavigationManager NavigationManager
-@inject ProtectedLocalStorage _localStorage
 @inject IConfiguration configuration
 @inject INotifier notifier
+
+@inject NavigationManager NavigationManager
+@inject ProtectedLocalStorage _localStorage
+
 @rendermode InteractiveServer
 
 <center>
