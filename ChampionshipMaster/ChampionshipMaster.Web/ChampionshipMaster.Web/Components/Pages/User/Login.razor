@@ -88,7 +88,7 @@
         isLogged = true;
         StateHasChanged();
         notifier.SendSuccessNotification("Logged in successfully!");
-        NavigationManager.NavigateTo("/");
+        NavigationManager.NavigateTo("/", forceLoad:true);
     }
 
     void OnInvalidSubmit(FormInvalidSubmitEventArgs args)

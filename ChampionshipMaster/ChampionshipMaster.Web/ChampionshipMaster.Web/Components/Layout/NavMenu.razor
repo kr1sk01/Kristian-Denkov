@@ -45,7 +45,7 @@
                 </RadzenMenuItem>
             </RadzenMenuItem>
         </RadzenMenuItem>
-        <RadzenMenuItem Icon="account_box" Text="Profile" Path="profile">
+        <RadzenMenuItem Icon="account_box" Text="Profile" Visible=@isLogged Path="profile">
         </RadzenMenuItem>
         <RadzenMenuItem Icon="exit_to_app" Visible=@isLogged Text="Log Out" Click="()=> LogOut(username)">
         </RadzenMenuItem>
