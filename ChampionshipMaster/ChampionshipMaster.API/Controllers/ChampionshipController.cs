@@ -30,7 +30,7 @@ public class ChampionshipController : ControllerBase
     }
 
     // GET: api/Championship/5
-    [Authorize(Policy = "Admin")]
+    
     [HttpGet("{id}")]
     public async Task<ActionResult<ChampionshipDto>> GetChampionship(int id)
     {

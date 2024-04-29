@@ -17,7 +17,7 @@
                 AllowFiltering="true"
                 FilterPopupRenderMode="PopupRenderMode.OnDemand"
                 AllowPaging="true"
-                PageSize="5"
+                PageSize="8"
                 AllowSorting="true"
                 Data="@championships"
                 TItem="ChampionshipDto">
@@ -69,7 +69,11 @@
                 @championship.ChampionshipTypeName
             </Template>
         </RadzenDataGridColumn>
-
+        <RadzenDataGridColumn Filterable=false Sortable=false Width="150px;" TItem="ChampionshipDto" Title="Details">
+            <Template Context="championship">
+                <RadzenButton ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" Icon="info" class="m-1" Click="() => Details(championship.Id)" />
+            </Template>
+        </RadzenDataGridColumn>
     </Columns>
 </RadzenDataGrid>
 
