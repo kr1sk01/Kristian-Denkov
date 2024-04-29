@@ -1,11 +1,11 @@
 @page "/championshipDetails/{id}"
-@using Microsoft.AspNetCore.WebUtilities
-@using Microsoft.AspNetCore.Components
-@inject IHttpClientFactory httpClient
+
 @inject NavigationManager nManager
-@inject IConfiguration configuration
-@using Microsoft.EntityFrameworkCore
 @inject Radzen.DialogService dialogService
+
+@inject IHttpClientFactory httpClient
+@inject IConfiguration configuration
+
 @rendermode InteractiveServer
 
 
@@ -20,7 +20,7 @@
                 AllowFiltering="true"
                 FilterPopupRenderMode="PopupRenderMode.OnDemand"
                 AllowPaging="true"
-                PageSize="6"
+                PageSize="100000"
                 AllowSorting="true"
                 Data="@games"
                 TItem="GameDto">
@@ -61,7 +61,6 @@
 @code {
 
     [Parameter] public string? id { get; set; }
-    [Parameter] public string? name { get; set; }
 
     RadzenDataGrid<GameDto>? gamesList;    
 
@@ -72,9 +71,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // Get the query parameters from the URL
-        var uri = nManager.ToAbsoluteUri(nManager.Uri);
-        var queryParams = QueryHelpers.ParseQuery(uri.Query);
 
         using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
         var test = await client.GetFromJsonAsync<ChampionshipDto>($"api/Championship/{id}");

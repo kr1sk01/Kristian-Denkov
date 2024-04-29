@@ -1,17 +1,20 @@
 ﻿@page "/championshipsmain"
-@using System.Net.Http
+
 @inject IHttpClientFactory httpClient
-@inject NavigationManager nManager
 @inject IConfiguration configuration
-@using Microsoft.EntityFrameworkCore
-@using System.Linq
+@inject ITokenService tokenService
+
+@inject NavigationManager nManager
+@inject ProtectedLocalStorage _localStorage
+@inject DialogService DialogService
+@inject NavigationManager NavigationManager
+
 
 @rendermode InteractiveServer
 
 <PageTitle>Championships</PageTitle>
 
 
-@inject DialogService DialogService
 
 <RadzenDataGrid @ref="championshipList"
                 AllowFiltering="true"
@@ -69,7 +72,7 @@
                 @championship.ChampionshipTypeName
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Filterable=false Sortable=false Width="150px;" TItem="ChampionshipDto" Title="Details">
+        <RadzenDataGridColumn Filterable=false Sortable=false TItem="ChampionshipDto" Title="Details">
             <Template Context="championship">
                 <RadzenButton ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" Icon="info" class="m-1" Click="() => OpenChampionship(championship.Id.ToString())" />
             </Template>
@@ -121,7 +124,7 @@
                     }
                     <td style="color:@StatusColor">@item.ChampionshipStatusName</td>
                     <td>@item.ChampionshipTypeName</td>
-                    <td><button class="btn-primary" @onclick="() => Details(item.Id)">Details</button></td>
+                    <td><button class="btn-primary" >Details</button></td>
                 </tr>
             }
         </tbody>
@@ -135,7 +138,7 @@ else
 
 
 @code {
-    RadzenDataGrid<ChampionshipDto> championshipList;
+    RadzenDataGrid<ChampionshipDto>? championshipList;
 
     string StatusColor = "white";
 
@@ -149,17 +152,24 @@ else
     }
     private List<ChampionshipDto>? championships;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
-        var test = await client.GetFromJsonAsync<List<ChampionshipDto>>("api/championship/details");
-        if (test != null)
-            championships = test;
-    }
+        if (firstRender)
+        {
+            if (await tokenService.ValidateToken())
+            {
+                var token = new JwtSecurityTokenHandler().ReadJwtToken(await tokenService.GetToken());
 
-    private void Details(int id)
-    {
-        nManager.NavigateTo($"/championshipDetails?id={Uri.EscapeDataString(id.ToString())}");
+                StateHasChanged();
+            }
+            else { NavigationManager.NavigateTo("/login"); }
+
+            using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+            var test = await client.GetFromJsonAsync<List<ChampionshipDto>>("api/championship/details");
+            if (test != null)
+                championships = test;
+            StateHasChanged();
+        } 
     }
 
     async Task OpenChampionship(string id)

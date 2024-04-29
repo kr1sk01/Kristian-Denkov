@@ -63,7 +63,6 @@
                         <RadzenRequiredValidator Component="confirmPassword" Text="Confirm Password is required." />
                         <RadzenCompareValidator Component="confirmPassword" Visible=@(!string.IsNullOrEmpty(model.ConfirmPassword)) Value=@model.Password Text="Passwords should be the same." />
                     </Helper>
-
                 </RadzenFormField>
                 <RadzenButton ButtonType="ButtonType.Submit" Text="Register"></RadzenButton>
             </RadzenStack>

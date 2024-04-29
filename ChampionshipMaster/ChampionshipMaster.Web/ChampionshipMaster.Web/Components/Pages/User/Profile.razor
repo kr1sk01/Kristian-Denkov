@@ -1,7 +1,5 @@
 ﻿@page "/profile"
-@using System
-@using System.IO
-@using Microsoft.AspNetCore.Hosting
+
 
 @inject ITokenService tokenService
 @inject IHttpClientFactory httpClient
@@ -9,6 +7,8 @@
 
 @inject ProtectedLocalStorage _localStorage
 @inject NavigationManager NavigationManager
+
+@rendermode InteractiveServer
 
 <PageTitle>Profile</PageTitle>
 
@@ -65,22 +65,7 @@ else
 
     private readonly List<string> _messages = new();
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
 
-            if (await tokenService.ValidateToken())
-            {
-                loggedIn = true;
-                var token = new JwtSecurityTokenHandler().ReadJwtToken(await tokenService.GetToken());
-                username = token.Claims.FirstOrDefault(x => x.Type == "unique_name")?.Value ?? "";
-
-                StateHasChanged();
-            }
-            else { NavigationManager.NavigateTo("/login"); }
-        
-    }
-}
-@code {
     private List<IBrowserFile> loadedFiles = new();
     private long maxFileSize = 1024 * 15;
     private int maxAllowedFiles = 3;
@@ -112,5 +97,22 @@ else
         }
 
         isLoading = false;
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender)
+        {
+            if (await tokenService.ValidateToken())
+            {
+                loggedIn = true;
+                var token = new JwtSecurityTokenHandler().ReadJwtToken(await tokenService.GetToken());
+                username = token.Claims.FirstOrDefault(x => x.Type == "unique_name")?.Value ?? "";
+
+                StateHasChanged();
+            }
+            else { NavigationManager.NavigateTo("/login"); }
+        }
+
+
     }
 }
