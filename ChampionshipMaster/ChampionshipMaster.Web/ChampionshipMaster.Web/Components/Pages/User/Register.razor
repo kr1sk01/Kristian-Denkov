@@ -85,7 +85,10 @@
 
     async Task OnSubmit(RegisterViewModel register)
     {
+
         using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+        register.CreatedOn = DateTime.UtcNow;
+        register.CreatedBy = register.UserName;
         var request = await client.PostAsJsonAsync("api/Player/register", register);
 
         if (!request.IsSuccessStatusCode)
@@ -95,6 +98,8 @@
             showError = true;
             return;
         }
+
+
         notifier.SendSuccessNotification("Registered successfully!");
         notifier.SendInformationalNotification("In order to use the app you need to confirmyour email and sing in!", 10);
         NavigationManager.NavigateTo("/login");

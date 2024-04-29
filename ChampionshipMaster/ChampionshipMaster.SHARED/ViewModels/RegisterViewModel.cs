@@ -26,5 +26,9 @@ namespace ChampionshipMaster.SHARED.ViewModels
         [DataType(DataType.Password)]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string? ConfirmPassword { get; set; }
+        
+        public DateTime? CreatedOn { get; set; }
+
+        public string? CreatedBy { get; set; }
     }
 }

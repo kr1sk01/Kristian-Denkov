@@ -12,12 +12,14 @@ namespace ChampionshipMaster.API.Services.ControllerServices
         private readonly UserManager<Player> _userManager;
         private readonly JwtService _jwtService;
         private readonly IEmailSender _emailSender;
+        private readonly ApplicationDbContext _context;
 
-        public PlayerService(UserManager<Player> userManager, JwtService jwtService, IEmailSender emailSender)
+        public PlayerService(UserManager<Player> userManager, JwtService jwtService, IEmailSender emailSender, ApplicationDbContext context)
         {
             _userManager = userManager;
             _jwtService = jwtService;
             _emailSender = emailSender;
+            _context = context;
         }
 
         public async Task<IActionResult> Register(RegisterViewModel registerRequest)
@@ -27,7 +29,12 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                 return BadRequest(ModelState);
             }
 
-            var user = new Player { UserName = registerRequest.UserName, Email = registerRequest.Email };
+            var user = new Player { 
+                UserName = registerRequest.UserName, 
+                Email = registerRequest.Email,
+                CreatedBy = registerRequest.CreatedBy,
+                CreatedOn = registerRequest.CreatedOn,
+            };
             var result = await _userManager.CreateAsync(user, registerRequest.Password!);
             await _userManager.AddToRoleAsync(user, "user");
 
@@ -73,6 +80,12 @@ namespace ChampionshipMaster.API.Services.ControllerServices
 
             // Generate a JWT token on successful loginRequest
             var token = _jwtService.GenerateToken(user);
+
+            var activeUser = await _context.Users.FirstOrDefaultAsync(x=>x.NormalizedEmail == loginRequest.Email!.ToUpper());
+
+            activeUser!.Active = true;
+
+            _context.SaveChanges();
 
             return Ok(new { message = "Login successful", jwtToken = token.Result });
         }
