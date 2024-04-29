@@ -6,6 +6,7 @@
 @inject NavigationManager NavigationManager
 @inject ProtectedLocalStorage _localStorage
 @inject IConfiguration configuration
+@inject INotifier notifier
 @rendermode InteractiveServer
 
 <center>
@@ -83,6 +84,7 @@
         var jwtToken = JsonSerializer.Deserialize<Dictionary<string, string>>(successfulLogin)!["jwtToken"];
         await _localStorage.SetAsync("jwtToken", jwtToken);
 
+        notifier.SendSuccessMessage("Logged in successfully!");
         NavigationManager.NavigateTo("/");
     }
 

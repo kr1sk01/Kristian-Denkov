@@ -21,7 +21,7 @@ public class Program
 
 
         builder.Services.AddTransient<ITokenService, TokenService>();
-
+        builder.Services.AddTransient<INotifier, Notifier>();
 
 
         builder.Services.AddHttpClient(builder.Configuration["ClientName"]!, client =>

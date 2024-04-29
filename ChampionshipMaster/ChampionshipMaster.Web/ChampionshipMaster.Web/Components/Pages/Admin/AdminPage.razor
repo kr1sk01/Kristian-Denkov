@@ -1,8 +1,7 @@
 ﻿@page "/admin"
 @inject NavigationManager NavigationManager
 @inject ITokenService tokenService
-@inject NotificationService NotificationService;
-
+@inject INotifier notifier
 
 @rendermode InteractiveServer
 
@@ -28,8 +27,8 @@
             }
             else 
             {
-                SendErrorMessage("Access denied!");
-                SendWarningMessage("If you believe there is an error, please contact administrator!");
+                notifier.SendErrorMessage("Access denied!");
+                notifier.SendWarningMessage("If you believe there is an error, please contact administrator!");
                 NavigationManager.NavigateTo("/"); 
             }
         }
@@ -38,31 +37,5 @@
     private void RedirectToAnotherPage(string url)
     {
         NavigationManager.NavigateTo(url);
-    }
-
-
-    protected void SendErrorMessage(string message)
-    {
-        NotificationService.Notify(new NotificationMessage
-            {
-                Detail = message,
-                Severity = NotificationSeverity.Error
-            });
-    }
-    protected void SendWarningMessage(string message)
-    {
-        NotificationService.Notify(new NotificationMessage
-            {
-                Detail = message,
-                Severity = NotificationSeverity.Warning
-            });
-    }
-    protected void SendInformationalMessage(string message)
-    {
-        NotificationService.Notify(new NotificationMessage
-            {
-                Detail = message,
-                Severity = NotificationSeverity.Info
-            });
     }
 }
