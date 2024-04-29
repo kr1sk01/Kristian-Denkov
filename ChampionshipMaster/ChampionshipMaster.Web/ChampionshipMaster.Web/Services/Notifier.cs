@@ -5,13 +5,13 @@ namespace ChampionshipMaster.Web.Services
 {
     public class Notifier : INotifier
     {
+
         private readonly NotificationService _notificationService;
 
         public Notifier(NotificationService notificationService)
         {
             _notificationService = notificationService;
         }
-
         public void SendErrorNotification(string message, int duration = 3)
         {        
             _notificationService.Notify(new NotificationMessage
@@ -22,6 +22,7 @@ namespace ChampionshipMaster.Web.Services
                 
             });
         }
+
         public void SendWarningNotification(string message, int duration = 3)
 {
             _notificationService.Notify(new NotificationMessage
@@ -31,6 +32,7 @@ namespace ChampionshipMaster.Web.Services
                 Duration = duration * 1000
             });
         }
+
         public void SendInformationalNotification(string message, int duration = 3)
 {
             _notificationService.Notify(new NotificationMessage
@@ -41,6 +43,7 @@ namespace ChampionshipMaster.Web.Services
             });
             
         }
+
         public void SendSuccessNotification(string message, int duration = 3)
 {
             _notificationService.Notify(new NotificationMessage
