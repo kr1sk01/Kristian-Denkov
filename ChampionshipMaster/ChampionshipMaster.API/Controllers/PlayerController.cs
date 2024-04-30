@@ -46,10 +46,16 @@ namespace ChampionshipMaster.API.Controllers
             return result;
         }
 
-        [HttpGet("confirmEmail")]
+        [HttpGet("confirmEmail1")]
         public async Task<IActionResult> ConfirmEmail([FromQuery] string userId, [FromQuery] string token)
         {
             var result = await _playerService.ConfirmEmail(userId, token);
+            return result;
+        }
+        [HttpPost("ChangePicture")]
+        public async Task<IActionResult> ChangePicture(ProfileDto profileDto)
+        {
+            var result = await _playerService.ChangePicture(profileDto);
             return result;
         }
     }

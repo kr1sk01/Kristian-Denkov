@@ -4,6 +4,7 @@
 @inject ITokenService tokenService
 @inject IHttpClientFactory httpClient
 @inject IWebHostEnvironment Environment
+@inject IConfiguration configuration
 
 @inject ProtectedLocalStorage _localStorage
 @inject NavigationManager NavigationManager
@@ -31,7 +32,7 @@
 <p>
     <label>
         Upload up to @maxAllowedFiles of up to @maxFileSize bytes:
-        <InputFile OnChange="LoadFiles" multiple />
+        <InputFile OnChange="LoadFiles" />
     </label>
 </p>
 
@@ -58,7 +59,7 @@ else
 
 @code {
     private bool loggedIn = false;
-
+    private const string UNIQUE_NAME = "unique_name";
     private string username = "";
 
     private HubConnection? _hubConnection;
@@ -71,32 +72,57 @@ else
     private int maxAllowedFiles = 3;
     private bool isLoading;
 
+    public ProfileDto profileDto=new ProfileDto();
+
     private async Task LoadFiles(InputFileChangeEventArgs e)
     {
         isLoading = true;
         loadedFiles.Clear();
-
-        foreach (var file in e.GetMultipleFiles(maxAllowedFiles))
+        try
         {
-            try
-            {
-                var trustedFileName = Path.GetRandomFileName();
-                var path = Path.Combine(Environment.ContentRootPath,
-                    Environment.EnvironmentName, "unsafe_uploads",
-                    trustedFileName);
-
-                await using FileStream fs = new(path, FileMode.Create);
-                await file.OpenReadStream(maxFileSize).CopyToAsync(fs);
-
-                loadedFiles.Add(file);
-
-            }
-            catch (Exception ex)
-            {
-            }
+            var file = e.File;
+            var test = await UploadMedia(file);
+            profileDto.Avatar = new byte[test.Length];
+            Array.Copy(test, profileDto.Avatar, test.Length);
         }
+        catch(Exception ex)
+        {
+            //Throw ex
+        }
+        var tokenString = await tokenService.GetToken();
+        if (tokenString != null)
+        {
+            var token = new JwtSecurityTokenHandler().ReadJwtToken(tokenString);
 
+            if (await tokenService.ValidateToken())
+            {              
+                profileDto.UserName = token.Claims.FirstOrDefault(x => x.Type == UNIQUE_NAME)?.Value ?? "";
+            }
+
+        }
+        using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+        var test2 = await client.PostAsJsonAsync("/api/Player/ChangePicture", profileDto);
         isLoading = false;
+    }
+    public static async Task<byte[]> UploadMedia(IBrowserFile file)
+    {
+        var path = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+
+        await using var fs = new FileStream(path, FileMode.Create);
+
+        await file.OpenReadStream(file.Size).CopyToAsync(fs);
+
+        var bytes = new byte[file.Size];
+
+        fs.Position = 0;
+
+        await fs.ReadAsync(bytes);
+
+        fs.Close();
+
+        File.Delete(path);
+
+        return bytes;
     }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

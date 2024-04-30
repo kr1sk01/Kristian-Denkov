@@ -4,6 +4,7 @@ using ChampionshipMaster.SHARED.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.Extensions.Primitives;
+using System.Collections;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
@@ -59,6 +60,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
 
         public async Task<IActionResult> Login(LoginViewModel loginRequest)
         {
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -87,7 +89,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
 
             await _context.SaveChangesAsync();
 
-            return Ok(new { message = "Login successful", jwtToken = token });
+            return Ok(new { message = "Login successful", jwtToken = token, image = Convert.ToBase64String(user.Avatar) });
         }
 
         public async Task<IActionResult> LogOut(string username, StringValues authHeader)
@@ -128,7 +130,8 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                 var tokenString = authHeader.ToString().Split(' ')[1];
                 var token = new JwtSecurityToken(tokenString);
 
-                var userName = token.Claims.First(c => c.Type == "unique_name").Value;
+                var userName = token.Claims.First(c => c.Type == ClaimTypes.Name).Value;
+                
                 var user = await _userManager.FindByNameAsync(userName) ?? throw new Exception($"Unable to find user - {userName}");
 
                 var result = await _userManager.ChangePasswordAsync(user, changePassword.Password!, changePassword.NewPassword!);
@@ -173,6 +176,26 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             }
 
             return BadRequest(result.Errors);
+        }
+
+        public async Task<IActionResult> ChangePicture(ProfileDto profileDto)
+        {
+            if(profileDto == null)
+            {
+                return BadRequest();
+            }
+            var user = await _userManager.FindByNameAsync(profileDto.UserName);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            user.Avatar = profileDto.Avatar;
+
+            _context.Entry(user).State = EntityState.Modified;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true });
         }
     }
 }

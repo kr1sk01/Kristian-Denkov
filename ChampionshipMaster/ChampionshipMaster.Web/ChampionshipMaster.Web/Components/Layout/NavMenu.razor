@@ -9,7 +9,7 @@
 
 <div style="top:0px;left:0px;margin-bottom: 0px;">
     <RadzenMenu Click="OnParentClicked">
-        <RadzenMenuItem Text="Home" Icon="home" Path="" Visible=@isLogged>
+        <RadzenMenuItem Text="Home" Icon="home" Path="/" Visible=@isLogged>
         </RadzenMenuItem>
         <RadzenMenuItem Text="Championships" Icon="assignment" Path="championshipsmain" Visible=@isLogged>
         </RadzenMenuItem>
@@ -42,14 +42,18 @@
                 </RadzenMenuItem>
             </RadzenMenuItem>
         </RadzenMenuItem>
-        
-        <RadzenMenuItem Icon="build" Text="Admin Panel" Visible=@isAdmin Path="admin"></RadzenMenuItem>
-        <RadzenMenuItem Style="float:right;" Icon="account_circle" Text="Account" Visible=@isLogged >
-            <RadzenMenuItem Icon="build" Visible=@isLogged Text="Manage profile" Path="profile"></RadzenMenuItem>
-            <RadzenMenuItem Icon="lock" Visible=@isLogged Text="Change password" Path="changePassword"></RadzenMenuItem>
-            <RadzenMenuItem Icon="exit_to_app" Visible=@isLogged Text="Log Out" Click="()=> LogOut(username)"></RadzenMenuItem>
-        </RadzenMenuItem>
         <RadzenMenuItem Icon="help_outline" Visible=@isLogged Text="Info" Path="info"></RadzenMenuItem>
+        <RadzenMenuItem Icon="build" Text="Admin Panel" Visible=@isAdmin Path="admin"></RadzenMenuItem>
+        <RadzenProfileMenu Visible=@isLogged>
+            <Template>
+                <RadzenImage Path="@($"data:image/jpeg;base64,{base64EncodedImageData}")" AlternateText="Profile picture" Visible=@isLogged />
+            </Template>
+            <ChildContent>
+                <RadzenMenuItem Icon="build" Visible=@isLogged Text="Manage profile" Path="profile"></RadzenMenuItem>
+                <RadzenMenuItem Icon="lock" Visible=@isLogged Text="Change password" Path="changePassword"></RadzenMenuItem>
+                <RadzenMenuItem Icon="exit_to_app" Visible=@isLogged Text="Log Out" Click="()=> LogOut(username)"></RadzenMenuItem>
+            </ChildContent>
+        </RadzenProfileMenu>
     </RadzenMenu>
 </div>
 
@@ -58,12 +62,18 @@
 @code {
     bool isAdmin = false;
     bool isLogged = false;
+
+    bool imageLoaded = false;
+
     string username = "";
+
+    string base64EncodedImageData = string.Empty;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
+
             var tokenString = await tokenService.GetToken();
             if (tokenString != null)
             {
@@ -72,8 +82,21 @@
                 if (await tokenService.ValidateToken())
                 {
                     isAdmin = tokenService.ValidateTokenAdmin(token);
-                    username = token.Claims.FirstOrDefault(x => x.Type == "unique_name")?.Value ?? "";
+                    username = token.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value ?? "";
                     isLogged = true;
+                    try
+                    {
+                        var imageResult = await _localStorage.GetAsync<string>("profilepicture");
+                        if (imageResult.Success && !string.IsNullOrEmpty(imageResult.Value))
+                        {
+                            base64EncodedImageData = imageResult.Value!;
+                        }
+
+                    }catch(Exception ex)
+                    {
+                        
+                    }
+                    
                     StateHasChanged();
                 }
 
@@ -93,7 +116,7 @@
         using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
         client.DefaultRequestHeaders.Add("Authorization", $"Bearer {tokenString}");
         await client.GetAsync($"api/Player/logout/{username}");
-
+        
         await _localStorage.DeleteAsync("jwtToken");
 
         isLogged = false;

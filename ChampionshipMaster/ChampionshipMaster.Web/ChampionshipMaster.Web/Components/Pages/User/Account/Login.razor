@@ -62,11 +62,10 @@
 
     Variant variant = Variant.Outlined;
 
-
     private LoginViewModel model = new LoginViewModel();
     private string? errorMessage;
     private bool showError = false;
-
+    
     private bool isLogged = false;
 
     bool hidePassword = true;
@@ -86,7 +85,10 @@
 
         var successfulLogin = await request.Content.ReadAsStringAsync();
         var jwtToken = JsonSerializer.Deserialize<Dictionary<string, string>>(successfulLogin)!["jwtToken"];
+        var image = JsonSerializer.Deserialize<Dictionary<string, string>>(successfulLogin)!["image"];
+        
         await _localStorage.SetAsync("jwtToken", jwtToken);
+        await _localStorage.SetAsync("profilepicture", image);
         isLogged = true;
         StateHasChanged();
         notifier.SendSuccessNotification("Logged in successfully!");

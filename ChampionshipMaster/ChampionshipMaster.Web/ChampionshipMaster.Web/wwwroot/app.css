@@ -78,3 +78,16 @@ h1:focus {
 .darker-border-checkbox.form-check-input {
     border-color: #929292;
 }
+.rz-navigation-item-link.active 
+{
+    color:red !important; 
+}
+.rz-navigation-item-link
+{
+    font-size: 20px;
+}
+.rz-menu.rz-profile-menu
+{
+    margin-left:auto;
+    padding:0 0 0 10px;
+}
