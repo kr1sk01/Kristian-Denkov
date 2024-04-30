@@ -13,15 +13,12 @@
         </RadzenMenuItem>
         <RadzenMenuItem Text="Championships" Icon="assignment" Path="championshipsmain">
         </RadzenMenuItem>
-        <RadzenMenuItem Text="Inputs" Icon="payment" Disabled="true">
-            <RadzenMenuItem Text="CheckBox" Path="checkbox" Icon="check_circle"></RadzenMenuItem>
-            <RadzenMenuItem Text="TextBox" Path="textbox" Icon="input"></RadzenMenuItem>
-            <RadzenMenuItem Text="TextArea" Path="textarea" Icon="description"></RadzenMenuItem>
-            <RadzenMenuItem Text="Password" Path="password" Icon="payment"></RadzenMenuItem>
-            <RadzenMenuItem Text="Numeric" Path="numeric" Icon="aspect_ratio"></RadzenMenuItem>
-            <RadzenMenuItem Text="DatePicker" Path="datepicker" Icon="date_range"></RadzenMenuItem>
+        <RadzenMenuItem Text="Teams" Icon="assignment_ind">
+            <RadzenMenuItem Text="My Teams" Path="" Icon="assessment"></RadzenMenuItem>
+            <RadzenMenuItem Text="Team Participations" Path="" Icon="account_box"></RadzenMenuItem>
+            <RadzenMenuItem Text="Create Team" Path="" Icon="note_add"></RadzenMenuItem>
         </RadzenMenuItem>
-        <RadzenMenuItem Text="Data" Icon="save">
+        <RadzenMenuItem Text="Data" Icon="save" Visible=false>
             <RadzenMenuItem Text="DataGrid" Path="datagrid" Icon="grid_on"></RadzenMenuItem>
             <RadzenMenuItem Text="DataList" Path="datalist" Icon="list"></RadzenMenuItem>
             <RadzenMenuItem Text="DropDown" Path="dropdown" Icon="dns"></RadzenMenuItem>
@@ -29,13 +26,13 @@
             <RadzenMenuItem Text="ListBox" Path="listbox" Icon="view_list"></RadzenMenuItem>
             <RadzenMenuItem Text="TemplateForm" Path="templateform" Icon="line_style"></RadzenMenuItem>
         </RadzenMenuItem>
-        <RadzenMenuItem Text="Containers" Icon="account_box">
+        <RadzenMenuItem Text="Containers" Icon="account_box" Visible=false>
             <RadzenMenuItem Text="Tabs" Path="tabs" Icon="tab"></RadzenMenuItem>
             <RadzenMenuItem Text="Panel" Path="panel" Icon="content_paste"></RadzenMenuItem>
             <RadzenMenuItem Text="Fieldset" Path="fieldset" Icon="account_balance_wallet"></RadzenMenuItem>
             <RadzenMenuItem Text="Card" Path="card" Icon="line_style"></RadzenMenuItem>
         </RadzenMenuItem>
-        <RadzenMenuItem Text="More">
+        <RadzenMenuItem Text="More" Visible=false>
             <RadzenMenuItem Text="Item1"></RadzenMenuItem>
             <RadzenMenuItem Text="Item2"></RadzenMenuItem>
             <RadzenMenuItem Text="More items">
@@ -45,7 +42,7 @@
                 </RadzenMenuItem>
             </RadzenMenuItem>
         </RadzenMenuItem>
-        <RadzenMenuItem Icon="account_box" Text="Profile" Visible=@isLogged Path="profile">
+        <RadzenMenuItem Icon="account_circle" Text="Profile" Visible=@isLogged Path="profile">
         </RadzenMenuItem>
         <RadzenMenuItem Icon="exit_to_app" Visible=@isLogged Text="Log Out" Click="()=> LogOut(username)">
         </RadzenMenuItem>
