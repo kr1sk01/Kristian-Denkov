@@ -98,7 +98,7 @@
         await base.OnInitializedAsync();
 
         using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
-        championshipTypeList = await client.GetFromJsonAsync<List<ChampionshipType>>("/api/ChampionshipType") ?? new List<ChampionshipType>();
+        championshipTypeList = await client.GetFromJsonAsync<List<ChampionshipType>>("/api/ChampionshipTypes") ?? new List<ChampionshipType>();
     }
 
     async Task EditRow(ChampionshipType championshipType)
@@ -121,7 +121,7 @@
         Reset(championshipType);
 
         using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
-        var result = await client.PutAsJsonAsync($"/api/ChampionshipType/{championshipType.Id}", championshipType);
+        var result = await client.PutAsJsonAsync($"/api/ChampionshipTypes/{championshipType.Id}", championshipType);
 
     }
 
@@ -135,7 +135,7 @@
         }
 
         using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
-        var response = await client.PostAsJsonAsync("/api/ChampionshipType", championshipType);
+        var response = await client.PostAsJsonAsync("/api/ChampionshipTypes", championshipType);
 
         if (response.IsSuccessStatusCode)
         {
@@ -171,7 +171,7 @@
             championshipTypeList.Remove(championshipType);
 
             using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
-            await client.DeleteAsync($"/api/ChampionshipType/{championshipType.Id}");
+            await client.DeleteAsync($"/api/ChampionshipTypes/{championshipType.Id}");
 
             await championshipTypeGrid.Reload();
 
