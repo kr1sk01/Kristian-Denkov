@@ -9,13 +9,13 @@
 
 <div style="top:0px;left:0px;margin-bottom: 0px;">
     <RadzenMenu Click="OnParentClicked">
-        <RadzenMenuItem Text="Home" Icon="home" Path="">
+        <RadzenMenuItem Text="Home" Icon="home" Path="" Visible=@isLogged>
         </RadzenMenuItem>
-        <RadzenMenuItem Text="Championships" Icon="assignment" Path="championshipsmain">
+        <RadzenMenuItem Text="Championships" Icon="assignment" Path="championshipsmain" Visible=@isLogged>
         </RadzenMenuItem>
-        <RadzenMenuItem Text="Teams" Icon="assignment_ind">
+        <RadzenMenuItem Text="Teams" Icon="assignment_ind" Visible=@isLogged>
             <RadzenMenuItem Text="My Teams" Path="" Icon="assessment"></RadzenMenuItem>
-            <RadzenMenuItem Text="Team Participations" Path="" Icon="account_box"></RadzenMenuItem>
+            <RadzenMenuItem Text="Team Participations" Path="" Icon="face"></RadzenMenuItem>
             <RadzenMenuItem Text="Create Team" Path="" Icon="note_add"></RadzenMenuItem>
         </RadzenMenuItem>
         <RadzenMenuItem Text="Data" Icon="save" Visible=false>
@@ -42,11 +42,14 @@
                 </RadzenMenuItem>
             </RadzenMenuItem>
         </RadzenMenuItem>
-        <RadzenMenuItem Icon="account_circle" Text="Profile" Visible=@isLogged Path="profile">
+        
+        <RadzenMenuItem Icon="build" Text="Admin Panel" Visible=@isAdmin ></RadzenMenuItem>
+        <RadzenMenuItem Style="float:right;" Icon="account_circle" Text="Account" Visible=@isLogged >
+            <RadzenMenuItem Icon="build" Visible=@isLogged Text="Manage profile" Path="profile"></RadzenMenuItem>
+            <RadzenMenuItem Icon="lock" Visible=@isLogged Text="Change password" Path="changePassword"></RadzenMenuItem>
+            <RadzenMenuItem Icon="exit_to_app" Visible=@isLogged Text="Log Out" Click="()=> LogOut(username)"></RadzenMenuItem>
         </RadzenMenuItem>
-        <RadzenMenuItem Icon="exit_to_app" Visible=@isLogged Text="Log Out" Click="()=> LogOut(username)">
-        </RadzenMenuItem>
-        <RadzenMenuItem Icon="build" Text="Admin Panel" Visible=@isAdmin Path="admin"></RadzenMenuItem>
+
     </RadzenMenu>
 </div>
 
