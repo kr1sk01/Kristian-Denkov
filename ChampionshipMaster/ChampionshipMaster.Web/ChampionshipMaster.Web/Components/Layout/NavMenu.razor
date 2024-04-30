@@ -43,7 +43,7 @@
             </RadzenMenuItem>
         </RadzenMenuItem>
         
-        <RadzenMenuItem Icon="build" Text="Admin Panel" Visible=@isAdmin ></RadzenMenuItem>
+        <RadzenMenuItem Icon="build" Text="Admin Panel" Visible=@isAdmin Path="admin"></RadzenMenuItem>
         <RadzenMenuItem Style="float:right;" Icon="account_circle" Text="Account" Visible=@isLogged >
             <RadzenMenuItem Icon="build" Visible=@isLogged Text="Manage profile" Path="profile"></RadzenMenuItem>
             <RadzenMenuItem Icon="lock" Visible=@isLogged Text="Change password" Path="changePassword"></RadzenMenuItem>
