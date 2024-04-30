@@ -63,10 +63,10 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             {
                 return BadRequest(ModelState);
             }
-
+            
             // Find the user by username
             var user = await _userManager.FindByEmailAsync(loginRequest.Email!);
-
+            
             if (user == null)
             {
                 return BadRequest("Invalid username or password");
@@ -74,22 +74,20 @@ namespace ChampionshipMaster.API.Services.ControllerServices
 
             // Validate the password
             var validPassword = await _userManager.CheckPasswordAsync(user, loginRequest.Password!);
-
+            
             if (!validPassword)
             {
                 return BadRequest("Invalid username or password");
             }
 
             // Generate a JWT token on successful loginRequest
-            var token = _jwtService.GenerateToken(user);
+            var token = await _jwtService.GenerateToken(user);
 
-            var activeUser = await _context.Users.FirstOrDefaultAsync(x=>x.NormalizedEmail == loginRequest.Email!.ToUpper());
+            user!.Online = true;
 
-            activeUser!.Online = true;
+            await _context.SaveChangesAsync();
 
-            _context.SaveChanges();
-
-            return Ok(new { message = "Login successful", jwtToken = token.Result });
+            return Ok(new { message = "Login successful", jwtToken = token });
         }
 
         public async Task<IActionResult> LogOut(string username, StringValues authHeader)

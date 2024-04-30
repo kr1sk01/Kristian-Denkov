@@ -5,12 +5,14 @@ using System.IdentityModel.Tokens.Jwt;
 
 namespace ChampionshipMaster.Web.Services
 {
-    public class TokenService : ITokenService
+    public class TokenService : NavigationManager,ITokenService
     {
         private readonly ProtectedLocalStorage _localStorage;
+        private readonly NavigationManager _nManager;
 
-        public TokenService(ProtectedLocalStorage localStorage)
+        public TokenService(ProtectedLocalStorage localStorage, NavigationManager nManager)
         {
+            _nManager = nManager;
             _localStorage = localStorage;
         }
 
@@ -29,7 +31,12 @@ namespace ChampionshipMaster.Web.Services
             try
             {
                 var handler = new JwtSecurityTokenHandler();
-                var token = handler.ReadJwtToken(await GetToken() ?? throw new Exception("Couldn't retrieve token"));
+                var tokenString = await GetToken();
+                if(string.IsNullOrEmpty(tokenString))
+                {
+                    _nManager.NavigateTo("/login");
+                }
+                var token = handler.ReadJwtToken(await GetToken());
 
                 List<bool> validatorsList = new List<bool>();
 
