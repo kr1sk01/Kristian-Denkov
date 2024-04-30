@@ -1,4 +1,4 @@
-﻿@page "/gametypemain"
+﻿@page "/GameTypeMain"
 
 
 @inject IHttpClientFactory httpClient
@@ -127,17 +127,7 @@
         if (GameTypeList.Any(x => x.Name!.ToLower() == GameType.Name!.ToLower()
             && x.Id != GameType.Id))
         {
-            var message = new NotificationMessage
-                {
-                    Severity = NotificationSeverity.Error,
-                    Summary = "Duplicate name",
-                    Detail = "There is already a game status with that name",
-                    Duration = 4000,
-                    CloseOnClick = true
-                };
-
-            notifier.SendSuccessNotification("Changes made successfully!");
-
+            notifier.SendErrorNotification("There is already a game status with that name");
             return;
         }
 

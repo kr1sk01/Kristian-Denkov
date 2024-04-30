@@ -1,12 +1,13 @@
 ﻿@using Microsoft.EntityFrameworkCore
 @using System.Text.Json
 
-@page "/gamestatusmain"
+@page "/GameStatusMain"
 
 @inject IHttpClientFactory httpClient
-@inject NotificationService NotificationService
 @inject IConfiguration configuration
 @inject INotifier notifier
+
+@inject NotificationService NotificationService
 @rendermode InteractiveServer
 
 <style>
@@ -129,17 +130,7 @@
         if (gameStatusList.Any(x => x.Name!.ToLower() == gameStatus.Name!.ToLower()
             && x.Id != gameStatus.Id))
         {
-            var message = new NotificationMessage
-                {
-                    Severity = NotificationSeverity.Error,
-                    Summary = "Duplicate name",
-                    Detail = "There is already a game status with that name",
-                    Duration = 4000,
-                    CloseOnClick = true
-                };
-
-            notifier.SendSuccessNotification("Changes made successfully!");
-
+            notifier.SendErrorNotification("There is already a game status with that name");
             return;
         }
 
