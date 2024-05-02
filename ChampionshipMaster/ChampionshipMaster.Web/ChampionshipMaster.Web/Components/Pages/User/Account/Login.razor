@@ -88,7 +88,7 @@
         var image = JsonSerializer.Deserialize<Dictionary<string, string>>(successfulLogin)!["image"];
         
         await _localStorage.SetAsync("jwtToken", jwtToken);
-        await _localStorage.SetAsync("profilepicture", image);
+        await _localStorage.SetAsync("playerAvatar", image);
         isLogged = true;
         StateHasChanged();
         notifier.SendSuccessNotification("Logged in successfully!");

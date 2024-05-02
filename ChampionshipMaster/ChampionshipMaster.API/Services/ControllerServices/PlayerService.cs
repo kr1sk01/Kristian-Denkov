@@ -4,6 +4,7 @@ using ChampionshipMaster.SHARED.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.Extensions.Primitives;
+using Microsoft.IdentityModel.Tokens;
 using System.Collections;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -89,7 +90,11 @@ namespace ChampionshipMaster.API.Services.ControllerServices
 
             await _context.SaveChangesAsync();
 
-            return Ok(new { message = "Login successful", jwtToken = token, image = Convert.ToBase64String(user.Avatar) });
+            string imageString;
+            if (user.Avatar.IsNullOrEmpty()) { imageString = ""; }
+            else { imageString = Convert.ToBase64String(user.Avatar!); }
+
+            return Ok(new { message = "Login successful", jwtToken = token, image = imageString });
         }
 
         public async Task<IActionResult> LogOut(string username, StringValues authHeader)
@@ -172,6 +177,8 @@ namespace ChampionshipMaster.API.Services.ControllerServices
 
             if (result.Succeeded)
             {
+                user.Active = true;
+                await _context.SaveChangesAsync();
                 return Redirect("https://localhost:56665/login");
             }
 
@@ -189,8 +196,10 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             {
                 return NotFound();
             }
-            user.Avatar = profileDto.Avatar;
 
+            user.Avatar = profileDto.Avatar;
+            user.ModifiedBy = profileDto.UserName;
+            user.ModifiedOn = DateTime.UtcNow;
             _context.Entry(user).State = EntityState.Modified;
 
             await _context.SaveChangesAsync();

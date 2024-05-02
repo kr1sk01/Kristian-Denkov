@@ -3,9 +3,11 @@
 
 @page "/ChampionshipTypesMain"
 
+@inject NavigationManager NavigationManager
+@inject ITokenService tokenService
 @inject IHttpClientFactory httpClient
-@inject IConfiguration configuration
 @inject INotifier notifier
+@inject IConfiguration configuration
 
 @inject NotificationService NotificationService
 @rendermode InteractiveServer
@@ -16,58 +18,62 @@
     }
 </style>
 
-<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="10px" class="mt-2 mb-4">
-    <RadzenButton Style="background-color:darkslategray"
-                  ButtonStyle="ButtonStyle.Success"
-                  Icon="add_circle_outline"
-                  Text="Add New championship type"
-                  Click="@InsertRow"
-                  Disabled="@(championshiptypesToInsert.Count() > 0)" />
-</RadzenStack>
+@if (isAdmin)
+{
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="10px" class="mt-2 mb-4">
+        <RadzenButton Style="background-color:darkslategray"
+                      ButtonStyle="ButtonStyle.Success"
+                      Icon="add_circle_outline"
+                      Text="Add New championship type"
+                      Click="@InsertRow"
+                      Disabled="@(championshiptypesToInsert.Count() > 0)" />
+    </RadzenStack>
 
-<RadzenDataGrid @ref="championshipTypeGrid"
-                AllowAlternatingRows="false"
-                AllowFiltering="false"
-                AllowPaging="true"
-                AllowSorting="true"
-                EditMode="@DataGridEditMode.Single"
-                PageSize="7"
-                Data="@championshipTypeList"
-                TItem="ChampionshipType"
-                RowUpdate="@OnUpdateRow"
-                RowCreate="@OnCreateRow"
-                Sort="@Reset"
-                Page="@Reset"
-                Filter="@Reset"
-                ColumnWidth="20200202px">
-    <Columns>
+    <RadzenDataGrid @ref="championshipTypeGrid"
+                    AllowAlternatingRows="false"
+                    AllowFiltering="false"
+                    AllowPaging="true"
+                    AllowSorting="true"
+                    EditMode="@DataGridEditMode.Single"
+                    PageSize="7"
+                    Data="@championshipTypeList"
+                    TItem="ChampionshipType"
+                    RowUpdate="@OnUpdateRow"
+                    RowCreate="@OnCreateRow"
+                    Sort="@Reset"
+                    Page="@Reset"
+                    Filter="@Reset"
+                    ColumnWidth="20200202px">
+        <Columns>
 
-        <RadzenDataGridColumn TItem="ChampionshipType" Property="Name" Title="Name">
-            <EditTemplate Context="championshipType">
-                <RadzenTextBox @bind-Value="championshipType.Name" Style="width:200px; display: block" Name="Name" />
-                <RadzenRequiredValidator Text="Name is required" Component="Name" Popup="true" />
-            </EditTemplate>
-        </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="ChampionshipType" Property="Name" Title="Name">
+                <EditTemplate Context="championshipType">
+                    <RadzenTextBox @bind-Value="championshipType.Name" Style="width:200px; display: block" Name="Name" />
+                    <RadzenRequiredValidator Text="Name is required" Component="Name" Popup="true" />
+                </EditTemplate>
+            </RadzenDataGridColumn>
 
-        <RadzenDataGridColumn Width="1%" TItem="ChampionshipType" Context="championshipType" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Frozen="true" FrozenPosition="FrozenColumnPosition.Right">
-            <Template Context="championshipType">
-                <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@(args => EditRow(championshipType))" @onclick:stopPropagation="true">
-                </RadzenButton>
-                <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@(args => DeleteRow(championshipType))" @onclick:stopPropagation="true">
-                </RadzenButton>
-            </Template>
-            <EditTemplate Context="championshipType">
-                <RadzenButton Icon="check" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@((args) => SaveRow(championshipType))">
-                </RadzenButton>
-                <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@((args) => CancelEdit(championshipType))">
-                </RadzenButton>
-                <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@(args => DeleteRow(championshipType))">
-                </RadzenButton>
-            </EditTemplate>
-        </RadzenDataGridColumn>
+            <RadzenDataGridColumn Width="1%" TItem="ChampionshipType" Context="championshipType" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Frozen="true" FrozenPosition="FrozenColumnPosition.Right">
+                <Template Context="championshipType">
+                    <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@(args => EditRow(championshipType))" @onclick:stopPropagation="true">
+                    </RadzenButton>
+                    <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@(args => DeleteRow(championshipType))" @onclick:stopPropagation="true">
+                    </RadzenButton>
+                </Template>
+                <EditTemplate Context="championshipType">
+                    <RadzenButton Icon="check" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@((args) => SaveRow(championshipType))">
+                    </RadzenButton>
+                    <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@((args) => CancelEdit(championshipType))">
+                    </RadzenButton>
+                    <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@(args => DeleteRow(championshipType))">
+                    </RadzenButton>
+                </EditTemplate>
+            </RadzenDataGridColumn>
 
-    </Columns>
-</RadzenDataGrid>
+        </Columns>
+    </RadzenDataGrid>
+
+}
 
 @code {
     private bool dataLoaded = false;
@@ -91,14 +97,6 @@
     {
         championshiptypesToInsert.Remove(championshipType);
         championshiptypesToUpdate.Remove(championshipType);
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        await base.OnInitializedAsync();
-
-        using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
-        championshipTypeList = await client.GetFromJsonAsync<List<ChampionshipType>>("/api/ChampionshipTypes") ?? new List<ChampionshipType>();
     }
 
     async Task EditRow(ChampionshipType championshipType)
@@ -199,6 +197,31 @@
     void OnCreateRow(ChampionshipType championshipType)
     {
         championshiptypesToInsert.Remove(championshipType);
+    }
+
+    bool isAdmin = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (await tokenService.ValidateToken(true))
+            {
+                isAdmin = true;
+                var token = await tokenService.GetToken();
+                using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+                client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+                championshipTypeList = await client.GetFromJsonAsync<List<ChampionshipType>>("/api/ChampionshipTypes") ?? new List<ChampionshipType>();
+                StateHasChanged();
+            }
+            else
+            {
+                notifier.SendErrorNotification("Access denied!");
+                notifier.SendWarningNotification("If you believe there is an error, please contact administrator!", 10);
+                NavigationManager.NavigateTo("/");
+
+            }
+        }
     }
 
 }

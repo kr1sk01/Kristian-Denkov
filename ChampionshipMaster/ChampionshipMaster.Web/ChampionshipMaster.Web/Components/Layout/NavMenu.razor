@@ -43,13 +43,14 @@
             </RadzenMenuItem>
         </RadzenMenuItem>
         <RadzenMenuItem Icon="help_outline" Visible=@isLogged Text="Info" Path="info"></RadzenMenuItem>
-        <RadzenMenuItem Icon="build" Text="Admin Panel" Visible=@isAdmin Path="admin"></RadzenMenuItem>
+        <RadzenMenuItem Icon="admin_panel_settings" Text="Admin Panel" Visible=@isAdmin Path="admin"></RadzenMenuItem>
         <RadzenProfileMenu Visible=@isLogged>
             <Template>
-                <RadzenImage Path="@($"data:image/jpeg;base64,{base64EncodedImageData}")" AlternateText="Profile picture" Visible=@isLogged />
+                <RadzenImage Path="@imagePath" AlternateText="Profile picture" Visible=@isLogged Style="margin-right: 10px; width: 32px;" />
+                <span class="rz-navigation-item-text" style="flex:none;">@username</span>
             </Template>
             <ChildContent>
-                <RadzenMenuItem Icon="build" Visible=@isLogged Text="Manage profile" Path="profile"></RadzenMenuItem>
+                <RadzenMenuItem Icon="account_circle" Visible=@isLogged Text="Manage profile" Path="profile"></RadzenMenuItem>
                 <RadzenMenuItem Icon="lock" Visible=@isLogged Text="Change password" Path="changePassword"></RadzenMenuItem>
                 <RadzenMenuItem Icon="exit_to_app" Visible=@isLogged Text="Log Out" Click="()=> LogOut(username)"></RadzenMenuItem>
             </ChildContent>
@@ -62,7 +63,7 @@
 @code {
     bool isAdmin = false;
     bool isLogged = false;
-
+    string imagePath = "";
     bool imageLoaded = false;
 
     string username = "";
@@ -82,21 +83,27 @@
                 if (await tokenService.ValidateToken())
                 {
                     isAdmin = tokenService.ValidateTokenAdmin(token);
-                    username = token.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value ?? "";
+                    username = token.Claims.FirstOrDefault(x => x.Type == "unique_name")?.Value ?? "";
                     isLogged = true;
                     try
                     {
-                        var imageResult = await _localStorage.GetAsync<string>("profilepicture");
+                        var imageResult = await _localStorage.GetAsync<string>("playerAvatar");
                         if (imageResult.Success && !string.IsNullOrEmpty(imageResult.Value))
                         {
                             base64EncodedImageData = imageResult.Value!;
+                            imagePath = $"data:image/jpeg;base64,{base64EncodedImageData}";
+                        }
+                        else
+                        {
+                            imagePath = "images/defaultAvatar.png";
                         }
 
-                    }catch(Exception ex)
-                    {
-                        
                     }
-                    
+                    catch (Exception ex)
+                    {
+
+                    }
+
                     StateHasChanged();
                 }
 
@@ -116,7 +123,7 @@
         using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
         client.DefaultRequestHeaders.Add("Authorization", $"Bearer {tokenString}");
         await client.GetAsync($"api/Player/logout/{username}");
-        
+
         await _localStorage.DeleteAsync("jwtToken");
 
         isLogged = false;

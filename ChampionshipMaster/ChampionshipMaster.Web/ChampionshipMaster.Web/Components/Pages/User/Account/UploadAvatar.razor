@@ -1,0 +1,22 @@
+﻿@rendermode InteractiveServer
+
+<div class="col-md-6 p-3">
+    <RadzenCard>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Avatar</RadzenText>
+        <RadzenUpload  Icon="upload" @ref="upload" Accept="image/*" Auto="false" Multiple="false" Url="upload/single" Change=@(args => OnChange(args)) InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})"
+                      Progress=@(args => OnProgress(args)) class="w-100" />
+        <RadzenButton Text="Save" Click=@(args => upload.Upload()) class="d-block mt-4" />
+    </RadzenCard>
+</div>
+
+@code {
+    RadzenUpload upload;
+
+    void OnProgress(UploadProgressArgs args)
+    {
+    }
+
+    void OnChange(UploadChangeEventArgs args)
+    {
+    }
+}

@@ -1,6 +1,7 @@
 ﻿@page "/GameTypeMain"
 
-
+@inject NavigationManager NavigationManager
+@inject ITokenService tokenService
 @inject IHttpClientFactory httpClient
 @inject INotifier notifier
 @inject IConfiguration configuration
@@ -13,58 +14,62 @@
     }
 </style>
 
-<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="10px" class="mt-2 mb-4">
-    <RadzenButton Style="background-color:darkslategray"
-                  ButtonStyle="ButtonStyle.Success"
-                  Icon="add_circle_outline"
-                  Text="Add New Game Status"
-                  Click="@InsertRow"
-                  Disabled="@(GameTypeesToInsert.Count() > 0)" />
-</RadzenStack>
+@if (isAdmin)
+{
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="10px" class="mt-2 mb-4">
+        <RadzenButton Style="background-color:darkslategray"
+                      ButtonStyle="ButtonStyle.Success"
+                      Icon="add_circle_outline"
+                      Text="Add New Game Status"
+                      Click="@InsertRow"
+                      Disabled="@(GameTypeesToInsert.Count() > 0)" />
+    </RadzenStack>
 
-<RadzenDataGrid @ref="GameTypeGrid"
-                AllowAlternatingRows="false"
-                AllowFiltering="false"
-                AllowPaging="true"
-                AllowSorting="true"
-                EditMode="@DataGridEditMode.Single"
-                PageSize="5"
-                Data="@GameTypeList"
-                TItem="GameType"
-                RowUpdate="@OnUpdateRow"
-                RowCreate="@OnCreateRow"
-                Sort="@Reset"
-                Page="@Reset"
-                Filter="@Reset"
-                ColumnWidth="20200202px">
-    <Columns>
+    <RadzenDataGrid @ref="GameTypeGrid"
+                    AllowAlternatingRows="false"
+                    AllowFiltering="false"
+                    AllowPaging="true"
+                    AllowSorting="true"
+                    EditMode="@DataGridEditMode.Single"
+                    PageSize="5"
+                    Data="@GameTypeList"
+                    TItem="GameType"
+                    RowUpdate="@OnUpdateRow"
+                    RowCreate="@OnCreateRow"
+                    Sort="@Reset"
+                    Page="@Reset"
+                    Filter="@Reset"
+                    ColumnWidth="20200202px">
+        <Columns>
 
-        <RadzenDataGridColumn TItem="GameType" Property="Name" Title="Name">
-            <EditTemplate Context="GameType">
-                <RadzenTextBox @bind-Value="GameType.Name" Style="width:200px; display: block" Name="Name" />
-                <RadzenRequiredValidator Text="Name is required" Component="Name" Popup="true" />
-            </EditTemplate>
-        </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="GameType" Property="Name" Title="Name">
+                <EditTemplate Context="GameType">
+                    <RadzenTextBox @bind-Value="GameType.Name" Style="width:200px; display: block" Name="Name" />
+                    <RadzenRequiredValidator Text="Name is required" Component="Name" Popup="true" />
+                </EditTemplate>
+            </RadzenDataGridColumn>
 
-        <RadzenDataGridColumn Width="1%" TItem="GameType" Context="GameType" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Frozen="true" FrozenPosition="FrozenColumnPosition.Right">
-            <Template Context="GameType">
-                <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@(args => EditRow(GameType))" @onclick:stopPropagation="true">
-                </RadzenButton>
-                <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@(args => DeleteRow(GameType))" @onclick:stopPropagation="true">
-                </RadzenButton>
-            </Template>
-            <EditTemplate Context="GameType">
-                <RadzenButton Icon="check" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@((args) => SaveRow(GameType))">
-                </RadzenButton>
-                <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@((args) => CancelEdit(GameType))">
-                </RadzenButton>
-                <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@(args => DeleteRow(GameType))">
-                </RadzenButton>
-            </EditTemplate>
-        </RadzenDataGridColumn>
+            <RadzenDataGridColumn Width="1%" TItem="GameType" Context="GameType" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Frozen="true" FrozenPosition="FrozenColumnPosition.Right">
+                <Template Context="GameType">
+                    <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@(args => EditRow(GameType))" @onclick:stopPropagation="true">
+                    </RadzenButton>
+                    <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@(args => DeleteRow(GameType))" @onclick:stopPropagation="true">
+                    </RadzenButton>
+                </Template>
+                <EditTemplate Context="GameType">
+                    <RadzenButton Icon="check" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@((args) => SaveRow(GameType))">
+                    </RadzenButton>
+                    <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@((args) => CancelEdit(GameType))">
+                    </RadzenButton>
+                    <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@(args => DeleteRow(GameType))">
+                    </RadzenButton>
+                </EditTemplate>
+            </RadzenDataGridColumn>
 
-    </Columns>
-</RadzenDataGrid>
+        </Columns>
+    </RadzenDataGrid>
+}
+
 
 @code {
     private bool dataLoaded = false;
@@ -88,14 +93,6 @@
     {
         GameTypeesToInsert.Remove(GameType);
         GameTypeesToUpdate.Remove(GameType);
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        await base.OnInitializedAsync();
-
-        using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
-        GameTypeList = await client.GetFromJsonAsync<List<GameType>>("/api/GameTypes") ?? new List<GameType>();
     }
 
     async Task EditRow(GameType GameType)
@@ -196,6 +193,31 @@
     void OnCreateRow(GameType GameType)
     {
         GameTypeesToInsert.Remove(GameType);
+    }
+
+    bool isAdmin = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (await tokenService.ValidateToken(true))
+            {
+                isAdmin = true;
+                var token = await tokenService.GetToken();
+                using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+                client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+                GameTypeList = await client.GetFromJsonAsync<List<GameType>>("/api/GameTypes") ?? new List<GameType>();
+                StateHasChanged();
+            }
+            else
+            {
+                notifier.SendErrorNotification("Access denied!");
+                notifier.SendWarningNotification("If you believe there is an error, please contact administrator!", 10);
+                NavigationManager.NavigateTo("/");
+
+            }
+        }
     }
 
 }
