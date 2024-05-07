@@ -80,63 +80,6 @@
     </Columns>
 </RadzenDataGrid>
 
-
-@if (championships != null)
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <td>id</td>
-                <th>Name</th>
-                <th>Game Type</th>
-                <th>Date</th>
-                <th>Winner</th>
-                <th>Champ Status</th>
-                <th>Champ Type</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in championships)
-            {
-                <tr class="table-row">
-                    <td>@item.Id</td>
-                    <td>@item.Name</td>
-                    <td>@item.GameTypeName</td>
-                    <td>@item.Date</td>
-                    <td>@item.WinnerName</td>
-
-                    @switch (item.ChampionshipStatusName)
-                    {
-                        case "Finished":
-                            StatusColor = "blue";
-                            break;
-                        case "Coming":
-                            StatusColor = "red";
-                            break;
-                        case "Live":
-                            StatusColor = "green";
-                            break;
-                        case "Cancelled":
-                            StatusColor = "darkgray";
-                            break;
-                        default:
-                            break;
-                    }
-                    <td style="color:@StatusColor">@item.ChampionshipStatusName</td>
-                    <td>@item.ChampionshipTypeName</td>
-                    <td><button class="btn-primary" >Details</button></td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
-else
-{
-    <p>There are no championships...</p>
-}
-
-
-
 @code {
     RadzenDataGrid<ChampionshipDto>? championshipList;
 
