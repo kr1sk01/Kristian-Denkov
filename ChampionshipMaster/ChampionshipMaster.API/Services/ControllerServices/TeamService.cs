@@ -116,8 +116,14 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                 return BadRequest("There is already a team with that name");
             }
 
-            var result = team.Adapt<Team>();
-
+            var result = new Team {
+                Name = team.Name,
+                TeamType = _context.TeamTypes.FirstOrDefault(x => x.Name == team.TeamTypeName),
+                CreatedBy = team.CreatedBy,
+                CreatedOn = DateTime.UtcNow,
+                Active = true
+            };
+            ;
             await _context.Teams.AddAsync(result);
 
             try
