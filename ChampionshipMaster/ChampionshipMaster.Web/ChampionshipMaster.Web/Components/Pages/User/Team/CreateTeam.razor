@@ -84,7 +84,7 @@
     Variant variant = Variant.Outlined;
 
     string username = "";
-
+    string id = "";
 
 
     TeamDto model = new TeamDto();
@@ -93,7 +93,6 @@
 
     //private GameType gameType = new GameType();
     private List<TeamType> teamTypes = new List<TeamType>(); // Assuming you have a list of TeamTypes to choose from
-
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -118,11 +117,16 @@
         {
             var token = new JwtSecurityTokenHandler().ReadJwtToken(await tokenService.GetToken());
             username = token.Claims.FirstOrDefault(x => x.Type == "unique_name")?.Value ?? "";
-
+            id = token.Claims.FirstOrDefault(x => x.Type == "nameid")?.Value ?? "";
         }
         model.CreatedBy = username;
+        
         using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {await tokenService.GetToken()}");
         await client.PostAsJsonAsync("/api/Teams", model);
+
+       
+
         //Navigate to My teams page
         //TeamDto team = new TeamDto { };
     }

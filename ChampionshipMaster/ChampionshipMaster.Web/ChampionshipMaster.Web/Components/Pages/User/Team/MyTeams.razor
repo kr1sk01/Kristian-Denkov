@@ -3,6 +3,7 @@
 @inject IHttpClientFactory httpClient
 @inject IConfiguration configuration
 @inject ITokenService tokenService
+@inject IWebHostEnvironment Environment
 
 @inject NavigationManager nManager
 @inject ProtectedLocalStorage _localStorage
@@ -10,8 +11,24 @@
 
 
 @rendermode InteractiveServer
-<h3>MyTeams</h3>
+
+<h3>@username Teams</h3>
 
 @code {
-    
+    string username = "";
+
+    private List<TeamDto> teams;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var token = new JwtSecurityTokenHandler().ReadJwtToken(await tokenService.GetToken());
+            username = token.Claims.FirstOrDefault(x => x.Type == "unique_name")?.Value ?? "";
+
+            using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+            var test = await client.GetFromJsonAsync<List<TeamDto>>("/api/Teams");
+            ;
+        }
+    }
 }

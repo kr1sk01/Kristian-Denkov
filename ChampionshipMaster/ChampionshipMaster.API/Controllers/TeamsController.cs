@@ -1,5 +1,6 @@
 ﻿using ChampionshipMaster.API.Interfaces;
 using ChampionshipMaster.DATA.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ChampionshipMaster.API.Controllers
 {
@@ -19,6 +20,13 @@ namespace ChampionshipMaster.API.Controllers
         public async Task<ActionResult<IEnumerable<TeamDto>>> GetTeams()
         {
             var result = await _teamService.GetAllTeams();
+            return Ok(result);
+        }
+
+        [HttpGet("{username}")]
+        public async Task<ActionResult<IEnumerable<TeamDto>>> GetTeamIparticipate(string username)
+        {
+            var result = await _teamService.GetTeamIparticipate(username);
             return Ok(result);
         }
 
@@ -48,10 +56,12 @@ namespace ChampionshipMaster.API.Controllers
 
         // POST: api/Teams
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<TeamDto>> PostTeam(TeamDto team)
         {
-            var result = await _teamService.PostTeam(team);
+            var authHeader = HttpContext.Request.Headers.Authorization;
+            var result = await _teamService.PostTeam(team, authHeader);
             return result;
         }
 

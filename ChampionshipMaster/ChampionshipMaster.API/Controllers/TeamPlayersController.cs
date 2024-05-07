@@ -1,5 +1,6 @@
 ﻿using ChampionshipMaster.API.Interfaces;
 using ChampionshipMaster.DATA.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ChampionshipMaster.API.Controllers
 {
@@ -41,12 +42,13 @@ namespace ChampionshipMaster.API.Controllers
 
         // POST: api/TeamPlayers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<TeamPlayers>> PostTeamPlayers(TeamPlayers teamPlayers)
-        {
-            var result = await _teamPLayersService.PostTeamPlayers(teamPlayers);
-            return result;
-        }
+        //[Authorize]
+        //[HttpPost]
+        //public async Task<ActionResult<TeamPlayers>> PostTeamPlayers(TeamDto team)
+        //{
+        //    var result = await _teamPLayersService.PostTeamPlayers(team);
+        //    return result;
+        //}
 
         // DELETE: api/TeamPlayers/5
         [HttpDelete("{id}")]

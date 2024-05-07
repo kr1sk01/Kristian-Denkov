@@ -1,14 +1,19 @@
 ﻿using ChampionshipMaster.API.Interfaces;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Primitives;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace ChampionshipMaster.API.Services.ControllerServices
 {
     public class TeamService : ControllerBase, ITeamService
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<Player> _userManager;
 
-        public TeamService(ApplicationDbContext context)
+        public TeamService(ApplicationDbContext context, UserManager<Player> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         public async Task<IActionResult> DeleteTeam(int id)
@@ -90,6 +95,16 @@ namespace ChampionshipMaster.API.Services.ControllerServices
 
             var dto = teams.Adapt<List<TeamDto>>();
             return dto;
+        }        
+        public async Task<List<TeamDto>> GetTeamIparticipate(string username)
+        {
+            var teams = await _context.Teams
+                .Include(x => x.TeamType)
+                //.Where(x=>x.CreatedBy.ToUpper() == username.ToUpper())
+                .ToListAsync();
+
+            var dto = teams.Adapt<List<TeamDto>>();
+            return dto;
         }
 
         public async Task<ActionResult<TeamDto?>> GetTeam(int id)
@@ -109,13 +124,21 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             return Ok(dto);
         }
 
-        public async Task<ActionResult<TeamDto>> PostTeam(TeamDto team)
+        public async Task<ActionResult<TeamDto>> PostTeam(TeamDto team, StringValues authHeader)
         {
+
+            
+
             if (await TeamNameExists(team.Name))
             {
                 return BadRequest("There is already a team with that name");
             }
+            var tokenString = authHeader.ToString().Split(' ')[1];
+            var token = new JwtSecurityToken(tokenString);
 
+            var id = token.Claims.First(c => c.Type == "nameid").Value;
+            var username = token.Claims.First(c => c.Type == "unique_name").Value;
+            
             var result = new Team {
                 Name = team.Name,
                 TeamType = _context.TeamTypes.FirstOrDefault(x => x.Name == team.TeamTypeName),
@@ -124,7 +147,16 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                 Active = true
             };
             ;
+            TeamPlayers tp = new TeamPlayers
+            {
+                Team = result,
+                Player = await _userManager.FindByIdAsync(id),
+                CreatedBy = username,
+                CreatedOn = DateTime.UtcNow,
+
+            };
             await _context.Teams.AddAsync(result);
+            await _context.TeamPlayers.AddAsync(tp);
 
             try
             {
