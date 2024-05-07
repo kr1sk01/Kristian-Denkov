@@ -34,17 +34,42 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                 return BadRequest(ModelState);
             }
 
-            var user = new Player { 
+            var player = new Player { 
                 UserName = registerRequest.UserName, 
                 Email = registerRequest.Email,
                 CreatedBy = registerRequest.CreatedBy,
                 CreatedOn = registerRequest.CreatedOn,
             };
-            var result = await _userManager.CreateAsync(user, registerRequest.Password!);
-            await _userManager.AddToRoleAsync(user, "user");
+            var result = await _userManager.CreateAsync(player, registerRequest.Password!);
+            await _userManager.AddToRoleAsync(player, "user");
 
             if (result.Succeeded)
             {
+                var user = await _userManager.FindByEmailAsync(registerRequest.Email!);
+                var team = new Team()
+                {
+                    Name = user.UserName,
+                    Active = true,
+                    CreatedBy = user.UserName,
+                    CreatedOn = DateTime.UtcNow,
+                    TeamType = await _context.TeamTypes.FirstOrDefaultAsync(x => x.Name!.ToLower() == "solo"),
+                    Logo = user.Avatar
+                };
+
+                await _context.Teams.AddAsync(team);
+                await _context.SaveChangesAsync();
+
+                var teamPlayers = new TeamPlayers()
+                {
+                    Player = user,
+                    Team = team,
+                    CreatedBy = user.UserName,
+                    CreatedOn = DateTime.UtcNow
+                };
+
+                user.TeamPlayers.Add(teamPlayers);
+                await _context.SaveChangesAsync();
+
                 var emailToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                 var userId = user.Id;
                 var confirmationLink = $"https://localhost:50397/api/Player/confirmEmail?userId=" +
