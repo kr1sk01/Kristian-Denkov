@@ -91,3 +91,8 @@ h1:focus {
     margin-left:auto;
     padding:0 0 0 10px;
 }
+.mainProfile{
+    background-color:#38474E;
+    border-radius:2.5%;
+    padding:1%;
+}
