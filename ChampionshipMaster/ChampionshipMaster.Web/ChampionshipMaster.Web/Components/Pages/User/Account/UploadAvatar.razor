@@ -12,10 +12,10 @@
     <RadzenCard>
         <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H1">Avatar</RadzenText>
         <RadzenImage Path="@imagePath" AlternateText="Profile picture" Style="margin: 16px; max-width: 256px;"></RadzenImage>
-        <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem">
-            <RadzenImage Path="@newImagePath" Visible="@(!string.IsNullOrEmpty(newImagePath))" AlternateText="New Avatar" Style="max-width: 64px; max-height: 64px;"></RadzenImage>
+        <RadzenStack Orientation="Orientation.Vertical" Gap="1rem">
             <RadzenUpload Icon="upload" @ref="upload" Accept=".png,.jpeg,.jpg" Auto="false" Multiple="false" Change=@(args => OnChange(args)) InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})"
                           Progress=@(args => OnProgress(args)) class="w-100" />
+            <RadzenImage Path="@newImagePath" Visible="@(!string.IsNullOrEmpty(newImagePath))" AlternateText="New Avatar" Style="max-width: 64px; max-height: 64px; align-self: center"></RadzenImage>
         </RadzenStack>
         <RadzenButton Text="Save" Click=@UploadImage class="d-block mt-4" Disabled="@disableSaveButton" />
     </RadzenCard>
