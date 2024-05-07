@@ -12,12 +12,16 @@
 @rendermode InteractiveServer
 
 <PageTitle>Profile</PageTitle>
+<center>
+    <h1>@(username)'s profile</h1>
+    <h2>Email: @email</h2>
 
-<h1>@username 's profile</h1>
+    <UploadAvatar></UploadAvatar>
+</center>
 
-<UploadAvatar></UploadAvatar>
 
 @code {
+    private string email = "";
     private bool loggedIn = false;
     private const string UNIQUE_NAME = "unique_name";
     private string username = "";
@@ -93,12 +97,11 @@
                 loggedIn = true;
                 var token = new JwtSecurityTokenHandler().ReadJwtToken(await tokenService.GetToken());
                 username = token.Claims.FirstOrDefault(x => x.Type == "unique_name")?.Value ?? "";
+                email = token.Claims.FirstOrDefault(x => x.Type == "email")?.Value ?? "";
 
                 StateHasChanged();
             }
             else { NavigationManager.NavigateTo("/login"); }
         }
-
-
     }
 }

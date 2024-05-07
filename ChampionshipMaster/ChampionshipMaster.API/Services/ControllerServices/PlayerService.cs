@@ -148,12 +148,12 @@ namespace ChampionshipMaster.API.Services.ControllerServices
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest("Invalid form data!");
             }
 
             if (string.IsNullOrEmpty(authHeader) || authHeader.ToString() == "Bearer ")
             {
-                return BadRequest("Missing authorization");
+                return BadRequest("Missing authorization!");
             }
 
             try
@@ -165,18 +165,23 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                 
                 var user = await _userManager.FindByNameAsync(userName) ?? throw new Exception($"Unable to find user - {userName}");
 
-                var result = await _userManager.ChangePasswordAsync(user, changePassword.Password!, changePassword.NewPassword!);
-
-                if (result.Succeeded)
+                if (await _userManager.CheckPasswordAsync(user, changePassword.Password!))
                 {
-                    user.ModifiedOn = DateTime.UtcNow;
-                    user.ModifiedBy = user.UserName;
+                    var result = await _userManager.ChangePasswordAsync(user, changePassword.Password!, changePassword.NewPassword!);
 
-                    await _context.SaveChangesAsync();
-                    return Ok("Password changed successfully");
+                    if (result.Succeeded)
+                    {
+                        user.ModifiedOn = DateTime.UtcNow;
+                        user.ModifiedBy = user.UserName;
+
+                        await _context.SaveChangesAsync();
+                        return Ok("Password changed successfully!");
+                    }
+
+                    return BadRequest("Failed to change password!");
                 }
 
-                return BadRequest("Something went wrong");
+                return BadRequest("Current password is invalid!");
             }
             catch (Exception ex)
             {

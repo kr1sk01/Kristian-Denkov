@@ -10,7 +10,7 @@
 @rendermode InteractiveServer
 
 <center>
-    <h3>Log In</h3>
+    <h3>Create Team</h3>
     <div style="justify-content:center;text-align:left;width:45%;">
         <RadzenTemplateForm TItem="TeamDto" Data=@model Submit=@OnSubmit InvalidSubmit=@OnInvalidSubmit>
             <RadzenStack Gap="1rem" Class="rz-p-sm-12">
@@ -26,7 +26,7 @@
 
                 <RadzenDropDown Placeholder="Select team type" Name="Type" @bind-Value=@model.TeamTypeName Data=@teamTypes.Select(x => x.Name).ToList() Style="width: 100%;" />
 
-                <RadzenButton ButtonType="ButtonType.Submit" Text="Log In"></RadzenButton>
+                <RadzenButton ButtonType="ButtonType.Submit" Text="Create Team"></RadzenButton>
             </RadzenStack>
 
         </RadzenTemplateForm>
