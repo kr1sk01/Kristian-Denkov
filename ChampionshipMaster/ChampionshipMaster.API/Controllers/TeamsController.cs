@@ -49,7 +49,7 @@ namespace ChampionshipMaster.API.Controllers
         // POST: api/Teams
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Team>> PostTeam(Team team)
+        public async Task<ActionResult<TeamDto>> PostTeam(TeamDto team)
         {
             var result = await _teamService.PostTeam(team);
             return result;

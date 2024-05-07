@@ -113,7 +113,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                 return BadRequest("There is already a game type with that name");
             }
 
-            _context.GameTypes.Add(gameType);
+            await _context.GameTypes.AddAsync(gameType);
             try
             {
                 await _context.SaveChangesAsync();

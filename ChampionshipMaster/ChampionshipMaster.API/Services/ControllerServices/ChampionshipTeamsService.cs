@@ -80,7 +80,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
 
         public async Task<ActionResult<ChampionshipTeams>> PostChampionshipTeams(ChampionshipTeams championshipTeams)
         {
-            _context.ChampionshipTeams.Add(championshipTeams);
+            await _context.ChampionshipTeams.AddAsync(championshipTeams);
 
             try
             {

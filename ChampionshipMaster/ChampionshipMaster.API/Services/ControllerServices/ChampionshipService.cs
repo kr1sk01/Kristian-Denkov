@@ -74,7 +74,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                 return BadRequest("There is already a championship with that name");
             }
 
-            _context.Championships.Add(championship);
+            await _context.Championships.AddAsync(championship);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(PostChampionship), new

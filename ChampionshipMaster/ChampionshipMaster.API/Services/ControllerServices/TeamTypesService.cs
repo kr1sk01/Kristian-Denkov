@@ -84,7 +84,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                 return BadRequest("There is already a team type with that name");
             }
 
-            _context.TeamTypes.Add(teamType);
+            await _context.TeamTypes.AddAsync(teamType);
             try
             {
                 await _context.SaveChangesAsync();

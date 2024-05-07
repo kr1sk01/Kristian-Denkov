@@ -11,7 +11,11 @@
 
         public string? TeamTypeName { get; set; }
 
-        public bool? Active { get; set; }
+        public bool? Active { get; set; } = true;
+
+        public string? CreatedBy { get; set; }
+
+        public DateTime? CreatedOn { get; set; }
 
         public virtual ICollection<PlayerDto> Players { get; set; } = new HashSet<PlayerDto>();
 

@@ -9,14 +9,14 @@
 
 <div style="top:0px;left:0px;margin-bottom: 0px;">
     <RadzenMenu Click="OnParentClicked">
-        <RadzenMenuItem Text="Home" Icon="home" Path="/" Visible=@isLogged>
+        <RadzenMenuItem Text="Home" Icon="home" Path="home" Visible=@isLogged>
         </RadzenMenuItem>
         <RadzenMenuItem Text="Championships" Icon="assignment" Path="championshipsmain" Visible=@isLogged>
         </RadzenMenuItem>
         <RadzenMenuItem Text="Teams" Icon="assignment_ind" Visible=@isLogged>
             <RadzenMenuItem Text="My Teams" Path="" Icon="assessment"></RadzenMenuItem>
             <RadzenMenuItem Text="Team Participations" Path="" Icon="face"></RadzenMenuItem>
-            <RadzenMenuItem Text="Create Team" Path="" Icon="note_add"></RadzenMenuItem>
+            <RadzenMenuItem Text="Create Team" Path="createteam" Icon="note_add"></RadzenMenuItem>
         </RadzenMenuItem>
         <RadzenMenuItem Text="Data" Icon="save" Visible=false>
             <RadzenMenuItem Text="DataGrid" Path="datagrid" Icon="grid_on"></RadzenMenuItem>

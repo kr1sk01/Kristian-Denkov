@@ -75,7 +75,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
 
         public async Task<ActionResult<TeamPlayers>> PostTeamPlayers(TeamPlayers teamPlayers)
         {
-            _context.TeamPlayers.Add(teamPlayers);
+            await _context.TeamPlayers.AddAsync(teamPlayers);
             try
             {
                 await _context.SaveChangesAsync();

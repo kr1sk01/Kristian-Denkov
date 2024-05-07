@@ -96,7 +96,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
 
         public async Task<ActionResult<Game>> PostGame(Game game)
         {
-            _context.Games.Add(game);
+            await _context.Games.AddAsync(game);
             try
             {
                 await _context.SaveChangesAsync();

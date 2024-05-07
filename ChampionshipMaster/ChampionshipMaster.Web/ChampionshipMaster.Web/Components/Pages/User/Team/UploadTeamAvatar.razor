@@ -11,7 +11,6 @@
 <div class="col-md-6 p-3">
     <RadzenCard>
         <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H1">Avatar</RadzenText>
-        <RadzenImage Path="@imagePath" AlternateText="Profile picture" Style="margin: 16px; max-width: 256px;"></RadzenImage>
         <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem">
             <RadzenImage Path="@newImagePath" Visible="@(!string.IsNullOrEmpty(newImagePath))" AlternateText="New Avatar" Style="max-width: 64px; max-height: 64px;"></RadzenImage>
             <RadzenUpload Icon="upload" @ref="upload" Accept=".png,.jpeg,.jpg" Auto="false" Multiple="false" Change=@(args => OnChange(args)) InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})"
@@ -47,7 +46,7 @@
                 var token = new JwtSecurityTokenHandler().ReadJwtToken(tokenString);
                 try
                 {
-                    var imageResult = await _localStorage.GetAsync<string>("playerAvatar");
+                    var imageResult = await _localStorage.GetAsync<string>("teamAvatar");
                     if (imageResult.Success && !string.IsNullOrEmpty(imageResult.Value))
                     {
                         base64EncodedImageData = imageResult.Value!;
@@ -70,7 +69,7 @@
     }
 
     async Task OnProgress(UploadProgressArgs args)
-    { 
+    {
     }
 
     async Task OnChange(UploadChangeEventArgs args)
@@ -95,43 +94,28 @@
 
         uploadedImage = args.Files.First();
         var newImage = await imageService.ConvertToBase64String(uploadedImage);
-        newImagePath = $"data:{uploadedImage.ContentType};base64,{ newImage }";
+        newImagePath = $"data:{uploadedImage.ContentType};base64,{newImage}";
         disableSaveButton = false;
         StateHasChanged();
     }
 
     async Task UploadImage()
     {
-        var token = await tokenService.GetToken();
-        using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
-        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
         var imageBase64 = await imageService.ConvertToBase64String(uploadedImage!);
-        var content = new ProfileDto { Avatar = Convert.FromBase64String(imageBase64) };
-        var response = await client.PostAsJsonAsync($"api/Player/changeAvatar/", content);
 
-        if (response.IsSuccessStatusCode)
+        try
         {
-            try
-            {
-                await _localStorage.SetAsync("playerAvatar", imageBase64);
-                var body = await response.Content.ReadAsStringAsync();
-                notifier.SendSuccessNotification(body);
-                imagePath = $"data:image/{uploadedImage!.ContentType};base64,{ imageBase64 }";
-                newImagePath = string.Empty;
-                disableSaveButton = true;
-                await upload.ClearFiles();
-                StateHasChanged();
-                NavigationManager.NavigateTo("/profile", forceLoad: true);
-            }
-            catch
-            {
-                notifier.SendErrorNotification("Something went wrong");
-            }
+            await _localStorage.SetAsync("teamAvatar", imageBase64);
+            imagePath = $"data:image/{uploadedImage!.ContentType};base64,{imageBase64}";
+            newImagePath = string.Empty;
+            disableSaveButton = true;
+            await upload.ClearFiles();
+            StateHasChanged();
         }
-        else
+        catch
         {
-            var body = await response.Content.ReadAsStringAsync();
-            notifier.SendErrorNotification(body);
+            notifier.SendErrorNotification("Something went wrong!");
         }
+
     }
 }

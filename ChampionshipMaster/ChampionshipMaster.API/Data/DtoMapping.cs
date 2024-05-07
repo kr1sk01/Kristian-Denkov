@@ -4,6 +4,7 @@ namespace ChampionshipMaster.API.Data
 {
     public static class DtoMapping
     {
+        private static readonly ApplicationDbContext _context = new ApplicationDbContext(new DbContextOptions<ApplicationDbContext>());
         public static void ConfigureMappings(this IServiceCollection services)
         {
             TypeAdapterConfig<Championship, ChampionshipDto>.NewConfig()
@@ -14,6 +15,9 @@ namespace ChampionshipMaster.API.Data
 
             TypeAdapterConfig<Player, PlayerDto>.NewConfig()
                 .Map(dest => dest.Name, src => src.UserName);
+
+            TypeAdapterConfig<TeamDto, Team>.NewConfig()
+                .Map(dest => dest.TeamType, src => _context.TeamTypes.FirstOrDefault(x => x.Name == src.TeamTypeName));
 
             TypeAdapterConfig.GlobalSettings.Scan(Assembly.GetExecutingAssembly());
         }

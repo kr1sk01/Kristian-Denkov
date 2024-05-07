@@ -109,14 +109,16 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             return Ok(dto);
         }
 
-        public async Task<ActionResult<Team>> PostTeam(Team team)
+        public async Task<ActionResult<TeamDto>> PostTeam(TeamDto team)
         {
             if (await TeamNameExists(team.Name))
             {
                 return BadRequest("There is already a team with that name");
             }
 
-            _context.Teams.Add(team);
+            var result = team.Adapt<Team>();
+
+            await _context.Teams.AddAsync(result);
 
             try
             {
@@ -124,7 +126,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             }
             catch (DbUpdateException)
             {
-                if (await TeamExists(team.Id))
+                if (await TeamExists(result.Id))
                 {
                     return Conflict();
                 }
@@ -134,7 +136,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                 }
             }
 
-            return CreatedAtAction(nameof(PostTeam), new { id = team.Id }, team);
+            return CreatedAtAction(nameof(PostTeam), new { id = result.Id }, result);
         }
 
         public async Task<bool> TeamExists(int id)

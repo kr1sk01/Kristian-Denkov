@@ -1,7 +1,47 @@
-﻿@* @page "/addTeam"
-@using System.ComponentModel.DataAnnotations
+﻿@page "/createteam"
+@using ChampionshipMaster.Web.Components.Pages.User.Account
 
-<EditForm Model="@gameType" OnValidSubmit="HandleValidSubmit">
+@inject NavigationManager nManager
+@inject Radzen.DialogService dialogService
+
+@inject IHttpClientFactory httpClient
+@inject IConfiguration configuration
+
+@rendermode InteractiveServer
+
+<center>
+    <h3>Log In</h3>
+    <div style="justify-content:center;text-align:left;width:45%;">
+        <RadzenTemplateForm TItem="TeamDto" Data=@model Submit=@OnSubmit InvalidSubmit=@OnInvalidSubmit>
+            <RadzenStack Gap="1rem" Class="rz-p-sm-12">
+                <RadzenFormField Text="Name" Variant="@variant">
+                    <ChildContent>
+                        <RadzenTextBox Name="Name" @bind-Value=@model.Name />
+                    </ChildContent>
+                    <Helper>
+                        <RadzenRequiredValidator Component="Name" Text="Name is required." />
+                        <RadzenLengthValidator Component="Name" Min="3" Max="32" Text="Name can be between 3 and 32 characters" />
+                    </Helper>
+                </RadzenFormField>
+
+                <RadzenDropDown Placeholder="Select team type" Name="Type" @bind-Value=@model.TeamTypeName Data=@teamTypes.Select(x => x.Name).ToList() Style="width: 100%;" />
+
+                <RadzenButton ButtonType="ButtonType.Submit" Text="Log In"></RadzenButton>
+            </RadzenStack>
+
+        </RadzenTemplateForm>
+
+    </div>
+</center>
+
+
+
+
+<div class="rz-p-sm-12 rz-text-align-center">
+</div>
+
+
+@* <EditForm Model="" OnValidSubmit="HandleValidSubmit">
     <DataAnnotationsValidator />
 
     <div class="row justify-content-center">
@@ -9,13 +49,13 @@
         <div class="form-group">
             <label for="name">Name:</label>
             <InputText id="name" class="form-control" @bind-Value="gameType.Name" />
-            <ValidationMessage For="@(() => gameType.Name)" />
+
         </div>
 
         <div class="form-group">
             <label for="maxPoints">Max Points:</label>
             <InputNumber id="maxPoints" class="form-control" @bind-Value="gameType.MaxPoints" />
-            <ValidationMessage For="@(() => gameType.MaxPoints)" />
+
         </div>
 
         <div class="form-group">
@@ -29,23 +69,47 @@
             </select>
             <ValidationMessage For="@(() => gameType.TeamTypeId)" />
         </div>
-
+        <br />
         <button type="submit" class="btn btn-primary">Submit</button>
     </div>
-</EditForm>
+</EditForm> *@
 
 @code {
-    private GameType gameType = new GameType();
-    private List<TeamType> teamTypes = new List<TeamType> // Assuming you have a list of TeamTypes to choose from
-    {
-        //Get all teamtypes to display when creating team
-    };
+    Variant variant = Variant.Outlined;
 
-    private async Task HandleValidSubmit()
+
+
+
+    TeamDto model = new TeamDto();
+
+
+
+    //private GameType gameType = new GameType();
+    private List<TeamType> teamTypes = new List<TeamType>(); // Assuming you have a list of TeamTypes to choose from
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        // Submit form data to backend here (e.g., via WebAPI)
-        // You can use gameType object to access the entered data
-        // Example: await Http.PostAsJsonAsync("/api/GameType", gameType);
+        if (firstRender)
+        {
+            using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+            var test = await client.GetFromJsonAsync<List<TeamType>>("api/TeamTypes");
+            teamTypes = test;
+            StateHasChanged();
+        }
+    }
+
+
+
+    private async Task OnInvalidSubmit(FormInvalidSubmitEventArgs args)
+    {
+        //TeamDto team = new TeamDto { };
+    }
+    private async Task OnSubmit(TeamDto model)
+    {
+        using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+        var test = await client.PostAsJsonAsync("/api/Team", model);
+        //Navigate to My teams page
+        //TeamDto team = new TeamDto { };
     }
 }
- *@

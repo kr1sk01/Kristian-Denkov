@@ -96,7 +96,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                 return BadRequest("There is already a game status with that name");
             }
 
-            _context.GameStatuses.Add(gameStatus);
+            await _context.GameStatuses.AddAsync(gameStatus);
             try
             {
                 await _context.SaveChangesAsync();
