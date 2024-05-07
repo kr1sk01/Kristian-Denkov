@@ -247,5 +247,48 @@ namespace ChampionshipMaster.API.Services.ControllerServices
 
             return Ok("Avatar updated successfully");
         }
+
+        public async Task<IActionResult> ChangeUsername(string newUsername, StringValues authHeader)
+        {
+            try
+            {
+                if (await _userManager.FindByNameAsync(newUsername) != null)
+                {
+                    return BadRequest("The username is already taken!");
+                }
+
+                var tokenString = authHeader.ToString().Split(' ')[1];
+                var token = new JwtSecurityToken(tokenString);
+
+                var userName = token.Claims.First(c => c.Type == "unique_name").Value;
+
+                var user = await _userManager.FindByNameAsync(userName);
+
+                if (user == null)
+                {
+                    return BadRequest("Wrong credentials. Please try to log in again");
+                }
+
+                user.UserName = newUsername;
+                await _context.SaveChangesAsync();
+
+                var newToken = await _jwtService.GenerateToken(user);
+
+                user!.Online = true;
+
+                await _context.SaveChangesAsync();
+
+                string imageString;
+                if (user.Avatar.IsNullOrEmpty()) { imageString = ""; }
+                else { imageString = Convert.ToBase64String(user.Avatar!); }
+
+                return Ok(new { message = "Login successful!", jwtToken = newToken, image = imageString });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return BadRequest("Something went wrong!");
+            }
+        }
     }
 }

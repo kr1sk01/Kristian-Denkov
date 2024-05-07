@@ -61,5 +61,15 @@ namespace ChampionshipMaster.API.Controllers
             var result = await _playerService.ChangeAvatar(request, authHeader);
             return result;
         }
+
+        [Authorize]
+        [HttpPost("changeUsername")]
+        public async Task<IActionResult> ChangeUsername([FromBody] Dictionary<string, string> content)
+        {
+            var authHeader = HttpContext.Request.Headers.Authorization;
+            var newUsername = content["newUsername"];
+            var result = await _playerService.ChangeUsername(newUsername, authHeader);
+            return result;
+        }
     }
 }
