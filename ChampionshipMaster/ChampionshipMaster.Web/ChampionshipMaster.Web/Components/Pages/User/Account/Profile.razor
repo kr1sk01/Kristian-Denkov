@@ -12,13 +12,15 @@
 @rendermode InteractiveServer
 
 <PageTitle>Profile</PageTitle>
-<center>
-    <h1>@(username)'s profile</h1>
-    <h2>Email: @email</h2>
 
-    <UploadAvatar></UploadAvatar>
-</center>
-
+<div class="mainProfile">
+    <center>
+        <h1>@(username)'s profile</h1>
+        <h2>Email: @email</h2>
+        <ChangeUsername></ChangeUsername>
+        <UploadAvatar></UploadAvatar>
+    </center>
+</div>
 
 @code {
     private string email = "";
@@ -36,7 +38,7 @@
     private int maxAllowedFiles = 3;
     private bool isLoading;
 
-    public ProfileDto profileDto=new ProfileDto();
+    public ProfileDto profileDto = new ProfileDto();
 
     private async Task LoadFiles(InputFileChangeEventArgs e)
     {
@@ -49,7 +51,7 @@
             profileDto.Avatar = new byte[test.Length];
             Array.Copy(test, profileDto.Avatar, test.Length);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             //Throw ex
         }
@@ -59,7 +61,7 @@
             var token = new JwtSecurityTokenHandler().ReadJwtToken(tokenString);
 
             if (await tokenService.ValidateToken())
-            {              
+            {
                 profileDto.UserName = token.Claims.FirstOrDefault(x => x.Type == UNIQUE_NAME)?.Value ?? "";
             }
 
@@ -90,7 +92,7 @@
     }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if(firstRender)
+        if (firstRender)
         {
             if (await tokenService.ValidateToken())
             {
