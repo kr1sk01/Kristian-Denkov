@@ -22,7 +22,7 @@
 </div>
 
 @code {
-    const long FileSizeLimit = 256 * 1024;
+    const long FileSizeLimit = 40 * 1024;
     bool disableSaveButton = true;
     string imagePath = string.Empty;
     string newImagePath = string.Empty;
@@ -120,6 +120,7 @@
                 disableSaveButton = true;
                 await upload.ClearFiles();
                 StateHasChanged();
+                NavigationManager.NavigateTo("/profile", forceLoad: true);
             }
             catch
             {

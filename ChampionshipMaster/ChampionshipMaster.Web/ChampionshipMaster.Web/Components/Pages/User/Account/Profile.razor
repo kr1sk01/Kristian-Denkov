@@ -15,48 +15,6 @@
 
 <h1>@username 's profile</h1>
 
-<p>
-    <label>
-        Max file size:
-        <input type="number" @bind="maxFileSize" />
-    </label>
-</p>
-
-<p>
-    <label>
-        Max allowed files:
-        <input type="number" @bind="maxAllowedFiles" />
-    </label>
-</p>
-
-<p>
-    <label>
-        Upload up to @maxAllowedFiles of up to @maxFileSize bytes:
-        <InputFile OnChange="LoadFiles" />
-    </label>
-</p>
-
-@if (isLoading)
-{
-    <p>Uploading...</p>
-}
-else
-{
-    <ul>
-        @foreach (var file in loadedFiles)
-        {
-            <li>
-                <ul>
-                    <li>Name: @file.Name</li>
-                    <li>Last modified: @file.LastModified.ToString()</li>
-                    <li>Size (bytes): @file.Size</li>
-                    <li>Content type: @file.ContentType</li>
-                </ul>
-            </li>
-        }
-    </ul>
-}
-
 <UploadAvatar></UploadAvatar>
 
 @code {
