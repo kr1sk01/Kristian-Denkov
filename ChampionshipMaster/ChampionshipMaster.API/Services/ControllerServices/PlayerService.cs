@@ -1,5 +1,6 @@
 ﻿using ChampionshipMaster.API.Interfaces;
 using ChampionshipMaster.DATA.Models;
+using ChampionshipMaster.SHARED.DTO;
 using ChampionshipMaster.SHARED.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
@@ -135,7 +136,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                 var tokenString = authHeader.ToString().Split(' ')[1];
                 var token = new JwtSecurityToken(tokenString);
 
-                var userName = token.Claims.First(c => c.Type == ClaimTypes.Name).Value;
+                var userName = token.Claims.First(c => c.Type == "unique_name").Value;
                 
                 var user = await _userManager.FindByNameAsync(userName) ?? throw new Exception($"Unable to find user - {userName}");
 
@@ -185,26 +186,36 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             return BadRequest(result.Errors);
         }
 
-        public async Task<IActionResult> ChangePicture(ProfileDto profileDto)
+        public async Task<IActionResult> ChangeAvatar(ProfileDto request, StringValues authHeader)
         {
-            if(profileDto == null)
+            if(request.Avatar == null || request.Avatar.Length == 0)
             {
-                return BadRequest();
-            }
-            var user = await _userManager.FindByNameAsync(profileDto.UserName);
-            if (user == null)
-            {
-                return NotFound();
+                return BadRequest("Image not received");
             }
 
-            user.Avatar = profileDto.Avatar;
-            user.ModifiedBy = profileDto.UserName;
-            user.ModifiedOn = DateTime.UtcNow;
-            _context.Entry(user).State = EntityState.Modified;
+            try
+            {
+                var tokenString = authHeader.ToString().Split(' ')[1];
+                var token = new JwtSecurityToken(tokenString);
 
-            await _context.SaveChangesAsync();
+                var userName = token.Claims.First(c => c.Type == "unique_name").Value;
 
-            return Ok(new { success = true });
+                var user = await _userManager.FindByNameAsync(userName) ?? throw new Exception($"Unable to find user - {userName}");
+
+                user.Avatar = request.Avatar;
+                user.ModifiedBy = userName;
+                user.ModifiedOn = DateTime.UtcNow;
+                _context.Entry(user).State = EntityState.Modified;
+
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return BadRequest("Something went wrong");
+            }
+
+            return Ok("Avatar updated successfully");
         }
     }
 }

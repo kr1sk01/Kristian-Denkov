@@ -52,10 +52,13 @@ namespace ChampionshipMaster.API.Controllers
             var result = await _playerService.ConfirmEmail(userId, token);
             return result;
         }
-        [HttpPost("ChangePicture")]
-        public async Task<IActionResult> ChangePicture(ProfileDto profileDto)
+
+        [Authorize]
+        [HttpPost("changeAvatar")]
+        public async Task<IActionResult> ChangeAvatar(ProfileDto request)
         {
-            var result = await _playerService.ChangePicture(profileDto);
+            var authHeader = HttpContext.Request.Headers.Authorization;
+            var result = await _playerService.ChangeAvatar(request, authHeader);
             return result;
         }
     }
