@@ -35,7 +35,10 @@ namespace ChampionshipMaster.API.Services.ControllerServices
 
             return NoContent();
         }
-
+        public async Task<ActionResult<TeamDto>> AddTeamMember(TeamDto team, StringValues authHeader)
+        {
+            return NoContent();
+        }
         public async Task<IActionResult> EditTeam(int id, Team team)
         {
             if (id != team.Id)
@@ -125,10 +128,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
         }
 
         public async Task<ActionResult<TeamDto>> PostTeam(TeamDto team, StringValues authHeader)
-        {
-
-            
-
+        {           
             if (await TeamNameExists(team.Name))
             {
                 return BadRequest("There is already a team with that name");
@@ -174,7 +174,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                 }
             }
 
-            return CreatedAtAction(nameof(PostTeam), new { id = result.Id }, result);
+            return CreatedAtAction(nameof(PostTeam), new { id = result.Id });
         }
 
         public async Task<bool> TeamExists(int id)

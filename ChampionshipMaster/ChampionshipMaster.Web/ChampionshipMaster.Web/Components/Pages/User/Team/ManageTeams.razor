@@ -16,8 +16,77 @@
 @rendermode InteractiveServer
 
 
-<h3>ManageTeams</h3>
+<h3>Manage Teams</h3>
 
+<RadzenDataGrid @ref="teamsList"
+                AllowFiltering="true"
+                FilterPopupRenderMode="PopupRenderMode.OnDemand"
+                AllowPaging="true"
+                PageSize="8"
+                AllowSorting="true"
+                Data="@teams"
+                TItem="TeamDto">
+    <Columns>
+        @* <RadzenDataGridColumn Title="Photo" Frozen="true" Sortable="false" Filterable="false" Width="80px" TextAlign="TextAlign.Center">
+            <Template Context="data">
+                <RadzenImage Path="@teams." class="rz-gravatar" AlternateText="@(data.FirstName + " " + data.LastName)" />
+            </Template>
+        </RadzenDataGridColumn> *@
+        <RadzenDataGridColumn TItem="TeamDto" Property="Name" Title="Name">
+            <Template Context="teams">
+                @teams.Name
+            </Template>
+        </RadzenDataGridColumn>       
+        <RadzenDataGridColumn TItem="TeamDto" Property="CreatedOn" Title="Created On">
+            <Template Context="teams">
+                @teams.CreatedOn
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="TeamDto" Property="CreatedBy" Title="Created By">
+            <Template Context="teams">
+                @teams.CreatedBy
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="TeamDto" Property="CreatedBy" Title="Team Type">
+            <Template Context="teams">
+                @teams.TeamTypeName
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Filterable=false Sortable=false Property="CreatedBy" TItem="TeamDto" Title="Edit">
+            <Template Context="teams">
+                <RadzenButton Visible="@(teams.CreatedBy == username ? true : false)" ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" Icon="build" class="m-1" Click="() => EditTeam(teams.Id.ToString())" />
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
 @code {
+    bool myTeamOnlyMode = false;
+    private string username = "";
+    RadzenDataGrid<TeamDto>? teamsList;
 
+    private List<TeamDto>? teams;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var token = new JwtSecurityTokenHandler().ReadJwtToken(await tokenService.GetToken());
+            username = token.Claims.FirstOrDefault(x => x.Type == "unique_name")?.Value ?? "";
+            await GetData();
+            StateHasChanged();
+        }
+
+    }
+
+
+    private async Task GetData()
+    {
+        using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+        var test = await client.GetFromJsonAsync<List<TeamDto>>("/api/Teams");
+        teams = test;
+
+    }
+    async Task EditTeam(string id)
+    {
+        NavigationManager.NavigateTo($"/editteam/{id}");
+    }
 }

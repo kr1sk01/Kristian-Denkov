@@ -26,7 +26,12 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             _emailSender = emailSender;
             _context = context;
         }
-
+        public async Task<List<PlayerDto>> GetAllActivePlayers()
+        {
+            var activePlayers = await _userManager.Users.Where(x=>x.Active == true).ToArrayAsync();
+            var players = activePlayers.Adapt<List<PlayerDto>>();
+            return players;
+        }
         public async Task<IActionResult> Register(RegisterViewModel registerRequest)
         {
             if (!ModelState.IsValid)

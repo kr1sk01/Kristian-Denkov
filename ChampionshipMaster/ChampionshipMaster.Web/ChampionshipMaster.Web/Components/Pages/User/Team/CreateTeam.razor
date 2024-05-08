@@ -52,8 +52,8 @@
     Variant variant = Variant.Outlined;
 
     string username = "";
-    string id = "";
-
+    string playerId = "";
+    string teamid = "";
 
     TeamDto model = new TeamDto();
 
@@ -85,17 +85,22 @@
         {
             var token = new JwtSecurityTokenHandler().ReadJwtToken(await tokenService.GetToken());
             username = token.Claims.FirstOrDefault(x => x.Type == "unique_name")?.Value ?? "";
-            id = token.Claims.FirstOrDefault(x => x.Type == "nameid")?.Value ?? "";
+            playerId = token.Claims.FirstOrDefault(x => x.Type == "nameid")?.Value ?? "";
         }
         model.CreatedBy = username;
 
         using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
         client.DefaultRequestHeaders.Add("Authorization", $"Bearer {await tokenService.GetToken()}");
-        await client.PostAsJsonAsync("/api/Teams", model);
+
+        var response = await client.PostAsJsonAsync("/api/Teams", model);
+
+        var content = await response.Content.ReadAsStringAsync();
+        var TeamTypeResponse = JsonSerializer.Deserialize<Dictionary<string, object>>(content);
+        var id = TeamTypeResponse!["id"].ToString();
 
         notifier.SendSuccessNotification("Team created successfully!");
-        NavigationManager.NavigateTo("/home");
-        //Navigate to My teams page
+
+        NavigationManager.NavigateTo($"/editteam/{id}");
         //TeamDto team = new TeamDto { };
     }
 }

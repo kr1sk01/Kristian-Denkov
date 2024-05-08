@@ -1,0 +1,119 @@
+﻿@page "/editteam/{id}"
+
+@inject NavigationManager nManager
+@inject Radzen.DialogService dialogService
+
+@inject IHttpClientFactory httpClient
+@inject IConfiguration configuration
+@inject ITokenService tokenService
+@inject IHttpClientFactory httpClient
+@inject IWebHostEnvironment Environment
+
+@inject ProtectedLocalStorage _localStorage
+@inject NavigationManager NavigationManager
+
+@rendermode InteractiveServer
+
+<h3>Edit Team</h3>
+
+<span>Team Name:@team.Name</span>
+<span>Created By: @team.CreatedBy</span>
+<span>Created On: @team.CreatedOn</span>
+<span>Active:@team.Active</span>
+
+<div class="rz-p-sm-12 rz-text-align-center">
+    <RadzenLabel Text="Select Value"
+                 Component="DropDownFiltering"
+                 Style="margin-right: 8px; vertical-align: middle;" />
+     <RadzenDropDown @ref=@radzenDropDown
+                    @bind-SearchText=SearchText
+                    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                    FilterOperator="StringFilterOperator.StartsWith"
+                    AllowFiltering="true"
+                    Data=@customers
+                    TextProperty="Name" 
+                    ValueProperty="Name"
+                    AllowClear="true"
+                    @bind-Value=value
+                    Style="width: 100%; max-width: 400px;"
+                    Name="DropDownFiltering" /> 
+</div>
+
+
+<div class="rz-p-sm-3 rz-text-align-left">
+    <RadzenLabel Text="@searchTextStatus" />
+</div>
+
+@code {
+
+}
+
+
+@code {
+    [Parameter] public string? id { get; set; }
+    TeamDto team = new TeamDto();
+    RadzenDropDown<string> radzenDropDown = new RadzenDropDown<string>();
+
+    IEnumerable<PlayerDto> customers = new List<PlayerDto>();
+
+    string value= "";
+    string searchTextStatus = "";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+
+
+
+        if (firstRender)
+        {
+            using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+
+            var smth = await _localStorage.GetAsync<string>("jwtToken");
+            var test = await client.GetFromJsonAsync<TeamDto>($"api/Teams/{id}");
+            team = test;
+            StateHasChanged();
+            ;
+
+
+
+            var test2 = await client.GetFromJsonAsync<List<PlayerDto>>("/api/Player");
+            if (test2 != null)
+            {
+                customers = test2;
+            }
+        ;
+            searchTextStatus = $"Search text: {searchText}";
+
+        }
+
+
+    }
+
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     await base.OnInitializedAsync();
+
+    //     customers = dbContext.Customers;
+
+    //
+    // }
+
+    string searchText = "al";
+
+    public string SearchText
+    {
+        get
+        {
+            return searchText;
+        }
+        set
+        {
+            if (searchText != value)
+            {
+                searchText = value;
+                searchTextStatus = $"Search text: {searchText}";
+                Console.WriteLine($"Search text: {radzenDropDown.SearchText}");
+            }
+        }
+    }
+}

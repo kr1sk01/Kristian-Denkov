@@ -23,7 +23,7 @@ namespace ChampionshipMaster.API.Controllers
             return Ok(result);
         }
 
-        [HttpGet("{username}")]
+        [HttpGet("team/{username}")]
         public async Task<ActionResult<IEnumerable<TeamDto>>> GetTeamIparticipate(string username)
         {
             var result = await _teamService.GetTeamIparticipate(username);
@@ -38,7 +38,7 @@ namespace ChampionshipMaster.API.Controllers
             return result;
         }
 
-        [HttpGet("{id}/Game_History")]
+        [HttpGet("Game_History/{id}")]
         public async Task<ActionResult<List<GameDto>>> GameHistory(int id)
         {
             var result = await _teamService.GameHistory(id);

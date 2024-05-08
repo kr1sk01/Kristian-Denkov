@@ -15,6 +15,15 @@ namespace ChampionshipMaster.API.Controllers
             _playerService = playerService;
         }
 
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<PlayerDto>>> GetAllActivePlayers()
+        {
+            var authHeader = HttpContext.Request.Headers.Authorization;
+            var result = await _playerService.GetAllActivePlayers();
+            return Ok(result);
+        }
+
+
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterViewModel register)
         {
