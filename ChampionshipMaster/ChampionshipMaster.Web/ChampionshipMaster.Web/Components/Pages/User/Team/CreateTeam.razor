@@ -9,6 +9,8 @@
 @inject ITokenService tokenService
 @inject IHttpClientFactory httpClient
 @inject IWebHostEnvironment Environment
+@inject INotifier notifier
+
 
 @inject ProtectedLocalStorage _localStorage
 @inject NavigationManager NavigationManager
@@ -45,40 +47,6 @@
 
 <div class="rz-p-sm-12 rz-text-align-center">
 </div>
-
-
-@* <EditForm Model="" OnValidSubmit="HandleValidSubmit">
-    <DataAnnotationsValidator />
-
-    <div class="row justify-content-center">
-        <h3>Add Game Type</h3>
-        <div class="form-group">
-            <label for="name">Name:</label>
-            <InputText id="name" class="form-control" @bind-Value="gameType.Name" />
-
-        </div>
-
-        <div class="form-group">
-            <label for="maxPoints">Max Points:</label>
-            <InputNumber id="maxPoints" class="form-control" @bind-Value="gameType.MaxPoints" />
-
-        </div>
-
-        <div class="form-group">
-            <label for="teamType">Team Type:</label>
-            <select id="teamType" class="form-control" @bind="@gameType.TeamTypeId">
-                <option value="">-- Select Team Type --</option>
-                @foreach (var teamType in teamTypes)
-                {
-                    <option value="@teamType.Id">@teamType.Name</option>
-                }
-            </select>
-            <ValidationMessage For="@(() => gameType.TeamTypeId)" />
-        </div>
-        <br />
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </div>
-</EditForm> *@
 
 @code {
     Variant variant = Variant.Outlined;
@@ -120,13 +88,13 @@
             id = token.Claims.FirstOrDefault(x => x.Type == "nameid")?.Value ?? "";
         }
         model.CreatedBy = username;
-        
+
         using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
         client.DefaultRequestHeaders.Add("Authorization", $"Bearer {await tokenService.GetToken()}");
         await client.PostAsJsonAsync("/api/Teams", model);
 
-       
-
+        notifier.SendSuccessNotification("Team created successfully!");
+        NavigationManager.NavigateTo("/home");
         //Navigate to My teams page
         //TeamDto team = new TeamDto { };
     }
