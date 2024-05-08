@@ -11,5 +11,6 @@ namespace ChampionshipMaster.API.Interfaces
         Task<IActionResult> ChangePassword(ChangePasswordViewModel changePassword, StringValues authHeader);
         Task<IActionResult> ConfirmEmail(string userId, string token);
         Task<IActionResult> ChangeAvatar(ProfileDto request, StringValues authHeader);
+        Task<IActionResult> ChangeUsername(string newUsername, StringValues authHeader);
     }
 }
