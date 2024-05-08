@@ -32,7 +32,7 @@
                     AllowFiltering="true"
                     Data=@customers
                     TextProperty="Name" 
-                    ValueProperty="Name"
+                    ValueProperty="Id"
                     AllowClear="true"
                     @bind-Value=value
                     Style="width: 100%; max-width: 400px;"
@@ -43,14 +43,14 @@
 <div class="rz-p-sm-3 rz-text-align-left">
     <RadzenLabel Text="@searchTextStatus" />
 </div>
-
+<RadzenButton Click=@(()=> AddPlayerToTeam()) Text="Add Player To Team" ButtonStyle="ButtonStyle.Primary" />
 @code {
 
 }
 
 
 @code {
-    [Parameter] public string? id { get; set; }
+    [Parameter] public string id { get; set; }
     TeamDto team = new TeamDto();
     RadzenDropDown<string> radzenDropDown = new RadzenDropDown<string>();
 
@@ -58,6 +58,8 @@
 
     string value= "";
     string searchTextStatus = "";
+
+    string userToAdd_Id = "";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -70,25 +72,44 @@
 
             var smth = await _localStorage.GetAsync<string>("jwtToken");
             var test = await client.GetFromJsonAsync<TeamDto>($"api/Teams/{id}");
-            team = test;
-            StateHasChanged();
-            ;
-
-
+            if(test != null)
+            {
+                team = test;
+                StateHasChanged();
+            }
 
             var test2 = await client.GetFromJsonAsync<List<PlayerDto>>("/api/Player");
             if (test2 != null)
             {
                 customers = test2;
             }
-        ;
+
+
             searchTextStatus = $"Search text: {searchText}";
 
         }
 
 
     }
+    private async Task AddPlayerToTeam()
+    {
 
+        if (radzenDropDown.Value != null)
+        {
+            userToAdd_Id = radzenDropDown.Value.ToString()!;
+        }
+        Dictionary<string, string> dict = new Dictionary<string, string>
+                    {
+                { "playerId", userToAdd_Id },
+                { "teamid", id }
+            };
+
+        using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+
+        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {await tokenService.GetToken()}");
+        await client.PostAsJsonAsync("/api/Teams/addplayer", dict);
+        
+    }
     // protected override async Task OnInitializedAsync()
     // {
     //     await base.OnInitializedAsync();

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Primitives;
 using System.IdentityModel.Tokens.Jwt;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ChampionshipMaster.API.Services.ControllerServices
 {
@@ -35,10 +36,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
 
             return NoContent();
         }
-        public async Task<ActionResult<TeamDto>> AddTeamMember(TeamDto team, StringValues authHeader)
-        {
-            return NoContent();
-        }
+
         public async Task<IActionResult> EditTeam(int id, Team team)
         {
             if (id != team.Id)
@@ -98,7 +96,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
 
             var dto = teams.Adapt<List<TeamDto>>();
             return dto;
-        }        
+        }
         public async Task<List<TeamDto>> GetTeamIparticipate(string username)
         {
             var teams = await _context.Teams
@@ -126,7 +124,42 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             var dto = team.Adapt<TeamDto>();
             return Ok(dto);
         }
+        public async Task<ActionResult<TeamDto>> AddTeamMember(Dictionary<string, string> dict, StringValues authHeader)
+        {
+            if (await TeamIdExists(int.Parse(dict["teamid"])) == false)
+            {
+                return BadRequest("This team doesn't exist!");
+            }
+            var tokenString = authHeader.ToString().Split(' ')[1];
+            var token = new JwtSecurityToken(tokenString);
 
+            
+            var teamCreatorUsername = token.Claims.First(c => c.Type == "unique_name").Value;
+
+            var teamToAdd = await _context.Teams.FirstOrDefaultAsync(x => x.Id == int.Parse(dict["teamid"]));
+
+            var test = await _userManager.FindByIdAsync(dict["playerId"]);
+
+            TeamPlayers tp = new TeamPlayers
+            {
+                Team = teamToAdd,               
+                Player = test,
+                CreatedBy = teamCreatorUsername,
+                CreatedOn = DateTime.UtcNow,
+
+            };
+            try
+            {
+                await _context.TeamPlayers.AddAsync(tp);
+                await _context.SaveChangesAsync();
+            }catch(Exception ex)
+            {
+                return BadRequest();
+            }
+            
+            
+            return Ok();
+        }
         public async Task<ActionResult<TeamDto>> PostTeam(TeamDto team, StringValues authHeader)
         {           
             if (await TeamNameExists(team.Name))
@@ -185,6 +218,10 @@ namespace ChampionshipMaster.API.Services.ControllerServices
         public async Task<bool> TeamNameExists(string? name)
         {
             return await _context.Teams.AnyAsync(x => x.Name == name);
+        }
+        public async Task<bool> TeamIdExists(int? id)
+        {
+            return await _context.Teams.AnyAsync(x => x.Id == id);
         }
     }
 }

@@ -64,6 +64,14 @@ namespace ChampionshipMaster.API.Controllers
             var result = await _teamService.PostTeam(team, authHeader);
             return result;
         }
+        [Authorize]
+        [HttpPost("addplayer")]
+        public async Task<ActionResult<TeamDto>> AddTeamMember(Dictionary<string, string> dict)
+        {
+            var authHeader = HttpContext.Request.Headers.Authorization;
+            var result = await _teamService.AddTeamMember(dict, authHeader);
+            return result;
+        }
 
         // DELETE: api/Teams/5
         [HttpDelete("{id}")]
