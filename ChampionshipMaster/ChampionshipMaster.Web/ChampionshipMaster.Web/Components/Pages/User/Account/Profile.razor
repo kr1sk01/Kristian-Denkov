@@ -17,11 +17,18 @@
     <center>
         <h1>@(username)'s profile</h1>
         <h2>Email: @email</h2>
-        <ChangeUsername></ChangeUsername>
+        
+        <ChangeName @ref=@changeUsername
+                    Title="Change Username"
+                    RequestUrl="api/Player/changeUsername"
+                    ResponseProperty="jwtToken"
+                    ToLocalStorage="jwtToken"
+                    ReloadPageOnComplete="@true" />
+        
         <ImageUpload @ref=@playerAvatar
                      Title="Avatar"
                      SetImageFor="@ImageUpload.SetImageForOptions.Avatar"
-                     UploadUrl="api/Player/changeAvatar/"
+                     RequestUrl="api/Player/changeAvatar/"
                      ToLocalStorage="playerAvatar"
                      ReloadPageOnComplete="@true" />
     </center>
@@ -29,6 +36,7 @@
 
 @code {
     ImageUpload playerAvatar;
+    ChangeName changeUsername;
     bool loggedIn = false;
     string username = string.Empty;
     string email = string.Empty;
@@ -46,6 +54,7 @@
             loggedIn = true;
             var token = new JwtSecurityTokenHandler().ReadJwtToken(await tokenService.GetToken());
             username = token.Claims.FirstOrDefault(x => x.Type == "unique_name")?.Value ?? "";
+            changeUsername.SetInitialValue(username);
             email = token.Claims.FirstOrDefault(x => x.Type == "email")?.Value ?? "";
 
             try

@@ -67,7 +67,7 @@ namespace ChampionshipMaster.API.Controllers
         public async Task<IActionResult> ChangeAvatar([FromBody] Dictionary<string, string> content)
         {
             var authHeader = HttpContext.Request.Headers.Authorization;
-            var newAvatar = content["newAvatar"];
+            var newAvatar = content.First().Value;
             var result = await _playerService.ChangeAvatar(newAvatar, authHeader);
             return result;
         }
@@ -77,7 +77,7 @@ namespace ChampionshipMaster.API.Controllers
         public async Task<IActionResult> ChangeUsername([FromBody] Dictionary<string, string> content)
         {
             var authHeader = HttpContext.Request.Headers.Authorization;
-            var newUsername = content["newUsername"];
+            var newUsername = content.First().Value;
             var result = await _playerService.ChangeUsername(newUsername, authHeader);
             return result;
         }

@@ -23,13 +23,13 @@
 
 @code {
     [Parameter]
-    public string Title { get; set; }
+    public required string Title { get; set; }
     [Parameter]
     public string? ToLocalStorage { get; set; }
     [Parameter]
     public SetImageForOptions SetImageFor { get; set; }
     [Parameter]
-    public string UploadUrl { get; set; }
+    public required string RequestUrl { get; set; }
     [Parameter]
     public bool ReloadPageOnComplete { get; set; } = false;
 
@@ -44,8 +44,6 @@
     bool disableSaveButton = true;
     string imagePath = string.Empty;
     string newImagePath = string.Empty;
-    string base64EncodedImageData = string.Empty;
-    string base64EncodedNewImageData = string.Empty;
 
     Radzen.FileInfo? uploadedImage = null;
     RadzenUpload upload = default!;
@@ -113,10 +111,10 @@
         var imageBase64 = await imageService.ConvertToBase64String(uploadedImage!);
         Dictionary<string, string> content = new Dictionary<string, string>
                 {
-                    { $"new{SetImageFor.ToString()}", imageBase64 }
+                    { "newImage", imageBase64 }
                 };
 
-        var response = await client.PostAsJsonAsync(UploadUrl, content);
+        var response = await client.PostAsJsonAsync(RequestUrl, content);
 
         if (response.IsSuccessStatusCode)
         {
@@ -139,11 +137,11 @@
                     notifier.SendSuccessNotification(body);
                 }
 
-                if (ReloadPageOnComplete == true) { NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true); }
+                if (ReloadPageOnComplete) { NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true); }
             }
             catch
             {
-                notifier.SendErrorNotification("Something went wrong");
+                notifier.SendErrorNotification("Something went wrong!");
             }
         }
         else
