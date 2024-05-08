@@ -18,92 +18,54 @@
         <h1>@(username)'s profile</h1>
         <h2>Email: @email</h2>
         <ChangeUsername></ChangeUsername>
-        <UploadAvatar></UploadAvatar>
+        <ImageUpload @ref=@playerAvatar
+                     Title="Avatar"
+                     SetImageFor="@ImageUpload.SetImageForOptions.Avatar"
+                     UploadUrl="api/Player/changeAvatar/"
+                     ToLocalStorage="playerAvatar"
+                     ReloadPageOnComplete="@true" />
     </center>
 </div>
 
 @code {
-    private string email = "";
-    private bool loggedIn = false;
-    private const string UNIQUE_NAME = "unique_name";
-    private string username = "";
+    ImageUpload playerAvatar;
+    bool loggedIn = false;
+    string username = string.Empty;
+    string email = string.Empty;
+    string? base64EncodedImageData;
 
-    private HubConnection? _hubConnection;
-
-    private readonly List<string> _messages = new();
-
-
-    private List<IBrowserFile> loadedFiles = new();
-    private long maxFileSize = 1024 * 15;
-    private int maxAllowedFiles = 3;
-    private bool isLoading;
-
-    public ProfileDto profileDto = new ProfileDto();
-
-    private async Task LoadFiles(InputFileChangeEventArgs e)
-    {
-        isLoading = true;
-        loadedFiles.Clear();
-        try
-        {
-            var file = e.File;
-            var test = await UploadMedia(file);
-            profileDto.Avatar = new byte[test.Length];
-            Array.Copy(test, profileDto.Avatar, test.Length);
-        }
-        catch (Exception ex)
-        {
-            //Throw ex
-        }
-        var tokenString = await tokenService.GetToken();
-        if (tokenString != null)
-        {
-            var token = new JwtSecurityTokenHandler().ReadJwtToken(tokenString);
-
-            if (await tokenService.ValidateToken())
-            {
-                profileDto.UserName = token.Claims.FirstOrDefault(x => x.Type == UNIQUE_NAME)?.Value ?? "";
-            }
-
-        }
-        using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
-        var test2 = await client.PostAsJsonAsync("/api/Player/ChangePicture", profileDto);
-        isLoading = false;
-    }
-    public static async Task<byte[]> UploadMedia(IBrowserFile file)
-    {
-        var path = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-
-        await using var fs = new FileStream(path, FileMode.Create);
-
-        await file.OpenReadStream(file.Size).CopyToAsync(fs);
-
-        var bytes = new byte[file.Size];
-
-        fs.Position = 0;
-
-        await fs.ReadAsync(bytes);
-
-        fs.Close();
-
-        File.Delete(path);
-
-        return bytes;
-    }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            if (await tokenService.ValidateToken())
+            if (!await tokenService.ValidateToken())
             {
-                loggedIn = true;
-                var token = new JwtSecurityTokenHandler().ReadJwtToken(await tokenService.GetToken());
-                username = token.Claims.FirstOrDefault(x => x.Type == "unique_name")?.Value ?? "";
-                email = token.Claims.FirstOrDefault(x => x.Type == "email")?.Value ?? "";
-
-                StateHasChanged();
+                NavigationManager.NavigateTo("/login");
             }
-            else { NavigationManager.NavigateTo("/login"); }
+
+            loggedIn = true;
+            var token = new JwtSecurityTokenHandler().ReadJwtToken(await tokenService.GetToken());
+            username = token.Claims.FirstOrDefault(x => x.Type == "unique_name")?.Value ?? "";
+            email = token.Claims.FirstOrDefault(x => x.Type == "email")?.Value ?? "";
+
+            try
+            {
+                var imageResult = await _localStorage.GetAsync<string>("playerAvatar");
+                if (imageResult.Success && !string.IsNullOrEmpty(imageResult.Value))
+                {
+                    base64EncodedImageData = imageResult.Value!;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                playerAvatar.UpdateDisplayedImagePath(base64EncodedImageData);
+            }
+
+            StateHasChanged();
         }
     }
 }

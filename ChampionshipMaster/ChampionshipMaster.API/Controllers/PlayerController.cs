@@ -64,10 +64,11 @@ namespace ChampionshipMaster.API.Controllers
 
         [Authorize]
         [HttpPost("changeAvatar")]
-        public async Task<IActionResult> ChangeAvatar(ProfileDto request)
+        public async Task<IActionResult> ChangeAvatar([FromBody] Dictionary<string, string> content)
         {
             var authHeader = HttpContext.Request.Headers.Authorization;
-            var result = await _playerService.ChangeAvatar(request, authHeader);
+            var newAvatar = content["newAvatar"];
+            var result = await _playerService.ChangeAvatar(newAvatar, authHeader);
             return result;
         }
 

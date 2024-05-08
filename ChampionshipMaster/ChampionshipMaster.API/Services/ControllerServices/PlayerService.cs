@@ -221,9 +221,9 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             return BadRequest(result.Errors);
         }
 
-        public async Task<IActionResult> ChangeAvatar(ProfileDto request, StringValues authHeader)
+        public async Task<IActionResult> ChangeAvatar(string newAvatar, StringValues authHeader)
         {
-            if(request.Avatar == null || request.Avatar.Length == 0)
+            if(string.IsNullOrEmpty(newAvatar))
             {
                 return BadRequest("Image not received");
             }
@@ -237,7 +237,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
 
                 var user = await _userManager.FindByNameAsync(userName) ?? throw new Exception($"Unable to find user - {userName}");
 
-                user.Avatar = request.Avatar;
+                user.Avatar = Convert.FromBase64String(newAvatar);
                 user.ModifiedBy = userName;
                 user.ModifiedOn = DateTime.UtcNow;
                 _context.Entry(user).State = EntityState.Modified;

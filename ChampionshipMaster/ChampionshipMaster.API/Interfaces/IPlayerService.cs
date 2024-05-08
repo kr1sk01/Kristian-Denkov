@@ -10,7 +10,7 @@ namespace ChampionshipMaster.API.Interfaces
         Task<IActionResult> LogOut(string username, StringValues authHeader);
         Task<IActionResult> ChangePassword(ChangePasswordViewModel changePassword, StringValues authHeader);
         Task<IActionResult> ConfirmEmail(string userId, string token);
-        Task<IActionResult> ChangeAvatar(ProfileDto request, StringValues authHeader);
+        Task<IActionResult> ChangeAvatar(string newAvatar, StringValues authHeader);
         Task<IActionResult> ChangeUsername(string newUsername, StringValues authHeader);
         Task<List<PlayerDto>> GetAllActivePlayers();
     }
