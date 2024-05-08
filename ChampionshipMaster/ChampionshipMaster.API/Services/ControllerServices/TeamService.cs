@@ -130,20 +130,38 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             {
                 return BadRequest("This team doesn't exist!");
             }
+            
             var tokenString = authHeader.ToString().Split(' ')[1];
             var token = new JwtSecurityToken(tokenString);
 
             
             var teamCreatorUsername = token.Claims.First(c => c.Type == "unique_name").Value;
-
+          
             var teamToAdd = await _context.Teams.FirstOrDefaultAsync(x => x.Id == int.Parse(dict["teamid"]));
+            if (teamToAdd == null)
+            {
+                return BadRequest();
+            }
+            var playerToAdd = await _userManager.FindByIdAsync(dict["playerId"]);
+            if(playerToAdd == null)
+            {
+                return BadRequest();
+            }
+            
+            var playerCountMax = await _context.Teams.Where(x=>x.Id == teamToAdd.Id).Select(x=>x.TeamType).Select(x=>x.TeamSize).FirstOrDefaultAsync();
 
-            var test = await _userManager.FindByIdAsync(dict["playerId"]);
+            var actualPlayerCount = _context.TeamPlayers.Where(x => x.TeamId == teamToAdd.Id).ToList().Count;
 
+            var playerList = await _context.TeamPlayers.Where(x => x.TeamId == teamToAdd.Id).Select(x => x.Player).Select(x=>x.Id).ToListAsync();
+
+            if (actualPlayerCount >= playerCountMax || !playerList.Contains(playerToAdd.Id))
+            {
+                return BadRequest();
+            }
             TeamPlayers tp = new TeamPlayers
             {
                 Team = teamToAdd,               
-                Player = test,
+                Player = playerToAdd,
                 CreatedBy = teamCreatorUsername,
                 CreatedOn = DateTime.UtcNow,
 
