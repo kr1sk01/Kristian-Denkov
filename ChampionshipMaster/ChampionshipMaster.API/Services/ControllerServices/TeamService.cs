@@ -140,12 +140,12 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             var teamToAdd = await _context.Teams.FirstOrDefaultAsync(x => x.Id == int.Parse(dict["teamid"]));
             if (teamToAdd == null)
             {
-                return BadRequest();
+                return BadRequest("Team doesn't exist!");
             }
             var playerToAdd = await _userManager.FindByIdAsync(dict["playerId"]);
             if(playerToAdd == null)
             {
-                return BadRequest();
+                return BadRequest("Player doesn't exist!");
             }
             
             var playerCountMax = await _context.Teams.Where(x=>x.Id == teamToAdd.Id).Select(x=>x.TeamType).Select(x=>x.TeamSize).FirstOrDefaultAsync();
@@ -154,9 +154,13 @@ namespace ChampionshipMaster.API.Services.ControllerServices
 
             var playerList = await _context.TeamPlayers.Where(x => x.TeamId == teamToAdd.Id).Select(x => x.Player).Select(x=>x.Id).ToListAsync();
 
-            if (actualPlayerCount >= playerCountMax || !playerList.Contains(playerToAdd.Id))
+            if (actualPlayerCount >= playerCountMax)
             {
-                return BadRequest();
+                return BadRequest("Team is full!");
+            }
+            if(!playerList.Contains(playerToAdd.Id))
+            {
+                return BadRequest($"{playerToAdd.UserName} is already in this team!");
             }
             TeamPlayers tp = new TeamPlayers
             {
@@ -172,7 +176,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                 await _context.SaveChangesAsync();
             }catch(Exception ex)
             {
-                return BadRequest();
+                return BadRequest("Couldn't save data to the database!");
             }
             
             
