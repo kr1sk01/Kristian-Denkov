@@ -54,13 +54,14 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Filterable=false Sortable=false Property="CreatedBy" TItem="TeamDto" Title="Edit">
             <Template Context="teams">
-                <RadzenButton Visible="@(teams.CreatedBy == username ? true : false)" ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" Icon="build" class="m-1" Click="() => EditTeam(teams.Id.ToString())" />
+                <RadzenButton Visible="@(teams.CreatedBy == playerId ? true : false)" ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" Icon="build" class="m-1" Click="() => EditTeam(teams.Id.ToString())" />
             </Template>
         </RadzenDataGridColumn>
     </Columns>
 </RadzenDataGrid>
 @code {
     bool myTeamOnlyMode = false;
+    string playerId = "";
     private string username = "";
     RadzenDataGrid<TeamDto>? teamsList;
 
@@ -71,6 +72,7 @@
         {
             var token = new JwtSecurityTokenHandler().ReadJwtToken(await tokenService.GetToken());
             username = token.Claims.FirstOrDefault(x => x.Type == "unique_name")?.Value ?? "";
+            playerId = token.Claims.FirstOrDefault(x => x.Type == "nameid")?.Value ?? "";
             await GetData();
             StateHasChanged();
         }

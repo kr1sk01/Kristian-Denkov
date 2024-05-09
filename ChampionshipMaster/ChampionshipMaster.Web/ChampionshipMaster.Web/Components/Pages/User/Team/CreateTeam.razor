@@ -87,7 +87,7 @@
             username = token.Claims.FirstOrDefault(x => x.Type == "unique_name")?.Value ?? "";
             playerId = token.Claims.FirstOrDefault(x => x.Type == "nameid")?.Value ?? "";
         }
-        model.CreatedBy = username;
+        model.CreatedBy = playerId;
 
         using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
         client.DefaultRequestHeaders.Add("Authorization", $"Bearer {await tokenService.GetToken()}");
