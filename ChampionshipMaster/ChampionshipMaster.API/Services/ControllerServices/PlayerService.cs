@@ -275,6 +275,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                 }
 
                 user.UserName = newUsername;
+                user.NormalizedUserName = newUsername.ToUpper();
                 await _context.SaveChangesAsync();
 
                 var newToken = await _jwtService.GenerateToken(user);

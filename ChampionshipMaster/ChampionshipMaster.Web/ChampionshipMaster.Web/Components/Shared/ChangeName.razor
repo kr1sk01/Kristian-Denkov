@@ -9,12 +9,12 @@
 
 @rendermode InteractiveServer
 
-<div class="col-md-6 col-lg-4 p-3">
+<div class="col-md-6 col-lg-6 p-3">
     <RadzenCard>
         <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H1">@Title</RadzenText>
         <RadzenStack Orientation="Orientation.Horizontal">
             <RadzenTextBox @ref="@textBox" Value="@currentValue" @oninput=@(args => OnChange(args.Value?.ToString())) class="w-100" />
-            <RadzenButton Disabled="@(!usernameHasChanged)" Click="OnClick">Save</RadzenButton>
+            <RadzenButton Text="Save" Disabled="@(!usernameHasChanged)" Click="OnClick"></RadzenButton>
         </RadzenStack>
     </RadzenCard>
 </div>
