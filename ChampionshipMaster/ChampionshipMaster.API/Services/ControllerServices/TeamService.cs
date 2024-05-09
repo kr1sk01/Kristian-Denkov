@@ -158,7 +158,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             {
                 return BadRequest("Team is full!");
             }
-            if(!playerList.Contains(playerToAdd.Id))
+            if(playerList.Contains(playerToAdd.Id))
             {
                 return BadRequest($"{playerToAdd.UserName} is already in this team!");
             }
