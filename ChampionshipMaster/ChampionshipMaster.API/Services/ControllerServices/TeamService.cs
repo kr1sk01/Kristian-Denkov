@@ -147,6 +147,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             var teamCreatorUsername = token.Claims.First(c => c.Type == "unique_name").Value;
           
             var teamToAdd = await _context.Teams.FirstOrDefaultAsync(x => x.Id == int.Parse(dict["teamid"]));
+
             if (teamToAdd == null)
             {
                 return BadRequest("Team doesn't exist!");
@@ -209,16 +210,16 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                 Active = true
             };
             ;
-            TeamPlayers tp = new TeamPlayers
-            {
-                Team = result,
-                Player = await _userManager.FindByIdAsync(id),
-                CreatedBy = username,
-                CreatedOn = DateTime.UtcNow,
+            //TeamPlayers tp = new TeamPlayers
+            //{
+            //    Team = result,
+            //    Player = await _userManager.FindByIdAsync(id),
+            //    CreatedBy = username,
+            //    CreatedOn = DateTime.UtcNow,
 
-            };
+            //};
             await _context.Teams.AddAsync(result);
-            await _context.TeamPlayers.AddAsync(tp);
+            //await _context.TeamPlayers.AddAsync(tp);
 
             try
             {
