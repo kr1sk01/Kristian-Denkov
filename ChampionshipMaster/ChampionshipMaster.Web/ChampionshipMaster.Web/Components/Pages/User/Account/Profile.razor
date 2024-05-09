@@ -23,14 +23,16 @@
                     RequestUrl="api/Player/changeUsername"
                     ResponseProperty="jwtToken"
                     ToLocalStorage="jwtToken"
-                    ReloadPageOnComplete="@true" />
+                    StateChange=@CheckButtonState />
         
         <ImageUpload @ref=@playerAvatar
                      Title="Avatar"
                      SetImageFor="@ImageUpload.SetImageForOptions.Avatar"
                      RequestUrl="api/Player/changeAvatar/"
                      ToLocalStorage="playerAvatar"
-                     ReloadPageOnComplete="@true" />
+                     StateChange=@CheckButtonState />
+
+        <RadzenButton Text="Save Changes" Disabled="@isValueInitial" Click="OnClick"></RadzenButton>
     </center>
 </div>
 
@@ -41,6 +43,7 @@
     string username = string.Empty;
     string email = string.Empty;
     string? base64EncodedImageData;
+    bool isValueInitial = true;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -76,5 +79,17 @@
 
             StateHasChanged();
         }
+    }
+
+    public async Task OnClick()
+    {
+        await changeUsername.OnClick();
+        await playerAvatar.UploadImage();
+        NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
+    }
+
+    public async Task CheckButtonState()
+    {
+        isValueInitial = playerAvatar.isValueInitial && changeUsername.isValueInitial;
     }
 }

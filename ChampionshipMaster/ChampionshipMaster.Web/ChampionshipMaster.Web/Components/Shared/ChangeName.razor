@@ -14,12 +14,13 @@
         <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H1">@Title</RadzenText>
         <RadzenStack Orientation="Orientation.Horizontal">
             <RadzenTextBox @ref="@textBox" Value="@currentValue" @oninput=@(args => OnChange(args.Value?.ToString())) class="w-100" />
-            <RadzenButton Text="Save" Disabled="@(!usernameHasChanged)" Click="OnClick"></RadzenButton>
         </RadzenStack>
     </RadzenCard>
 </div>
 
-@code {
+    @code {
+    [Parameter]
+    public EventCallback StateChange { get; set; }
     [Parameter]
     public required string Title { get; set; }
     [Parameter]
@@ -35,7 +36,7 @@
 
     RadzenTextBox textBox = default!;
     string? currentValue = "";
-    bool usernameHasChanged = false;
+    public bool isValueInitial = true;
 
     public void SetInitialValue(string initialValue)
     {
@@ -44,95 +45,70 @@
         StateHasChanged();
     }
 
-    public void OnChange(string? value)
+    async Task OnChange(string? value)
     {
         if (!string.IsNullOrEmpty(value) && value != InitialValue)
         {
-            usernameHasChanged = true;
+            isValueInitial = false;
             currentValue = value;
             StateHasChanged();
+            await StateChange.InvokeAsync();
         }
         else
         {
-            usernameHasChanged = false;
+            isValueInitial = true;
             currentValue = value;
             StateHasChanged();
+            await StateChange.InvokeAsync();
         }
     }
 
     public async Task OnClick()
     {
-        if (!await tokenService.ValidateToken())
+        if (!isValueInitial)
         {
-            notifier.SendInformationalNotification("You're not logged in or your session has expired");
-            NavigationManager.NavigateTo("/login");
-        }
+            if (!await tokenService.ValidateToken())
+            {
+                notifier.SendInformationalNotification("You're not logged in or your session has expired");
+                NavigationManager.NavigateTo("/login");
+            }
 
-        var token = await tokenService.GetToken();
-        using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
-        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+            var token = await tokenService.GetToken();
+            using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 
-        var newName = textBox.Value;
-        Dictionary<string, string> content = new Dictionary<string, string>
+            var newName = textBox.Value;
+            Dictionary<string, string> content = new Dictionary<string, string>
                  {
                      { "newName", newName }
                  };
 
-        var request = await client.PostAsJsonAsync(RequestUrl, content);
-        var body = await request.Content.ReadAsStringAsync();
+            var request = await client.PostAsJsonAsync(RequestUrl, content);
+            var body = await request.Content.ReadAsStringAsync();
 
-        if (request.IsSuccessStatusCode)
-        {
-            try
+            if (request.IsSuccessStatusCode)
             {
-                var responseValue = JsonSerializer.Deserialize<Dictionary<string, string>>(body)![ResponseProperty];
-
-                if (!string.IsNullOrEmpty(ToLocalStorage))
+                try
                 {
-                    await _localStorage.SetAsync(ToLocalStorage, responseValue);
+                    var responseValue = JsonSerializer.Deserialize<Dictionary<string, string>>(body)![ResponseProperty];
+
+                    if (!string.IsNullOrEmpty(ToLocalStorage))
+                    {
+                        await _localStorage.SetAsync(ToLocalStorage, responseValue);
+                    }
+
+                    if (ReloadPageOnComplete) { NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true); }
                 }
-
-                if (ReloadPageOnComplete) { NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true); }
+                catch (Exception ex)
+                {
+                    notifier.SendErrorNotification("Something went wrong!");
+                    Console.WriteLine(ex.Message);
+                }
             }
-            catch (Exception ex)
+            else
             {
-                notifier.SendErrorNotification("Something went wrong!");
-                Console.WriteLine(ex.Message);
+                notifier.SendErrorNotification(body);
             }
         }
-        else
-        {
-            notifier.SendErrorNotification(body);
-        }
-
-        // var token = await tokenService.GetToken();
-        // if (token == null)
-        // {
-        //     NavigationManager.NavigateTo("/login");
-        // }
-        // else
-        // {
-        //     using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
-        //     client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
-        //     var newUsername = textBox.Value;
-        //     Dictionary<string, string> content = new Dictionary<string, string>
-        //         {
-        //             { "newUsername", newUsername }
-        //         };
-        //     var request = await client.PostAsJsonAsync("api/Player/changeUsername", content);
-        //     var body = await request.Content.ReadAsStringAsync();
-
-        //     if (request.IsSuccessStatusCode)
-        //     {
-        //         var tokenString = JsonSerializer.Deserialize<Dictionary<string, string>>(body)!["jwtToken"];
-        //         await _localStorage.SetAsync("jwtToken", tokenString);
-        //         NavigationManager.NavigateTo("/profile", forceLoad: true);
-        //     }
-        //     else
-        //     {
-        //         notifier.SendErrorNotification(body, 5);
-        //     }
-        // }
-
     }
 }

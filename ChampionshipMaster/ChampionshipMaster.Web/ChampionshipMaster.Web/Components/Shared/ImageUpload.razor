@@ -17,11 +17,12 @@
                           Progress=@(args => OnProgress(args)) class="w-100" />
             <RadzenImage Path="@newImagePath" Visible="@(!string.IsNullOrEmpty(newImagePath))" AlternateText="New Image" Style="max-width: 64px; max-height: 64px; align-self: center"></RadzenImage>
         </RadzenStack>
-        <RadzenButton Text="Save" Click=@UploadImage class="d-block mt-4" Disabled="@disableSaveButton" />
     </RadzenCard>
 </div>
 
-@code {
+    @code {
+    [Parameter]
+    public EventCallback StateChange { get; set; }
     [Parameter]
     public required string Title { get; set; }
     [Parameter]
@@ -41,7 +42,7 @@
     }
 
     const long FileSizeLimit = 40 * 1024;
-    bool disableSaveButton = true;
+    public bool isValueInitial = true;
     string imagePath = string.Empty;
     string newImagePath = string.Empty;
 
@@ -74,9 +75,10 @@
     {
         if (!args.Files.Any())
         {
-            disableSaveButton = true;
-            newImagePath = string.Empty;
+            isValueInitial = true;
             StateHasChanged();
+            await StateChange.InvokeAsync();
+            newImagePath = string.Empty;
             return;
         }
 
@@ -84,70 +86,76 @@
         {
             notifier.SendErrorNotification($"The image you selected exceeds the size limit of {FileSizeLimit / 1024}KB", 5);
             await upload.ClearFiles();
-            disableSaveButton = true;
+            isValueInitial = true;
             newImagePath = string.Empty;
             StateHasChanged();
+            await StateChange.InvokeAsync();
             return;
         }
 
         uploadedImage = args.Files.First();
         var newImage = await imageService.ConvertToBase64String(uploadedImage);
         newImagePath = $"data:{uploadedImage.ContentType};base64,{newImage}";
-        disableSaveButton = false;
+        isValueInitial = false;
         StateHasChanged();
+        await StateChange.InvokeAsync();
     }
 
-    async Task UploadImage()
+    public async Task UploadImage()
     {
-        if (!await tokenService.ValidateToken())
+        if (!isValueInitial)
         {
-            notifier.SendInformationalNotification("You're not logged in or your session has expired");
-            NavigationManager.NavigateTo("/login");
-        }
+            if (!await tokenService.ValidateToken())
+            {
+                notifier.SendInformationalNotification("You're not logged in or your session has expired");
+                NavigationManager.NavigateTo("/login");
+            }
 
-        var token = await tokenService.GetToken();
-        using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
-        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
-        var imageBase64 = await imageService.ConvertToBase64String(uploadedImage!);
-        Dictionary<string, string> content = new Dictionary<string, string>
+            var token = await tokenService.GetToken();
+            using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+            var imageBase64 = await imageService.ConvertToBase64String(uploadedImage!);
+            Dictionary<string, string> content = new Dictionary<string, string>
                 {
                     { "newImage", imageBase64 }
                 };
 
-        var response = await client.PostAsJsonAsync(RequestUrl, content);
+            var response = await client.PostAsJsonAsync(RequestUrl, content);
 
-        if (response.IsSuccessStatusCode)
-        {
-            try
+            if (response.IsSuccessStatusCode)
             {
-                if (ToLocalStorage != null)
+                try
                 {
-                    await _localStorage.SetAsync(ToLocalStorage, imageBase64);
-                    var body = await response.Content.ReadAsStringAsync();
-                    notifier.SendSuccessNotification(body);
-                    imagePath = $"data:image/{uploadedImage!.ContentType};base64,{imageBase64}";
-                    newImagePath = string.Empty;
-                    disableSaveButton = true;
-                    await upload.ClearFiles();
-                    StateHasChanged();
-                }
-                else
-                {
-                    var body = await response.Content.ReadAsStringAsync();
-                    notifier.SendSuccessNotification(body);
-                }
+                    if (ToLocalStorage != null)
+                    {
+                        await _localStorage.SetAsync(ToLocalStorage, imageBase64);
+                        var body = await response.Content.ReadAsStringAsync();
+                        notifier.SendSuccessNotification(body);
+                        imagePath = $"data:image/{uploadedImage!.ContentType};base64,{imageBase64}";
+                        newImagePath = string.Empty;
+                        await upload.ClearFiles();
+                        isValueInitial = true;
+                        StateHasChanged();
+                        await StateChange.InvokeAsync();
+                    }
+                    else
+                    {
+                        var body = await response.Content.ReadAsStringAsync();
+                        notifier.SendSuccessNotification(body);
+                    }
 
-                if (ReloadPageOnComplete) { NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true); }
+                    if (ReloadPageOnComplete) { NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true); }
+                }
+                catch
+                {
+                    notifier.SendErrorNotification("Something went wrong!");
+                }
             }
-            catch
+            else
             {
-                notifier.SendErrorNotification("Something went wrong!");
+                var body = await response.Content.ReadAsStringAsync();
+                notifier.SendErrorNotification(body);
             }
-        }
-        else
-        {
-            var body = await response.Content.ReadAsStringAsync();
-            notifier.SendErrorNotification(body);
         }
     }
 }
