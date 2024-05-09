@@ -11,7 +11,8 @@ namespace ChampionshipMaster.API.Data
                 .Map(dest => dest.Teams, src => src.ChampionshipTeams.Select(sc => sc.Team).Adapt<List<TeamDto>>());
 
             TypeAdapterConfig<Team, TeamDto>.NewConfig()
-                .Map(dest => dest.Players, src => src.TeamPlayers.Select(sc => sc.Player).Adapt<List<PlayerDto>>());
+                .Map(dest => dest.Players, src => src.TeamPlayers.Select(sc => sc.Player).Adapt<List<PlayerDto>>())
+                .Map(dest => dest.TeamSize, src => src.TeamType.TeamSize);
 
             TypeAdapterConfig<Player, PlayerDto>.NewConfig()
                 .Map(dest => dest.Name, src => src.UserName);

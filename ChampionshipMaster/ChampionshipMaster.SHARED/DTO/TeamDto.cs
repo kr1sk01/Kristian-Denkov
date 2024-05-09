@@ -11,6 +11,8 @@
 
         public string? TeamTypeName { get; set; }
 
+        public int TeamSize { get; set; }
+
         public bool? Active { get; set; } = true;
 
         public string? CreatedBy { get; set; }

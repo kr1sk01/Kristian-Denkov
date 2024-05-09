@@ -110,19 +110,28 @@ namespace ChampionshipMaster.API.Services.ControllerServices
 
         public async Task<ActionResult<TeamDto?>> GetTeam(int id)
         {
-            var team = await _context.Teams
-                .Include(x => x.TeamType)
-                .Include(x => x.TeamPlayers)
-                    .ThenInclude(x => x.Player)
-                .FirstOrDefaultAsync(x => x.Id == id);
-
-            if (team == null)
+            try
             {
-                return NotFound();
-            }
+                var team = await _context.Teams
+                        .Include(x => x.TeamType)
+                        .Include(x => x.TeamPlayers)
+                            .ThenInclude(x => x.Player)
+                        .FirstOrDefaultAsync(x => x.Id == id);
 
-            var dto = team.Adapt<TeamDto>();
-            return Ok(dto);
+                if (team == null)
+                {
+                    return NotFound();
+                }
+
+                var dto = team.Adapt<TeamDto>();
+                return Ok(dto);
+            }
+            catch (Exception ex)
+            {
+                await Console.Out.WriteLineAsync(ex.Message);
+            }
+            return BadRequest();
+            
         }
         public async Task<ActionResult<TeamDto>> AddTeamMember(Dictionary<string, string> dict, StringValues authHeader)
         {
@@ -158,7 +167,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             {
                 return BadRequest("Team is full!");
             }
-            if(!playerList.Contains(playerToAdd.Id))
+            if(playerList.Contains(playerToAdd.Id))
             {
                 return BadRequest($"{playerToAdd.UserName} is already in this team!");
             }
@@ -177,9 +186,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             }catch(Exception ex)
             {
                 return BadRequest("Couldn't save data to the database!");
-            }
-            
-            
+            }                     
             return Ok();
         }
         public async Task<ActionResult<TeamDto>> PostTeam(TeamDto team, StringValues authHeader)
@@ -245,5 +252,6 @@ namespace ChampionshipMaster.API.Services.ControllerServices
         {
             return await _context.Teams.AnyAsync(x => x.Id == id);
         }
+
     }
 }
