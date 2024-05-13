@@ -14,10 +14,25 @@
 @inject NavigationManager NavigationManager
 
 @rendermode InteractiveServer
-
+@inject DialogService DialogService
 
 <h3>Manage Teams</h3>
 
+
+<div>
+    <RadzenButton Text="Create Team" ButtonStyle="ButtonStyle.Secondary" Click=@OpenCreateTeam />
+</div><br />
+
+@code {
+    int orderID = 10248;
+
+    public async Task OpenCreateTeam()
+    {
+        await DialogService.OpenAsync<CreateTeam>($"Create Team",
+               new Dictionary<string, object>() { },
+               new DialogOptions() { Width = "75%", Height = "50%", Resizable = true, Draggable = true });
+    }
+}
 <RadzenDataGrid @ref="teamsList"
                 AllowFiltering="true"
                 FilterPopupRenderMode="PopupRenderMode.OnDemand"
@@ -54,15 +69,17 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Filterable=false Sortable=false Property="CreatedBy" TItem="TeamDto" Title="Edit">
             <Template Context="teams">
-                <RadzenButton Visible="@(teams.CreatedBy == playerId ? true : false)" ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" Icon="build" class="m-1" Click="() => EditTeam(teams.Id.ToString())" />
+                <RadzenButton Visible="@(teams.CreatedBy == playerId || isAdmin ? true : false)" ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" Icon="build" class="m-1" Click="() => EditTeam(teams.Id.ToString())" />
             </Template>
         </RadzenDataGridColumn>
     </Columns>
 </RadzenDataGrid>
 @code {
+    bool isAdmin = false;
     bool myTeamOnlyMode = false;
     string playerId = "";
     private string username = "";
+    private string role = "";
     RadzenDataGrid<TeamDto>? teamsList;
 
     private List<TeamDto>? teams;
@@ -73,6 +90,8 @@
             var token = new JwtSecurityTokenHandler().ReadJwtToken(await tokenService.GetToken());
             username = token.Claims.FirstOrDefault(x => x.Type == "unique_name")?.Value ?? "";
             playerId = token.Claims.FirstOrDefault(x => x.Type == "nameid")?.Value ?? "";
+            role = token.Claims.FirstOrDefault(x => x.Type == "role")?.Value ?? "";
+            isAdmin = role == "admin" ? true : false;
             await GetData();
             StateHasChanged();
         }
