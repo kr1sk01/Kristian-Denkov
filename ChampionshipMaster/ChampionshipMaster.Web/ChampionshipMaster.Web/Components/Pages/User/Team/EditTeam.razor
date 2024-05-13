@@ -22,58 +22,99 @@
 <span>Created On: @team.CreatedOn</span>
 <span>Active:@team.Active</span>
 
+
+
 <div class="rz-p-sm-12 rz-text-align-center">
     <RadzenLabel Text="Select Value"
                  Component="DropDownFiltering"
-                 Style="margin-right: 8px; vertical-align: middle;" />
-     <RadzenDropDown @ref=@radzenDropDown
+                 Style="margin-right: 8px; vertical-align: middle;" /><br />
+    <RadzenDropDown @ref=@radzenDropDown
                     @bind-SearchText=SearchText
                     FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                     FilterOperator="StringFilterOperator.StartsWith"
                     AllowFiltering="true"
                     Data=@customers
-                    TextProperty="Name" 
+                    TextProperty="Name"
                     ValueProperty="Id"
                     AllowClear="true"
                     @bind-Value=value
                     Style="width: 100%; max-width: 400px;"
-                    Name="DropDownFiltering" /> 
-</div>
+                    Name="DropDownFiltering2" />
+    <RadzenDropDown @ref=@radzenDropDown2
+                    @bind-SearchText=SearchText2
+                    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                    FilterOperator="StringFilterOperator.StartsWith"
+                    AllowFiltering="true"
+                    Data=@customers2
+                    TextProperty="Name"
+                    ValueProperty="Id"
+                    AllowClear="true"
+                    @bind-Value=value2
+                    Style="width: 100%; max-width: 400px;"
+                    Name="DropDownFiltering3" /><br />
+    <RadzenDropDown @ref=@radzenDropDown3
+                    @bind-SearchText=SearchText3
+                    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                    FilterOperator="StringFilterOperator.StartsWith"
+                    AllowFiltering="true"
+                    Data=@customers3
+                    TextProperty="Name"
+                    ValueProperty="Id"
+                    AllowClear="true"
+                    @bind-Value=value3
+                    Style="width: 100%; max-width: 400px;"
+                    Name="DropDownFiltering" />
+    <RadzenDropDown @ref=@radzenDropDown4
+                    @bind-SearchText=SearchText4
+                    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                    FilterOperator="StringFilterOperator.StartsWith"
+                    AllowFiltering="true"
+                    Data=@customers4
+                    TextProperty="Name"
+                    ValueProperty="Id"
+                    AllowClear="true"
+                    @bind-Value=value4
+                    Style="width: 100%; max-width: 400px;"
+                    Name="DropDownFiltering4" />
 
 
-<div class="rz-p-sm-3 rz-text-align-left">
-    <RadzenLabel Text="@searchTextStatus" />
 </div>
 <RadzenButton Click=@(()=> AddPlayerToTeam()) Text="Add Player To Team" ButtonStyle="ButtonStyle.Primary" />
-@code {
 
-}
 
 
 @code {
+
+
     [Parameter] public string id { get; set; }
     TeamDto team = new TeamDto();
+
     RadzenDropDown<string> radzenDropDown = new RadzenDropDown<string>();
+    RadzenDropDown<string> radzenDropDown2 = new RadzenDropDown<string>();
+    RadzenDropDown<string> radzenDropDown3 = new RadzenDropDown<string>();
+    RadzenDropDown<string> radzenDropDown4 = new RadzenDropDown<string>();
 
     IEnumerable<PlayerDto> customers = new List<PlayerDto>();
+    IEnumerable<PlayerDto> customers2 = new List<PlayerDto>();
+    IEnumerable<PlayerDto> customers3 = new List<PlayerDto>();
+    IEnumerable<PlayerDto> customers4 = new List<PlayerDto>();
 
-    string value= "";
-    string searchTextStatus = "";
+    string value = "";
+    string value2 = "";
+    string value3 = "";
+    string value4 = "";
 
     string userToAdd_Id = "";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-
-
-
         if (firstRender)
         {
             using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
 
             var smth = await _localStorage.GetAsync<string>("jwtToken");
             var test = await client.GetFromJsonAsync<TeamDto>($"api/Teams/{id}");
-            if(test != null)
+            if (test != null)
             {
                 team = test;
                 StateHasChanged();
@@ -83,10 +124,11 @@
             if (test2 != null)
             {
                 customers = test2;
+                customers2 = test2;
+                customers3 = test2;
+                customers4 = test2;
+                StateHasChanged();
             }
-
-
-            searchTextStatus = $"Search text: {searchText}";
 
         }
 
@@ -120,7 +162,7 @@
 
     }
 
-    string searchText = "al";
+    string searchText = String.Empty;
 
     public string SearchText
     {
@@ -133,8 +175,54 @@
             if (searchText != value)
             {
                 searchText = value;
-                searchTextStatus = $"Search text: {searchText}";
-                Console.WriteLine($"Search text: {radzenDropDown.SearchText}");
+
+            }
+        }
+    }
+    string searchText2 = String.Empty;
+
+    public string SearchText2
+    {
+        get
+        {
+            return searchText2;
+        }
+        set
+        {
+            if (searchText2 != value)
+            {
+                searchText2 = value;
+            }
+        }
+    }
+    string searchText3 = String.Empty;
+
+    public string SearchText3
+    {
+        get
+        {
+            return searchText3;
+        }
+        set
+        {
+            if (searchText3 != value)
+            {
+                searchText3 = value;
+            }
+        }
+    }
+    string searchText4 = String.Empty;
+    public string SearchText4
+    {
+        get
+        {
+            return searchText4;
+        }
+        set
+        {
+            if (searchText4 != value)
+            {
+                searchText4 = value;
             }
         }
     }

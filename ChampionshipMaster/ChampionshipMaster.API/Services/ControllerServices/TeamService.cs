@@ -152,7 +152,9 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             {
                 return BadRequest("Team doesn't exist!");
             }
+
             var playerToAdd = await _userManager.FindByIdAsync(dict["playerId"]);
+
             if(playerToAdd == null)
             {
                 return BadRequest("Player doesn't exist!");
