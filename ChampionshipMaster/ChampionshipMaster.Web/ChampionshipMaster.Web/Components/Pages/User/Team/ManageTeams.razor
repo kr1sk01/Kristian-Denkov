@@ -16,12 +16,13 @@
 @rendermode InteractiveServer
 @inject DialogService DialogService
 
-<h3>Manage Teams</h3>
+<center><h1>Manage Teams</h1></center>
 
 
 <div>
-    <RadzenButton Text="Create Team" ButtonStyle="ButtonStyle.Secondary" Click=@OpenCreateTeam />
-</div><br />
+    <RadzenButton Icon="note_add" Text="Create Team" ButtonStyle="ButtonStyle.Secondary" Click=@OpenCreateTeam />
+</div>
+<br />
 
 @code {
     public async Task OpenCreateTeam()
@@ -35,7 +36,7 @@
                 AllowFiltering="true"
                 FilterPopupRenderMode="PopupRenderMode.OnDemand"
                 AllowPaging="true"
-                PageSize="8"
+                PageSize="7"
                 AllowSorting="true"
                 Data="@teams"
                 TItem="TeamDto">
@@ -60,7 +61,7 @@
                 @teams.CreatedBy
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="TeamDto" Property="CreatedBy" Title="Team Type">
+        <RadzenDataGridColumn TItem="TeamDto" Property="TeamType" Title="Team Type">
             <Template Context="teams">
                 @teams.TeamTypeName
             </Template>
