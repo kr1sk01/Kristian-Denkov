@@ -158,10 +158,19 @@
         if (radzenDropDown.Value != null)
         {
             userToAdd_Id = radzenDropDown.Value.ToString()!;
+            //userToAdd_Id2 = radzenDropDown2.Value.ToString()!;
+            //userToAdd_Id3 = radzenDropDown3.Value.ToString()!;
+            //userToAdd_Id4 = radzenDropDown4.Value.ToString()!;
+            
         }
         Dictionary<string, string> dict = new Dictionary<string, string>
                     {
                 { "playerId", userToAdd_Id },
+                //Just add { "playerId2", userToAdd_Id2 },
+                //Just add { "playerId3", userToAdd_Id3 },
+                //Just add { "playerId4", userToAdd_Id4 },
+                //And check on the backend if the playerId2,playerId3,playerId4 are null and if they're dont add anything to the team,
+                // otherwise add every player 
                 { "teamid", id }
             };
 
