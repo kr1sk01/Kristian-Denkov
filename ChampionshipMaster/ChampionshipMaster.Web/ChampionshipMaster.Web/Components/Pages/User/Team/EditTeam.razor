@@ -36,6 +36,7 @@
                     Data=@customers
                     TextProperty="Name"
                     ValueProperty="Id"
+                    Placeholder="Player 1"
                     AllowClear="true"
                     @bind-Value=value
                     Style="width: 100%; max-width: 400px;"
@@ -48,10 +49,12 @@
                     Data=@customers2
                     TextProperty="Name"
                     ValueProperty="Id"
+                    Placeholder="Player 2"
                     AllowClear="true"
                     @bind-Value=value2
                     Style="width: 100%; max-width: 400px;"
-                    Name="DropDownFiltering3" /><br />
+                    Name="DropDownFiltering3" 
+                    Visible=@(teamMaxPlayers > 1 ? true:false) /><br />
     <RadzenDropDown @ref=@radzenDropDown3
                     @bind-SearchText=SearchText3
                     FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
@@ -61,9 +64,11 @@
                     TextProperty="Name"
                     ValueProperty="Id"
                     AllowClear="true"
+                    Placeholder="Player 3"
                     @bind-Value=value3
                     Style="width: 100%; max-width: 400px;"
-                    Name="DropDownFiltering" />
+                    Name="DropDownFiltering" 
+                    Visible=@(teamMaxPlayers > 2 ? true:false) />
     <RadzenDropDown @ref=@radzenDropDown4
                     @bind-SearchText=SearchText4
                     FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
@@ -72,10 +77,12 @@
                     Data=@customers4
                     TextProperty="Name"
                     ValueProperty="Id"
+                    Placeholder="Player 4"
                     AllowClear="true"
                     @bind-Value=value4
                     Style="width: 100%; max-width: 400px;"
-                    Name="DropDownFiltering4" />
+                    Name="DropDownFiltering4"
+                    Visible=@(teamMaxPlayers > 3 ? true:false)/>
 
 
 </div>
@@ -87,7 +94,11 @@
 
 
     [Parameter] public string id { get; set; }
+
     TeamDto team = new TeamDto();
+    IEnumerable<PlayerDto> playersList;
+
+
 
     RadzenDropDown<string> radzenDropDown = new RadzenDropDown<string>();
     RadzenDropDown<string> radzenDropDown2 = new RadzenDropDown<string>();
@@ -105,6 +116,7 @@
     string value4 = "";
 
     string userToAdd_Id = "";
+    int teamMaxPlayers = 0;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -113,10 +125,46 @@
             using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
 
             var smth = await _localStorage.GetAsync<string>("jwtToken");
-            var test = await client.GetFromJsonAsync<TeamDto>($"api/Teams/{id}");
-            if (test != null)
+            var teamDto = await client.GetFromJsonAsync<TeamDto>($"api/Teams/{id}");
+            if (teamDto != null)
             {
-                team = test;
+                team = teamDto;
+                playersList = teamDto.Players;
+
+                teamMaxPlayers = teamDto.TeamSize;
+                if (playersList != null )
+                {
+                    if (teamDto.Players.Count > 0)
+                    {
+                        switch (teamMaxPlayers)
+                        {
+                            case 1:
+                                radzenDropDown.Value = playersList.FirstOrDefault().Name;
+                                break;
+                            case 2:
+                                radzenDropDown.Value = playersList.FirstOrDefault().Name;
+                                radzenDropDown2.Value = playersList.Skip(1).FirstOrDefault().Name;
+                                break;
+                            case 3:
+                                radzenDropDown.Value = playersList.FirstOrDefault().Name;
+                                radzenDropDown2.Value = playersList.Skip(1).FirstOrDefault().Name;
+                                radzenDropDown3.Value = playersList.Skip(2).FirstOrDefault().Name;
+                                break;
+                            case 4:
+                                radzenDropDown.Value = playersList.FirstOrDefault().Name;
+                                radzenDropDown2.Value = playersList.Skip(1).FirstOrDefault().Name;
+                                radzenDropDown3.Value = playersList.Skip(2).FirstOrDefault().Name;
+                                radzenDropDown4.Value = playersList.Skip(3).FirstOrDefault().Name;
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                  
+                }
+                
+
+
                 StateHasChanged();
             }
 

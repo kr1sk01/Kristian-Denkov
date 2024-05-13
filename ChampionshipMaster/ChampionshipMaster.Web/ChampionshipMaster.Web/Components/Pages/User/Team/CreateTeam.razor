@@ -19,9 +19,9 @@
 
 <center>
     <h3>Create Team</h3>
-    <div style="justify-content:center;text-align:left;width:45%;">
+    <div style="justify-content:center;text-align:left;width:50%;">
         <RadzenTemplateForm TItem="TeamDto" Data=@model Submit=@OnSubmit InvalidSubmit=@OnInvalidSubmit>
-            <RadzenStack Gap="1rem" Class="rz-p-sm-12">
+            <RadzenStack Gap="0.5rem" Class="rz-p-sm-12">
                 <RadzenFormField Text="Name" Variant="@variant">
                     <ChildContent>
                         <RadzenTextBox Name="Name" @bind-Value=@model.Name />
@@ -35,18 +35,11 @@
                 <RadzenDropDown Placeholder="Select team type" Name="Type" @bind-Value=@model.TeamTypeName Data=@teamTypes.Select(x => x.Name).ToList() Style="width: 100%;" />
 
                 <RadzenButton ButtonType="ButtonType.Submit" Text="Create Team"></RadzenButton>
+
             </RadzenStack>
-
         </RadzenTemplateForm>
-
     </div>
 </center>
-
-
-
-
-<div class="rz-p-sm-12 rz-text-align-center">
-</div>
 
 @code {
     Variant variant = Variant.Outlined;
