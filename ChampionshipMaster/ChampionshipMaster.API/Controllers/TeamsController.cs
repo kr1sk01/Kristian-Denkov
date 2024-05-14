@@ -65,11 +65,11 @@ namespace ChampionshipMaster.API.Controllers
             return result;
         }
         [Authorize]
-        [HttpGet("addplayer/{id}")]
-        public async Task<ActionResult<TeamDto>> SetTeamMembers(Dictionary<PlayerDto, string> dict, string teamId)
+        [HttpPost("setPlayers")]
+        public async Task<ActionResult<TeamDto>> SetTeamMembers([FromQuery] string teamId, [FromBody] List<string> playerIds)
         {
             var authHeader = HttpContext.Request.Headers.Authorization;
-            var result = await _teamService.SetTeamMembers(dict, teamId, authHeader);
+            var result = await _teamService.SetTeamMembers(teamId, playerIds, authHeader);
             return result;
         }
 
@@ -78,6 +78,26 @@ namespace ChampionshipMaster.API.Controllers
         public async Task<IActionResult> DeleteTeam(int id)
         {
             var result = await _teamService.DeleteTeam(id);
+            return result;
+        }
+
+        [Authorize]
+        [HttpPost("changeTeamName")]
+        public async Task<IActionResult> ChangeTeamName([FromQuery] string teamId, [FromBody] Dictionary<string, string> content)
+        {
+            var authHeader = HttpContext.Request.Headers.Authorization;
+            string newName = content.FirstOrDefault().Value;
+            var result = await _teamService.ChangeTeamName(teamId, newName, authHeader);
+            return result;
+        }
+
+        [Authorize]
+        [HttpPost("changeTeamLogo")]
+        public async Task<IActionResult> ChangeTeamLogo([FromQuery] string teamId, [FromBody] Dictionary<string, string> content)
+        {
+            var authHeader = HttpContext.Request.Headers.Authorization;
+            string newLogo = content.FirstOrDefault().Value;
+            var result = await _teamService.ChangeTeamLogo(teamId, newLogo, authHeader);
             return result;
         }
     }

@@ -17,36 +17,82 @@
 
 <h3>Edit Team</h3>
 
+@if (isLogged)
+{
+        <center>
+            <ChangeTeamMembers @ref=@changeTeamMembers id="@id" StateChange="@CheckButtonState" RequestUrl="@teamMembersRequestUrl" />
+            <ChangeName @ref=@changeTeamName
+                        Title="Change Team Name"
+                        RequestUrl="@nameRequestUrl"
+                        StateChange=@CheckButtonState />
 
+            <ImageUpload @ref=@changeTeamLogo
+                         Title="Team Logo"
+                         SetImageFor="@ImageUpload.SetImageForOptions.Team"
+                         RequestUrl="@logoRequestUrl"
+                         StateChange=@CheckButtonState />
 
-    <div class="rz-p-sm-12 rz-text-align-center">
-        <center></center><br />
-        <ChangeTeamMembers @ref=@component id="@id" StateChange="@CheckButtonState" ></ChangeTeamMembers>
-        
-    </div>
-    <RadzenButton Click=@Click Text="Add Player To Team" ButtonStyle="ButtonStyle.Primary"  />
-
-
-
-
+            <RadzenButton Click=@OnClick Text="Save Changes" ButtonStyle="ButtonStyle.Primary" Disabled="@isValueInitial" />
+        </center>
+}
 
 @code {
 
     [Parameter] public string id { get; set; }
+
     bool isValueInitial = true;
-    ChangeTeamMembers component;
+    bool isLogged = false;
+    ChangeTeamMembers changeTeamMembers;
+    ChangeName changeTeamName;
+    ImageUpload changeTeamLogo;
+
+    string nameRequestUrl = "api/Teams/changeTeamName";
+    string logoRequestUrl = "api/Teams/changeTeamLogo";
+    string teamMembersRequestUrl = "api/Teams/setPlayers";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (!await tokenService.ValidateToken())
+            {
+                notifier.SendErrorNotification("Your session has ran out or you're not logged in");
+                NavigationManager.NavigateTo("/login");
+            }
+
+            isLogged = true;
+            StateHasChanged();
+
+            using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+
+            var team = await client.GetFromJsonAsync<TeamDto>($"api/Teams/{id}");
+            if (team != null)
+            {
+                changeTeamName.SetInitialValue(team.Name!);
+                nameRequestUrl += $"?teamId={id}";
+
+                changeTeamLogo.UpdateDisplayedImagePath(Convert.ToBase64String(team.Logo ?? new byte[0]));
+                logoRequestUrl += $"?teamId={id}";
+
+                teamMembersRequestUrl += $"?teamId={id}";
+                StateHasChanged();
+            }
+        }
+    }
 
     public void CheckButtonState()
     {
-        isValueInitial = component.isValueInitial;
-        //StateHasChanged();
+        isValueInitial = changeTeamName.isValueInitial && changeTeamLogo.isValueInitial && changeTeamMembers.isValueInitial;
     }
 
-    public void Click()
+    public async Task OnClick()
     {
-        StateHasChanged();
+        await changeTeamName.OnClick();
+        await changeTeamLogo.UploadImage();
+        await changeTeamMembers.SetTeamMembers();
+        NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
     }
-    // Pass to this dictionary which has for key all choosen players list and for value username for the user which does it 
+    // Pass to this dictionary which has for key all choosen players list and for value username for the user which does it
     /*
      *   EXHAMPLE:
      *
@@ -56,7 +102,7 @@
      *       dict.Add(teamPlayersToSet[i], sender[i]);
      *   }
      *
-     *   Then just past dict to AddPlayerToTeam 
+     *   Then just past dict to AddPlayerToTeam
      *   We dont need initial players, only chosen one from dropdowns!
      */
     private async Task AddPlayerToTeam(Dictionary<PlayerDto, string> dict)

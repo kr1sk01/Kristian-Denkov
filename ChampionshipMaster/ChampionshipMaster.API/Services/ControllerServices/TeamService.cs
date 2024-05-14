@@ -134,52 +134,65 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             return BadRequest();
             
         }
-        public async Task<ActionResult<TeamDto>> SetTeamMembers(Dictionary<PlayerDto, string> dict, string teamId, StringValues authHeader)
+        public async Task<ActionResult<TeamDto>> SetTeamMembers(string teamId, List<string> playerIds, StringValues authHeader)
         {
-            if (await TeamIdExists(int.Parse(teamId)) == false)
-            {
-                return BadRequest("This team doesn't exist!");
-            }
-            
-            var tokenString = authHeader.ToString().Split(' ')[1];
-            var token = new JwtSecurityToken(tokenString);
-            
-            var teamToAdd = await _context.Teams.FirstOrDefaultAsync(x => x.Id == int.Parse(teamId));
-            
-            TeamPlayers test;
-
-            if (teamToAdd == null)
-            {
-                return BadRequest("Team doesn't exist!");
-            }
-            //Delete all previous players
-            var teamPlayerList = await _context.TeamPlayers.Where(x => x.TeamId == teamToAdd.Id).ToListAsync();
-            foreach (var item in teamPlayerList)
-            {
-                _context.TeamPlayers.Remove(item);
-            }
-            //Add new ones
-            foreach (var playerIDS in dict)
-            {
-                var playerToAdd = await _userManager.FindByIdAsync(playerIDS.Key.Id!);
-                var teamCreatorUsername = playerIDS.Value;
-                test = new TeamPlayers
-                {
-                    Team = teamToAdd,
-                    Player = playerToAdd,
-                    CreatedBy = teamCreatorUsername,
-                    CreatedOn = DateTime.UtcNow,
-                };
-                await _context.TeamPlayers.AddAsync(test);                             
-            }
             try
             {
+                var tokenString = authHeader.ToString().Split(' ')[1];
+                var token = new JwtSecurityToken(tokenString);
+
+                var userId = token.Claims.First(x => x.Type == "nameid").Value;
+                var userRole = token.Claims.First(x => x.Type == "role").Value;
+                var teamToEdit = await _context.Teams.FirstOrDefaultAsync(x => x.Id == int.Parse(teamId));
+
+                if (teamToEdit == null)
+                {
+                    return NotFound("This team doesn't exist!");
+                }
+
+                if (teamToEdit.CreatedBy != userId && userRole != "admin")
+                {
+                    return Forbid("You do not have permission for this operation!");
+                }
+
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null)
+                {
+                    return NotFound("Request failed!");
+                }
+
+                TeamPlayers teamPlayer;
+
+                //Delete all previous players
+                var teamPlayerList = await _context.TeamPlayers.Where(x => x.TeamId == teamToEdit.Id).ToListAsync();
+                foreach (var item in teamPlayerList)
+                {
+                    _context.TeamPlayers.Remove(item);
+                }
+
+                //Add new ones
+                foreach (var playerId in playerIds)
+                {
+                    var playerToAdd = await _userManager.FindByIdAsync(playerId);
+
+                    teamPlayer = new TeamPlayers
+                    {
+                        Team = teamToEdit,
+                        Player = playerToAdd,
+                        CreatedBy = userId,
+                        CreatedOn = DateTime.UtcNow,
+                    };
+                    await _context.TeamPlayers.AddAsync(teamPlayer);
+                }
+
                 await _context.SaveChangesAsync();
-            }catch(Exception ex)
+                return Ok();
+            }
+            catch (Exception ex)
             {
+                await Console.Out.WriteLineAsync(ex.Message);
                 return BadRequest("Couldn't save data to the database!");
-            }                     
-            return Ok();
+            }
         }
         public async Task<ActionResult<TeamDto>> PostTeam(TeamDto team, StringValues authHeader)
         {           
@@ -245,5 +258,82 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             return await _context.Teams.AnyAsync(x => x.Id == id);
         }
 
+        public async Task<ActionResult> ChangeTeamName(string teamId, string newName, StringValues authHeader)
+        {
+            try
+            {
+                var tokenString = authHeader.ToString().Split(' ')[1];
+                var token = new JwtSecurityToken(tokenString);
+
+                var userId = token.Claims.First(x => x.Type == "nameid").Value;
+                var userRole = token.Claims.First(x => x.Type == "role").Value;
+                var teamToEdit = await _context.Teams.FirstOrDefaultAsync(x => x.Id == int.Parse(teamId));
+
+                if (teamToEdit == null)
+                {
+                    return NotFound("This team doesn't exist!");
+                }
+
+                if (teamToEdit.CreatedBy != userId && userRole != "admin")
+                {
+                    return Forbid("You do not have permission for this operation!");
+                }
+
+                bool isNewNameExist = await _context.Teams.AnyAsync(x => x.Name == newName && x.Id != teamToEdit.Id);
+                if (isNewNameExist)
+                {
+                    return BadRequest("There is already a team with that name!");
+                }
+
+                teamToEdit.Name = newName;
+                teamToEdit.ModifiedBy = userId;
+                teamToEdit.ModifiedOn = DateTime.UtcNow;
+                _context.Entry(teamToEdit).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+
+                return Ok("Changed team name successfully!");
+            }
+            catch (Exception ex)
+            {
+                await Console.Out.WriteLineAsync(ex.Message);
+                return BadRequest("Something went wrong");
+            }
+        }
+
+        public async Task<ActionResult> ChangeTeamLogo(string teamId, string newLogo, StringValues authHeader)
+        {
+            try
+            {
+                var tokenString = authHeader.ToString().Split(' ')[1];
+                var token = new JwtSecurityToken(tokenString);
+
+                var userId = token.Claims.First(x => x.Type == "nameid").Value;
+                var userRole = token.Claims.First(x => x.Type == "role").Value;
+                var teamToEdit = await _context.Teams.FirstOrDefaultAsync(x => x.Id == int.Parse(teamId));
+
+                if (teamToEdit == null)
+                {
+                    return NotFound("This team doesn't exist!");
+                }
+
+                if (teamToEdit.CreatedBy != userId && userRole != "admin")
+                {
+                    return Forbid("You do not have permission for this operation!");
+                }
+
+                teamToEdit.Logo = Convert.FromBase64String(newLogo);
+                teamToEdit.ModifiedBy = userId;
+                teamToEdit.ModifiedOn = DateTime.UtcNow;
+                _context.Entry(teamToEdit).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+
+                return Ok("Changed team logo successfully!");
+            }
+            catch (Exception ex)
+            {
+                await Console.Out.WriteLineAsync(ex.Message);
+                return BadRequest("Something went wrong");
+            }
+        }
     }
 }

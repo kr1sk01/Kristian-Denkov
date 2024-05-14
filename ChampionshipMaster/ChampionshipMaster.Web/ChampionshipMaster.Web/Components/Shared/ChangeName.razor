@@ -18,7 +18,7 @@
     </RadzenCard>
 </div>
 
-    @code {
+@code {
     [Parameter]
     public EventCallback StateChange { get; set; }
     [Parameter]
@@ -28,7 +28,7 @@
     [Parameter]
     public required string RequestUrl { get; set; }
     [Parameter]
-    public required string ResponseProperty { get; set; }
+    public string? ResponseProperty { get; set; }
     [Parameter]
     public string? ToLocalStorage { get; set; }
     [Parameter]
@@ -90,13 +90,15 @@
             {
                 try
                 {
-                    var responseValue = JsonSerializer.Deserialize<Dictionary<string, string>>(body)![ResponseProperty];
-
-                    if (!string.IsNullOrEmpty(ToLocalStorage))
+                    if (!string.IsNullOrEmpty(ResponseProperty))
                     {
-                        await _localStorage.SetAsync(ToLocalStorage, responseValue);
+                        var responseValue = JsonSerializer.Deserialize<Dictionary<string, string>>(body)![ResponseProperty];
+                        if (!string.IsNullOrEmpty(ToLocalStorage))
+                        {
+                            await _localStorage.SetAsync(ToLocalStorage, responseValue);
+                        }
                     }
-
+                    
                     if (ReloadPageOnComplete) { NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true); }
                 }
                 catch (Exception ex)
