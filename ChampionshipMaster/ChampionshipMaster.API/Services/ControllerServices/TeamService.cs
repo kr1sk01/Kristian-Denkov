@@ -167,12 +167,16 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                 var teamPlayerList = await _context.TeamPlayers.Where(x => x.TeamId == teamToEdit.Id).ToListAsync();
                 foreach (var item in teamPlayerList)
                 {
-                    _context.TeamPlayers.Remove(item);
+                    if (!playerIds.Any(x => x == item.PlayerId))
+                        _context.TeamPlayers.Remove(item);
                 }
 
                 //Add new ones
                 foreach (var playerId in playerIds)
                 {
+                    if (teamPlayerList.Any(x => x.PlayerId == playerId))
+                        continue;
+
                     var playerToAdd = await _userManager.FindByIdAsync(playerId);
 
                     teamPlayer = new TeamPlayers
