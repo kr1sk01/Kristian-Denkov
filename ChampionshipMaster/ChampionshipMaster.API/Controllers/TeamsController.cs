@@ -65,11 +65,11 @@ namespace ChampionshipMaster.API.Controllers
             return result;
         }
         [Authorize]
-        [HttpPost("addplayer")]
-        public async Task<ActionResult<TeamDto>> AddTeamMember(Dictionary<string, string> dict)
+        [HttpGet("addplayer/{id}")]
+        public async Task<ActionResult<TeamDto>> SetTeamMembers(Dictionary<PlayerDto, string> dict, string teamId)
         {
             var authHeader = HttpContext.Request.Headers.Authorization;
-            var result = await _teamService.AddTeamMember(dict, authHeader);
+            var result = await _teamService.SetTeamMembers(dict, teamId, authHeader);
             return result;
         }
 

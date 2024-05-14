@@ -1,4 +1,5 @@
 ﻿using ChampionshipMaster.API.Interfaces;
+using ChampionshipMaster.DATA.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Primitives;
 using System.IdentityModel.Tokens.Jwt;
@@ -133,58 +134,46 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             return BadRequest();
             
         }
-        public async Task<ActionResult<TeamDto>> AddTeamMember(Dictionary<string, string> dict, StringValues authHeader)
+        public async Task<ActionResult<TeamDto>> SetTeamMembers(Dictionary<PlayerDto, string> dict, string teamId, StringValues authHeader)
         {
-            if (await TeamIdExists(int.Parse(dict["teamid"])) == false)
+            if (await TeamIdExists(int.Parse(teamId)) == false)
             {
                 return BadRequest("This team doesn't exist!");
             }
             
             var tokenString = authHeader.ToString().Split(' ')[1];
             var token = new JwtSecurityToken(tokenString);
-
             
-            var teamCreatorUsername = token.Claims.First(c => c.Type == "unique_name").Value;
-          
-            var teamToAdd = await _context.Teams.FirstOrDefaultAsync(x => x.Id == int.Parse(dict["teamid"]));
+            var teamToAdd = await _context.Teams.FirstOrDefaultAsync(x => x.Id == int.Parse(teamId));
+            
+            TeamPlayers test;
 
             if (teamToAdd == null)
             {
                 return BadRequest("Team doesn't exist!");
             }
-
-            var playerToAdd = await _userManager.FindByIdAsync(dict["playerId"]);
-
-            if(playerToAdd == null)
+            //Delete all previous players
+            var teamPlayerList = await _context.TeamPlayers.Where(x => x.TeamId == teamToAdd.Id).ToListAsync();
+            foreach (var item in teamPlayerList)
             {
-                return BadRequest("Player doesn't exist!");
+                _context.TeamPlayers.Remove(item);
             }
-            
-            var playerCountMax = await _context.Teams.Where(x=>x.Id == teamToAdd.Id).Select(x=>x.TeamType).Select(x=>x.TeamSize).FirstOrDefaultAsync();
-
-            var actualPlayerCount = _context.TeamPlayers.Where(x => x.TeamId == teamToAdd.Id).ToList().Count;
-
-            var playerList = await _context.TeamPlayers.Where(x => x.TeamId == teamToAdd.Id).Select(x => x.Player).Select(x=>x.Id).ToListAsync();
-
-            if (actualPlayerCount >= playerCountMax)
+            //Add new ones
+            foreach (var playerIDS in dict)
             {
-                return BadRequest("Team is full!");
+                var playerToAdd = await _userManager.FindByIdAsync(playerIDS.Key.Id!);
+                var teamCreatorUsername = playerIDS.Value;
+                test = new TeamPlayers
+                {
+                    Team = teamToAdd,
+                    Player = playerToAdd,
+                    CreatedBy = teamCreatorUsername,
+                    CreatedOn = DateTime.UtcNow,
+                };
+                await _context.TeamPlayers.AddAsync(test);                             
             }
-            if(playerList.Contains(playerToAdd.Id))
-            {
-                return BadRequest($"{playerToAdd.UserName} is already in this team!");
-            }
-            TeamPlayers tp = new TeamPlayers
-            {
-                Team = teamToAdd,               
-                Player = playerToAdd,
-                CreatedBy = teamCreatorUsername,
-                CreatedOn = DateTime.UtcNow,
-
-            };
             try
             {
-                await _context.TeamPlayers.AddAsync(tp);
                 await _context.SaveChangesAsync();
             }catch(Exception ex)
             {

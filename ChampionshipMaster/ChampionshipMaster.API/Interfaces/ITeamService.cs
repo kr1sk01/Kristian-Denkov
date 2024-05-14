@@ -9,7 +9,7 @@ namespace ChampionshipMaster.API.Interfaces
         Task<ActionResult<TeamDto?>> GetTeam(int id);
         Task<ActionResult<List<GameDto>>> GameHistory(int id);
         Task<ActionResult<TeamDto>> PostTeam(TeamDto team, StringValues authHeader);
-        Task<ActionResult<TeamDto>> AddTeamMember(Dictionary<string,string> dict, StringValues authHeader);
+        Task<ActionResult<TeamDto>> SetTeamMembers(Dictionary<PlayerDto, string> dict, string teamId, StringValues authHeader);
         Task<IActionResult> EditTeam(int id, Team team);
         Task<bool> TeamExists(int id);
         Task<bool> TeamNameExists(string? name);
