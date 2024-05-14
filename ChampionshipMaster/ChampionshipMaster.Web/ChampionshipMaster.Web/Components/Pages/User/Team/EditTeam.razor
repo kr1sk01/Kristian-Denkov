@@ -17,240 +17,33 @@
 
 <h3>Edit Team</h3>
 
-<span>Team Name:@team.Name</span>
-<span>Created By: @team.CreatedBy</span>
-<span>Created On: @team.CreatedOn</span>
-<span>Active:@team.Active</span>
 
 
+    <div class="rz-p-sm-12 rz-text-align-center">
+        <center></center><br />
+        <ChangeTeamMembers @ref=@component id="@id" StateChange="@CheckButtonState" ></ChangeTeamMembers>
+        
+    </div>
+    <RadzenButton Click=@Click Text="Add Player To Team" ButtonStyle="ButtonStyle.Primary"  />
 
-<div class="rz-p-sm-12 rz-text-align-center">
-    <center><h1>Select Team Members</h1></center><br />
-    @if (playersList != null)
-    {
-        <RadzenDropDown @ref=@radzenDropDown
-                        @bind-SearchText=SearchText
-                        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                        FilterOperator="StringFilterOperator.StartsWith"
-                        AllowFiltering="true"
-                        Data=@customers
-                        TextProperty="Name"
-                        ValueProperty="Id"
-                        Placeholder=@(playersList.FirstOrDefault() != null ? playersList.FirstOrDefault().Name : "Player 1")
-                        AllowClear="true"
-                        @bind-Value=value
-                        Style="width: 100%; max-width: 400px;"
-                        Name="DropDownFiltering2" />
-        <RadzenDropDown @ref=@radzenDropDown2
-                        @bind-SearchText=SearchText2
-                        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                        FilterOperator="StringFilterOperator.StartsWith"
-                        AllowFiltering="true"
-                        Data=@customers2
-                        TextProperty="Name"
-                        ValueProperty="Id"
-                        Placeholder=@(playersList.Skip(1).FirstOrDefault() != null ? playersList.Skip(1).FirstOrDefault()!.Name : "Player 2")
-                        AllowClear="true"
-                        @bind-Value=value2
-                        Style="width: 100%; max-width: 400px;"
-                        Name="DropDownFiltering3"
-                        Visible=@(teamMaxPlayers > 1 ? true:false) />
 
-        <br />
-        <RadzenDropDown @ref=@radzenDropDown3
-                        @bind-SearchText=SearchText3
-                        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                        FilterOperator="StringFilterOperator.StartsWith"
-                        AllowFiltering="true"
-                        Data=@customers3
-                        TextProperty="Name"
-                        ValueProperty="Id"
-                        AllowClear="true"
-                        Placeholder=@(playersList.Skip(2).FirstOrDefault() != null ? playersList.Skip(2).FirstOrDefault()!.Name : "Player 3")
-                        @bind-Value=value3
-                        Style="width: 100%; max-width: 400px;"
-                        Name="DropDownFiltering"
-                        Visible=@(teamMaxPlayers > 2 ? true:false) />
-        <RadzenDropDown @ref=@radzenDropDown4
-                        @bind-SearchText=SearchText4
-                        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                        FilterOperator="StringFilterOperator.StartsWith"
-                        AllowFiltering="true"
-                        Data=@customers4
-                        TextProperty="Name"
-                        ValueProperty="Id"
-                        Placeholder=@(playersList.Skip(3).FirstOrDefault() != null ? playersList.Skip(3).FirstOrDefault()!.Name : "Player 4")
-                        AllowClear="true"
-                        @bind-Value=value4
-                        Style="width: 100%; max-width: 400px;"
-                        Name="DropDownFiltering4"
-                        Visible=@(teamMaxPlayers > 3 ? true:false) />
-    }
-
-</div>
-<RadzenButton Click=@(()=> AddPlayerToTeam()) Text="Add Player To Team" ButtonStyle="ButtonStyle.Primary" />
 
 
 
 @code {
 
-
     [Parameter] public string id { get; set; }
+    bool isValueInitial = true;
+    ChangeTeamMembers component;
 
-    TeamDto team = new TeamDto();
-    IEnumerable<PlayerDto> playersList;
-
-
-
-    RadzenDropDown<string> radzenDropDown = new RadzenDropDown<string>();
-    RadzenDropDown<string> radzenDropDown2 = new RadzenDropDown<string>();
-    RadzenDropDown<string> radzenDropDown3 = new RadzenDropDown<string>();
-    RadzenDropDown<string> radzenDropDown4 = new RadzenDropDown<string>();
-
-    IEnumerable<PlayerDto> customers = new List<PlayerDto>();
-    IEnumerable<PlayerDto> customers2 = new List<PlayerDto>();
-    IEnumerable<PlayerDto> customers3 = new List<PlayerDto>();
-    IEnumerable<PlayerDto> customers4 = new List<PlayerDto>();
-
-    string value = "";
-    string value2 = "";
-    string value3 = "";
-    string value4 = "";
-
-    string userToAdd_Id = "";
-    int teamMaxPlayers = 0;
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    public void CheckButtonState()
     {
-        if (firstRender)
-        {
-            using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
-
-            var smth = await _localStorage.GetAsync<string>("jwtToken");
-            var teamDto = await client.GetFromJsonAsync<TeamDto>($"api/Teams/{id}");
-            if (teamDto != null)
-            {
-                team = teamDto;
-                playersList = teamDto.Players;
-
-                teamMaxPlayers = teamDto.TeamSize;
-
-                StateHasChanged();
-            }
-
-            var test2 = await client.GetFromJsonAsync<List<PlayerDto>>("/api/Player");
-            if (test2 != null)
-            {
-                customers = test2;
-                customers2 = test2;
-                customers3 = test2;
-                customers4 = test2;
-                StateHasChanged();
-            }
-
-        }
-
-
-    }
-    private async Task AddPlayerToTeam()
-    {
-
-        if (radzenDropDown.Value != null)
-        {
-            userToAdd_Id = radzenDropDown.Value.ToString()!;
-            //userToAdd_Id2 = radzenDropDown2.Value.ToString()!;
-            //userToAdd_Id3 = radzenDropDown3.Value.ToString()!;
-            //userToAdd_Id4 = radzenDropDown4.Value.ToString()!;
-            
-        }
-        Dictionary<string, string> dict = new Dictionary<string, string>
-                    {
-                { "playerId", userToAdd_Id },
-                //Just add { "playerId2", userToAdd_Id2 },
-                //Just add { "playerId3", userToAdd_Id3 },
-                //Just add { "playerId4", userToAdd_Id4 },
-                //And check on the backend if the playerId2,playerId3,playerId4 are null and if they're dont add anything to the team,
-                // otherwise add every player 
-                { "teamid", id }
-            };
-
-        using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
-
-        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {await tokenService.GetToken()}");
-        var result = await client.PostAsJsonAsync("/api/Teams/addplayer", dict);
-        if (result.IsSuccessStatusCode)
-        {
-            notifier.SendSuccessNotification("This player was added to the team successfully!");
-        }
-        else
-        {
-            notifier.SendErrorNotification(await result.Content.ReadAsStringAsync());
-        }
-
+        isValueInitial = component.isValueInitial;
+        //StateHasChanged();
     }
 
-    string searchText = String.Empty;
-
-    public string SearchText
+    public void Click()
     {
-        get
-        {
-            return searchText;
-        }
-        set
-        {
-            if (searchText != value)
-            {
-                searchText = value;
-
-            }
-        }
-    }
-    string searchText2 = String.Empty;
-
-    public string SearchText2
-    {
-        get
-        {
-            return searchText2;
-        }
-        set
-        {
-            if (searchText2 != value)
-            {
-                searchText2 = value;
-            }
-        }
-    }
-    string searchText3 = String.Empty;
-
-    public string SearchText3
-    {
-        get
-        {
-            return searchText3;
-        }
-        set
-        {
-            if (searchText3 != value)
-            {
-                searchText3 = value;
-            }
-        }
-    }
-    string searchText4 = String.Empty;
-    public string SearchText4
-    {
-        get
-        {
-            return searchText4;
-        }
-        set
-        {
-            if (searchText4 != value)
-            {
-                searchText4 = value;
-            }
-        }
+        StateHasChanged();
     }
 }

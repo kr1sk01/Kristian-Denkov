@@ -1,0 +1,201 @@
+﻿@inject NavigationManager nManager
+@inject Radzen.DialogService dialogService
+
+@inject IHttpClientFactory httpClient
+@inject IConfiguration configuration
+@inject ITokenService tokenService
+@inject IHttpClientFactory httpClient
+@inject IWebHostEnvironment Environment
+@inject INotifier notifier
+
+@inject ProtectedLocalStorage _localStorage
+@inject NavigationManager NavigationManager
+
+@rendermode InteractiveServer
+
+<RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center">
+    <h2>Select Team Members</h2>
+    <RadzenDropDown @ref=@(dropDowns[0])
+                    TValue="string"
+                    ClearSearchAfterSelection="true"
+                    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                    FilterOperator="StringFilterOperator.StartsWith"
+                    AllowFiltering="true"
+                    Data=@selectablePlayers
+                    TextProperty="Name"
+                    ValueProperty="Id"
+                    Style="width: 100%; max-width: 400px;"
+                    Name="DropDownFiltering2"
+                    SelectedItemChanged="@(args => Test(args, 0))" />
+
+    <RadzenDropDown @ref=@(dropDowns[1])
+                    TValue="string"
+                    ClearSearchAfterSelection="true"
+                    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                    FilterOperator="StringFilterOperator.StartsWith"
+                    AllowFiltering="true"
+                    Data=@selectablePlayers
+                    TextProperty="Name"
+                    ValueProperty="Id"
+                    Style="width: 100%; max-width: 400px;"
+                    Name="DropDownFiltering3"
+                    Visible=@(teamMaxPlayers > 1)
+                    SelectedItemChanged="@(args => Test(args, 1))" />
+
+    <RadzenDropDown @ref=@(dropDowns[2])
+                    TValue="string"
+                    ClearSearchAfterSelection="true"
+                    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                    FilterOperator="StringFilterOperator.StartsWith"
+                    AllowFiltering="true"
+                    Data=@selectablePlayers
+                    TextProperty="Name"
+                    ValueProperty="Id"
+                    Style="width: 100%; max-width: 400px;"
+                    Name="DropDownFiltering"
+                    Visible=@(teamMaxPlayers > 2)
+                    SelectedItemChanged="@(args => Test(args, 2))" />
+
+    <RadzenDropDown @ref=@(dropDowns[3])
+                    TValue="string"
+                    ClearSearchAfterSelection="true"
+                    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                    FilterOperator="StringFilterOperator.StartsWith"
+                    AllowFiltering="true"
+                    Data=@selectablePlayers
+                    TextProperty="Name"
+                    ValueProperty="Id"
+                    Style="width: 100%; max-width: 400px;"
+                    Name="DropDownFiltering4"
+                    Visible=@(teamMaxPlayers > 3)
+                    SelectedItemChanged="@(args => Test(args, 3))" />
+</RadzenStack>
+
+@code {
+    [Parameter]
+    public EventCallback StateChange { get; set; }
+
+    [Parameter] 
+    public string id { get; set; }
+
+    bool isLogged = false;
+    List<PlayerDto> playersList;
+    RadzenButton saveChangesButton;
+    List<RadzenDropDown<string>> dropDowns = new List<RadzenDropDown<string>>(4)
+    {
+        new RadzenDropDown<string>(),
+        new RadzenDropDown<string>(),
+        new RadzenDropDown<string>(),
+        new RadzenDropDown<string>(),
+    };
+
+    List<PlayerDto> allPlayers = new List<PlayerDto>();
+    List<PlayerDto> selectablePlayers;
+    List<PlayerDto> initialPlayers = new List<PlayerDto>();
+
+    string userToAdd_Id = "";
+    int teamMaxPlayers = 0;
+
+    public bool isValueInitial = true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (!await tokenService.ValidateToken())
+            {
+                notifier.SendInformationalNotification("You're not logged in or your session has expired");
+                NavigationManager.NavigateTo("/login");
+            }
+
+            isLogged = true;
+
+            using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+            var token = await _localStorage.GetAsync<string>("jwtToken");
+
+            var team = await client.GetFromJsonAsync<TeamDto>($"api/Teams/{id}");
+            if (team == null)
+            {
+                notifier.SendErrorNotification("Sorry, couldn't retrieve team information!");
+                NavigationManager.NavigateTo("/manageteams");
+            }
+
+            allPlayers = await client.GetFromJsonAsync<List<PlayerDto>>("/api/Player");
+            if (allPlayers == null || allPlayers.Count == 0 )
+            {
+                notifier.SendErrorNotification("Sorry, couldn't retrieve players!");
+                NavigationManager.NavigateTo("/manageteams");
+            }
+
+            playersList = team.Players.ToList();
+            teamMaxPlayers = team.TeamSize;
+            selectablePlayers = new List<PlayerDto>(allPlayers);
+            StateHasChanged();
+
+            for (int i = 0; i < playersList.Count; i++)
+            {
+                await dropDowns[i].SelectItem(playersList[i], raiseChange: false);
+                initialPlayers.Add(playersList[i]);
+            }
+        }
+    }
+
+    public void Test(object args, int dropDownIndex)
+    {
+        var selectedPlayer = JsonSerializer.Deserialize<PlayerDto>(JsonSerializer.Serialize(args));
+        if (selectedPlayer == null)
+        {
+            return;
+        }
+        selectablePlayers.RemoveAll(x => x.Id == selectedPlayer.Id);
+
+        var deselectedPlayer = allPlayers.FirstOrDefault(x => x.Id == dropDowns[dropDownIndex].Value?.ToString());
+        if (deselectedPlayer != null)
+        {
+            selectablePlayers.Add(deselectedPlayer);
+        }
+
+        dropDowns[dropDownIndex].Value = selectedPlayer.Id;
+
+        var currentlySelectedPlayers = allPlayers.Where(x => !selectablePlayers.Any(y => y.Id == x.Id)).ToList();
+        isValueInitial = initialPlayers.Select(p => p.Id).ToHashSet().SetEquals(currentlySelectedPlayers.Select(p => p.Id).ToHashSet());
+        //StateChange.InvokeAsync();
+    }
+
+    private async Task AddPlayerToTeam()
+    {
+
+        // if (radzenDropDown.Value != null)
+        // {
+        //     userToAdd_Id = radzenDropDown.Value.ToString()!;
+        //     //userToAdd_Id2 = radzenDropDown2.Value.ToString()!;
+        //     //userToAdd_Id3 = radzenDropDown3.Value.ToString()!;
+        //     //userToAdd_Id4 = radzenDropDown4.Value.ToString()!;
+
+        // }
+        Dictionary<string, string> dict = new Dictionary<string, string>
+                    {
+                { "playerId", userToAdd_Id },
+                //Just add { "playerId2", userToAdd_Id2 },
+                //Just add { "playerId3", userToAdd_Id3 },
+                //Just add { "playerId4", userToAdd_Id4 },
+                //And check on the backend if the playerId2,playerId3,playerId4 are null and if they're dont add anything to the team,
+                // otherwise add every player
+                { "teamid", id }
+            };
+
+        using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+
+        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {await tokenService.GetToken()}");
+        var result = await client.PostAsJsonAsync("/api/Teams/addplayer", dict);
+        if (result.IsSuccessStatusCode)
+        {
+            notifier.SendSuccessNotification("This player was added to the team successfully!");
+        }
+        else
+        {
+            notifier.SendErrorNotification(await result.Content.ReadAsStringAsync());
+        }
+
+    }
+}
