@@ -19,8 +19,8 @@
 
 @if (isLogged)
 {
-        <center>
-            <ChangeTeamMembers @ref=@changeTeamMembers id="@id" StateChange="@CheckButtonState" RequestUrl="@teamMembersRequestUrl" />
+        <center><div class="mainProfile">
+            
             <ChangeName @ref=@changeTeamName
                         Title="Change Team Name"
                         RequestUrl="@nameRequestUrl"
@@ -31,9 +31,11 @@
                          SetImageFor="@ImageUpload.SetImageForOptions.Team"
                          RequestUrl="@logoRequestUrl"
                          StateChange=@CheckButtonState />
+        <ChangeTeamMembers @ref=@changeTeamMembers id="@id" StateChange="@CheckButtonState" RequestUrl="@teamMembersRequestUrl" /><br />
 
             <RadzenButton Click=@OnClick Text="Save Changes" ButtonStyle="ButtonStyle.Primary" Disabled="@isValueInitial" />
-        </center>
+        </div>
+    </center>
 }
 
 @code {
