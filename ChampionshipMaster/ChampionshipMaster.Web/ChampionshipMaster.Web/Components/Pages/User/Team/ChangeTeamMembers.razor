@@ -101,7 +101,10 @@
     List<PlayerDto> allPlayers = new List<PlayerDto>();
     List<PlayerDto> selectablePlayers = new List<PlayerDto>();
     List<PlayerDto> initialPlayers = new List<PlayerDto>();
-    public List<PlayerDto> selectedPlayers = new List<PlayerDto>();
+    public List<PlayerDto?> selectedPlayers = new List<PlayerDto?>()
+    {
+        null, null, null, null
+    };
 
     string userToAdd_Id = "";
     int teamMaxPlayers = 0;
@@ -136,8 +139,8 @@
             for (int i = 0; i < initialPlayers.Count; i++)
             {
                 await dropDowns[i].SelectItem(initialPlayers[i], raiseChange: false);
-                selectedPlayers.Add(initialPlayers[i]);
-                selectablePlayers.RemoveAll(x => selectedPlayers.Any(y => y.Id == x.Id));
+                selectedPlayers[i] = initialPlayers[i];
+                selectablePlayers.RemoveAll(x => selectedPlayers.Any(y => y != null && y.Id == x.Id));
             }
         }
 
@@ -146,8 +149,12 @@
             int i = 0;
             foreach (var selectedPlayer in selectedPlayers)
             {
-                await dropDowns[i].SelectItem(selectedPlayer, raiseChange: false);
-                dropDowns[i].Value = selectedPlayer.Id;
+                if (selectedPlayer != null)
+                {
+                    await dropDowns[i].SelectItem(selectedPlayer, raiseChange: false);
+                    dropDowns[i].Value = selectedPlayer.Id;
+                }
+                
                 i++;
             }
         }
@@ -170,12 +177,12 @@
         }
         else
         {
-            selectedPlayers.Add(selectedPlayer);
+            selectedPlayers[dropDownIndex] = selectedPlayer;
         }
 
         dropDowns[dropDownIndex].Value = selectedPlayer.Id;
 
-        isValueInitial = initialPlayers.Select(p => p.Id).ToHashSet().SetEquals(selectedPlayers.Select(p => p.Id).ToHashSet());
+        isValueInitial = initialPlayers.Select(p => p.Id).ToHashSet().SetEquals(selectedPlayers.Where(x => x != null).Select(p => p.Id).ToHashSet());
         StateHasChanged();
         await StateChange.InvokeAsync();
     }
@@ -195,7 +202,7 @@
         using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
         client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 
-        var selectedPlayersIds = selectedPlayers.Select(x => x.Id).ToList();
+        var selectedPlayersIds = selectedPlayers.Where(x => x != null).Select(x => x.Id).ToList();
         var jsonString = JsonSerializer.Serialize(selectedPlayersIds);
         var content = new StringContent(jsonString, System.Text.Encoding.UTF8, "application/json");
         var request = await client.PostAsync(RequestUrl, content);
