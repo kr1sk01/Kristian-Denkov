@@ -73,7 +73,7 @@
         </RadzenDataGridColumn>
     </Columns>
 </RadzenDataGrid>
-
+    
 <br />
 
 <div style="display: flex; align-items: center; margin-bottom: 16px">
@@ -113,9 +113,9 @@
         selecteTeam = null;
     }
 
-    protected override async Task OnInitializedAsync()
+    void Update()
     {
-        await base.OnInitializedAsync();
+        
 
 
     }
@@ -142,7 +142,6 @@
             selecteTeam = teams.Take(1).ToList();
             StateHasChanged();
         }
-
     }
 
 
