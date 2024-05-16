@@ -76,7 +76,7 @@ public partial class ManageTeams : ComponentBase
     private async Task GetData()
     {
         using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
-        var test = await client.GetFromJsonAsync<List<TeamDto>>("/api/Teams");
+        var test = await client.GetFromJsonAsync<List<TeamDto>>("/api/Teams/active");
         teams = test;
 
     }

@@ -5,7 +5,8 @@ namespace ChampionshipMaster.API.Interfaces
     public interface ITeamService
     {
         Task<List<TeamDto>> GetAllTeams();
-        Task<List<TeamDto>> GetTeamIparticipate(string username);
+        Task<List<TeamDto>> GetAllActiveTeams();
+        Task<List<TeamDto>> GetAllTeamsPlayerParticipation(string userId);
         Task<ActionResult<TeamDto?>> GetTeam(int id);
         Task<ActionResult<List<GameDto>>> GameHistory(int id);
         Task<ActionResult<TeamDto>> PostTeam(TeamDto team, StringValues authHeader);

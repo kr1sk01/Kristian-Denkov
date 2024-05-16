@@ -16,6 +16,7 @@
         public bool? Active { get; set; } = true;
 
         public string? CreatedBy { get; set; }
+        public string? CreatedByUsername { get; set; }
 
         public DateTime? CreatedOn { get; set; }
 
