@@ -1,13 +1,6 @@
 ﻿@page "/login"
-@using System.ComponentModel.DataAnnotations
-@using System.Text.Json
 
-@inject IHttpClientFactory httpClient
-@inject IConfiguration configuration
-@inject INotifier notifier
-
-@inject NavigationManager NavigationManager
-@inject ProtectedLocalStorage _localStorage
+@inherits ComponentBase
 
 @rendermode InteractiveServer
 
@@ -60,48 +53,6 @@
 
 @code {
 
-    Variant variant = Variant.Outlined;
-
-    private LoginViewModel model = new LoginViewModel();
-    private string? errorMessage;
-    private bool showError = false;
     
-    private bool isLogged = false;
-
-    bool hidePassword = true;
-
-    async Task OnSubmit(LoginViewModel login)
-    {
-        using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
-        var request = await client.PostAsJsonAsync("api/Player/login", login);
-
-        if (!request.IsSuccessStatusCode)
-        {
-            var responseBody = await request.Content.ReadAsStringAsync();
-            errorMessage = responseBody;
-            showError = true;
-            return;
-        }
-
-        var successfulLogin = await request.Content.ReadAsStringAsync();
-        var jwtToken = JsonSerializer.Deserialize<Dictionary<string, string>>(successfulLogin)!["jwtToken"];
-        var image = JsonSerializer.Deserialize<Dictionary<string, string>>(successfulLogin)!["image"];
-        
-        await _localStorage.SetAsync("jwtToken", jwtToken);
-        await _localStorage.SetAsync("playerAvatar", image);
-        isLogged = true;
-        StateHasChanged();
-        notifier.SendSuccessNotification("Logged in successfully!");
-        NavigationManager.NavigateTo("/", forceLoad:true);
-    }
-
-    void OnInvalidSubmit(FormInvalidSubmitEventArgs args)
-    {
-        showError = false;
-    }
-    void TogglePassword()
-    {
-        hidePassword = !hidePassword;
-    }
 
 }

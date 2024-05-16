@@ -1,17 +1,6 @@
 ﻿@page "/editteam/{id}"
 
-@inject NavigationManager nManager
-@inject Radzen.DialogService dialogService
-
-@inject IHttpClientFactory httpClient
-@inject IConfiguration configuration
-@inject ITokenService tokenService
-@inject IHttpClientFactory httpClient
-@inject IWebHostEnvironment Environment
-@inject INotifier notifier
-
-@inject ProtectedLocalStorage _localStorage
-@inject NavigationManager NavigationManager
+@inherits ComponentBase
 
 @rendermode InteractiveServer
 
@@ -40,87 +29,5 @@
 
 @code {
 
-    [Parameter] public string id { get; set; }
-
-    bool isValueInitial = true;
-    bool isLogged = false;
-    ChangeTeamMembers changeTeamMembers;
-    ChangeName changeTeamName;
-    ImageUpload changeTeamLogo;
-
-    string nameRequestUrl = "api/Teams/changeTeamName";
-    string logoRequestUrl = "api/Teams/changeTeamLogo";
-    string teamMembersRequestUrl = "api/Teams/setPlayers";
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            if (!await tokenService.ValidateToken())
-            {
-                notifier.SendWarningNotification("Your session has ran out or you're not logged in");
-                NavigationManager.NavigateTo("/login");
-            }
-
-            isLogged = true;
-            StateHasChanged();
-
-            using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
-
-            var team = await client.GetFromJsonAsync<TeamDto>($"api/Teams/{id}");
-            if (team != null)
-            {
-                changeTeamName.SetInitialValue(team.Name!);
-                nameRequestUrl += $"?teamId={id}";
-
-                changeTeamLogo.UpdateDisplayedImagePath(Convert.ToBase64String(team.Logo ?? new byte[0]));
-                logoRequestUrl += $"?teamId={id}";
-
-                teamMembersRequestUrl += $"?teamId={id}";
-                StateHasChanged();
-            }
-        }
-    }
-
-    public void CheckButtonState()
-    {
-        isValueInitial = changeTeamName.isValueInitial && changeTeamLogo.isValueInitial && changeTeamMembers.isValueInitial;
-    }
-
-    public async Task OnClick()
-    {
-        await changeTeamName.OnClick();
-        await changeTeamLogo.UploadImage();
-        await changeTeamMembers.SetTeamMembers();
-        NavigationManager.NavigateTo("/manageteams");
-    }
-    // Pass to this dictionary which has for key all choosen players list and for value username for the user which does it
-    /*
-     *   EXHAMPLE:
-     *
-     *   Dictionary<PlayerDto, string> dict = new Dictionary<PlayerDto, string>();
-     *   for (int i = 0; i < teamPlayersToSet.Count; i++)
-     *   {
-     *       dict.Add(teamPlayersToSet[i], sender[i]);
-     *   }
-     *
-     *   Then just past dict to AddPlayerToTeam
-     *   We dont need initial players, only chosen one from dropdowns!
-     */
-    private async Task AddPlayerToTeam(Dictionary<PlayerDto, string> dict)
-    {
-        using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
-
-        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {await tokenService.GetToken()}");
-        var result = await client.PostAsJsonAsync($"/api/Teams/addplayer/{id}", dict);
-        if (result.IsSuccessStatusCode)
-        {
-            notifier.SendSuccessNotification("This player was added to the team successfully!");
-        }
-        else
-        {
-            notifier.SendErrorNotification(await result.Content.ReadAsStringAsync());
-        }
-
-    }
+    
 }

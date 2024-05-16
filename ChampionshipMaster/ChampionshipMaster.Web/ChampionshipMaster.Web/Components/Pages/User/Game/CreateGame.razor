@@ -6,6 +6,8 @@
 @using Radzen
 @using Radzen.Blazor
 
+@inherits ComponentBase
+
 <div class="form-container">
     <RadzenTemplateForm TItem="GameDto" Data="@game" Submit="@OnSubmit" InvalidSubmit="@OnInvalidSubmit">
         <div class="form-row">

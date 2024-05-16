@@ -1,0 +1,71 @@
+﻿@page "/GameStatusMain"
+@inherits ComponentBase
+@rendermode InteractiveServer
+
+<style>
+    .rz-grid-table {
+        width: unset;
+    }
+</style>
+
+@if (isAdmin)
+{
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="10px" class="mt-2 mb-4">
+        <RadzenButton Style="background-color:darkslategray"
+                      ButtonStyle="ButtonStyle.Success"
+                      Icon="add_circle_outline"
+                      Text="Add New Game Status"
+                      Click="@InsertRow"
+                      Disabled="@(gameStatusesToInsert.Count() > 0)" />
+    </RadzenStack>
+
+    <RadzenDataGrid @ref="gameStatusGrid"
+                    AllowAlternatingRows="false"
+                    AllowFiltering="false"
+                    AllowPaging="true"
+                    AllowSorting="true"
+                    EditMode="@DataGridEditMode.Single"
+                    PageSize="7"
+                    Data="@gameStatusList"
+                    TItem="GameStatus"
+                    RowUpdate="@OnUpdateRow"
+                    RowCreate="@OnCreateRow"
+                    Sort="@Reset"
+                    Page="@Reset"
+                    Filter="@Reset"
+                    ColumnWidth="20200202px">
+        <Columns>
+
+            <RadzenDataGridColumn TItem="GameStatus" Property="Name" Title="Name">
+                <EditTemplate Context="gameStatus">
+                    <RadzenTextBox @bind-Value="gameStatus.Name" Style="width:200px; display: block" Name="Name" />
+                    <RadzenRequiredValidator Text="Name is required" Component="Name" Popup="true" />
+                </EditTemplate>
+            </RadzenDataGridColumn>
+
+            <RadzenDataGridColumn Width="1%" TItem="GameStatus" Context="gameStatus" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Frozen="true" FrozenPosition="FrozenColumnPosition.Right">
+                <Template Context="gameStatus">
+                    <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@(args => EditRow(gameStatus))" @onclick:stopPropagation="true">
+                    </RadzenButton>
+                    <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@(args => DeleteRow(gameStatus))" @onclick:stopPropagation="true">
+                    </RadzenButton>
+                </Template>
+                <EditTemplate Context="gameStatus">
+                    <RadzenButton Icon="check" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@((args) => SaveRow(gameStatus))">
+                    </RadzenButton>
+                    <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@((args) => CancelEdit(gameStatus))">
+                    </RadzenButton>
+                    <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@(args => DeleteRow(gameStatus))">
+                    </RadzenButton>
+                </EditTemplate>
+            </RadzenDataGridColumn>
+
+        </Columns>
+    </RadzenDataGrid>
+}
+
+
+@code {
+    
+
+}

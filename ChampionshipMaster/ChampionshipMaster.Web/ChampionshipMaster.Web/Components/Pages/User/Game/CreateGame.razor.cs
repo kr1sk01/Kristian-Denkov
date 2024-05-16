@@ -6,7 +6,7 @@ using Radzen;
 
 namespace ChampionshipMaster.Web.Components.Pages.User.Game
 {
-    public partial class CreateGame
+    public partial class CreateGame : ComponentBase
     {
         [Inject] ITokenService tokenService { get; set; } = default;
         [Inject] IHttpClientFactory httpClient { get; set; } = default;
@@ -31,29 +31,29 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Game
                 isFirstRender = false;
 
                 try
+            {
+                if (!await tokenService.ValidateToken())
                 {
-                    if (!await tokenService.ValidateToken())
-                    {
                         notifier.SendWarningNotification("Your session has run out or you're not logged in");
-                        NavigationManager.NavigateTo("/login");
+                    NavigationManager.NavigateTo("/login");
                         return;
-                    }
-
-                    isLogged = true;
-
-                    using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
-                    client.DefaultRequestHeaders.Add("Authorization", $"Bearer {await tokenService.GetToken()}");
-
-                    gameTypes = await client.GetFromJsonAsync<List<GameTypeDto>>("api/GameTypes");
-                    if (gameTypes == null || gameTypes.Count == 0)
-                    {
-                        notifier.SendErrorNotification("Couldn't retrieve game types!");
-                        NavigationManager.NavigateTo("/");
-                        return;
-                    }
-
-                    StateHasChanged();
                 }
+
+                isLogged = true;
+
+                using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+                client.DefaultRequestHeaders.Add("Authorization", $"Bearer {await tokenService.GetToken()}");
+
+                gameTypes = await client.GetFromJsonAsync<List<GameTypeDto>>("api/GameTypes");
+                if (gameTypes == null || gameTypes.Count == 0)
+                {
+                    notifier.SendErrorNotification("Couldn't retrieve game types!");
+                    NavigationManager.NavigateTo("/");
+                        return;
+                }
+
+                StateHasChanged();
+            }
                 catch (Exception ex)
                 {
                     notifier.SendErrorNotification($"Error: {ex.Message}");

@@ -1,25 +1,12 @@
 ﻿@page "/createteam"
-@using ChampionshipMaster.Web.Components.Pages.User.Account
 
-@inject NavigationManager nManager
-@inject Radzen.DialogService dialogService
-
-@inject IHttpClientFactory httpClient
-@inject IConfiguration configuration
-@inject ITokenService tokenService
-@inject IHttpClientFactory httpClient
-@inject IWebHostEnvironment Environment
-@inject INotifier notifier
-
-
-@inject ProtectedLocalStorage _localStorage
-@inject NavigationManager NavigationManager
+@inherits ComponentBase
 
 @rendermode InteractiveServer
 
 <center>
     <h3>Create Team</h3>
-    <div style="justify-content:center;text-align:left;width:50%;">
+    <div style="justify-content:center;text-align:left;width:90%;">
         <RadzenTemplateForm TItem="TeamDto" Data=@model Submit=@OnSubmit InvalidSubmit=@OnInvalidSubmit>
             <RadzenStack Gap="0.5rem" Class="rz-p-sm-12">
                 <RadzenFormField Text="Name" Variant="@variant">
@@ -31,69 +18,9 @@
                         <RadzenLengthValidator Component="Name" Min="3" Max="32" Text="Name can be between 3 and 32 characters" />
                     </Helper>
                 </RadzenFormField>
-
                 <RadzenDropDown Placeholder="Select team type" Name="Type" @bind-Value=@model.TeamTypeName Data=@teamTypes.Select(x => x.Name).ToList() Style="width: 100%;" />
-
                 <RadzenButton ButtonType="ButtonType.Submit" Text="Create Team"></RadzenButton>
-
             </RadzenStack>
         </RadzenTemplateForm>
     </div>
 </center>
-
-@code {
-    Variant variant = Variant.Outlined;
-
-    string username = "";
-    string playerId = "";
-    string teamid = "";
-
-    TeamDto model = new TeamDto();
-
-
-
-    //private GameType gameType = new GameType();
-    private List<TeamType> teamTypes = new List<TeamType>(); // Assuming you have a list of TeamTypes to choose from
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
-            var test = await client.GetFromJsonAsync<List<TeamType>>("api/TeamTypes");
-            teamTypes = test;
-            StateHasChanged();
-        }
-    }
-
-
-
-    private async Task OnInvalidSubmit(FormInvalidSubmitEventArgs args)
-    {
-        //TeamDto team = new TeamDto { };
-    }
-    private async Task OnSubmit(TeamDto model)
-    {
-        if (await tokenService.ValidateToken())
-        {
-            var token = new JwtSecurityTokenHandler().ReadJwtToken(await tokenService.GetToken());
-            username = token.Claims.FirstOrDefault(x => x.Type == "unique_name")?.Value ?? "";
-            playerId = token.Claims.FirstOrDefault(x => x.Type == "nameid")?.Value ?? "";
-        }
-        model.CreatedBy = playerId;
-
-        using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
-        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {await tokenService.GetToken()}");
-
-        var response = await client.PostAsJsonAsync("/api/Teams", model);
-
-        var content = await response.Content.ReadAsStringAsync();
-        var TeamTypeResponse = JsonSerializer.Deserialize<Dictionary<string, object>>(content);
-        var id = TeamTypeResponse!["id"].ToString();
-
-        notifier.SendSuccessNotification("Team created successfully!");
-
-        NavigationManager.NavigateTo($"/editteam/{id}");
-        //TeamDto team = new TeamDto { };
-    }
-}
