@@ -1,10 +1,6 @@
 @page "/championshipDetails/{id}"
 
-@inject NavigationManager nManager
-@inject Radzen.DialogService dialogService
-
-@inject IHttpClientFactory httpClient
-@inject IConfiguration configuration
+@inherits ComponentBase
 
 @rendermode InteractiveServer
 
@@ -60,24 +56,5 @@
 
 @code {
 
-    [Parameter] public string? id { get; set; }
-
-    RadzenDataGrid<GameDto>? gamesList;    
-
-    private string? data;
-
-    private ChampionshipDto? championshipWithDetails;
-    private IEnumerable<GameDto>? games;
-
-    protected override async Task OnInitializedAsync()
-    {
-
-        using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
-        var test = await client.GetFromJsonAsync<ChampionshipDto>($"api/Championship/{id}");
-        if (test != null)
-        {
-            championshipWithDetails = test;
-            games = championshipWithDetails.Games;
-        }     
-    }
+    
 }
