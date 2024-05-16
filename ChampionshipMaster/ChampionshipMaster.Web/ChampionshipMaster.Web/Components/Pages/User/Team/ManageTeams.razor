@@ -73,7 +73,53 @@
         </RadzenDataGridColumn>
     </Columns>
 </RadzenDataGrid>
+
+<br />
+
+<div style="display: flex; align-items: center; margin-bottom: 16px">
+    <RadzenButton Style="margin-right:5px;" Icon="note_add" Text="Create Team" ButtonStyle="ButtonStyle.Secondary" Click=@OpenCreateTeam />
+    <RadzenButton Style="margin-right:5px;" Click="@ClearSelection" Text="Clear Selection" />
+    <RadzenButton Style="margin-right:5px;" Disabled=@(selecteTeam != null || isAdmin ? true : false) Click="@(()=> EditTeam(selecteTeam.FirstOrDefault()!.Id.ToString()))" Icon="edit" Text="Edit" />
+@if (selecteTeam?.Any() == true)
+{
+<div style="margin-left: 16px">
+    Selected Team: @selecteTeam[0].Name
+</div>
+}
+</div>
+
+<RadzenDataGrid AllowFiltering="true" 
+    FilterPopupRenderMode="PopupRenderMode.OnDemand" 
+    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
+    AllowPaging="true" 
+    PageSize="4"
+                AllowSorting="true" Data="@teams" ColumnWidth="200px"
+            SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selecteTeam
+ >
+    <Columns>
+        <RadzenDataGridColumn TItem="TeamDto" Property="Name" Title="Name" />
+        <RadzenDataGridColumn TItem="TeamDto" Property="CreatedOn" Title="Created On" />
+        <RadzenDataGridColumn TItem="TeamDto" Property="CreatedBy" Title="Created By" />
+        <RadzenDataGridColumn TItem="TeamDto" Property="TeamTypeName" Title="Team Type" />
+    </Columns>
+</RadzenDataGrid>
+
 @code {
+    //IEnumerable<TeamDto> employees;
+    IList<TeamDto> selecteTeam;
+
+    void ClearSelection()
+    {
+        selecteTeam = null;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+
+    }
+  
     bool forceAdmin = true;
     bool isAdmin = false;
     bool myTeamOnlyMode = false;
@@ -93,6 +139,7 @@
             role = token.Claims.FirstOrDefault(x => x.Type == "role")?.Value ?? "";
             isAdmin = role == "admin" || forceAdmin ? true : false;
             await GetData();
+            selecteTeam = teams.Take(1).ToList();
             StateHasChanged();
         }
 

@@ -16,7 +16,7 @@
             {
                 <RadzenAlert Variant="@Variant.Filled" AlertStyle=@AlertStyle.Primary Size=@AlertSize.Small Shade="Shade.Lighter" AllowClose=false>
                     <RadzenText TagName="TagName.P">@errorMessage</RadzenText>
-                </RadzenAlert>
+                    </RadzenAlert>
             }
             <RadzenStack Gap="1rem" Class="rz-p-sm-12">
                 <RadzenFormField Text="Email" Variant="@variant">
@@ -26,7 +26,7 @@
                     <Helper>
                         <RadzenRequiredValidator Component="email" Text="Email is required." />
                         <RadzenEmailValidator Component="email" Text="Email is not valid." />
-                        <RadzenLengthValidator Component="email" Max="256" Text="Email can be a maximum of 256 characters"/>
+                        <RadzenLengthValidator Component="email" Max="256" Text="Email can be a maximum of 256 characters" />
                     </Helper>
                 </RadzenFormField>
                 <RadzenFormField Text="Username" Variant="@variant">
@@ -46,10 +46,6 @@
                     <End>
                         <RadzenButton Icon="@(hidePassword ? "visibility" : "visibility_off")" Click="TogglePassword" Variant="Variant.Text" Size="ButtonSize.Small" />
                     </End>
-                    <Helper>
-                        <RadzenRequiredValidator Component="Password" Text="Password is required." />
-                        <RadzenLengthValidator Component="Password" Min="8" Max="100" Text="Password should be between 8 and 100 characters" />
-                    </Helper>
                 </RadzenFormField>
                 <RadzenFormField Text="Confirm Password" Variant="@variant">
                     <ChildContent>
@@ -59,10 +55,6 @@
                     <End>
                         <RadzenButton Icon="@(hideConfirmPassword ? "visibility" : "visibility_off")" Click="ToggleConfirmPassword" Variant="Variant.Text" Size="ButtonSize.Small" />
                     </End>
-                    <Helper>
-                        <RadzenRequiredValidator Component="confirmPassword" Text="Confirm Password is required." />
-                        <RadzenCompareValidator Component="confirmPassword" Visible=@(!string.IsNullOrEmpty(model.ConfirmPassword)) Value=@model.Password Text="Passwords should be the same." />
-                    </Helper>
                 </RadzenFormField>
                 <RadzenButton ButtonType="ButtonType.Submit" Text="Register"></RadzenButton>
             </RadzenStack>
@@ -85,6 +77,34 @@
 
     async Task OnSubmit(RegisterViewModel register)
     {
+        if (model.ConfirmPassword == null)
+        {
+            ShowError("Confirm password is required!");
+            return;
+        }
+
+
+        if (model.Password == null)
+        {
+            ShowError("Password is required!");
+            return;
+        }
+
+
+        if (model.Password != null && (model.Password.Length < 8 || model.Password.Length > 100))
+        {
+            ShowError("Password must be between 8 and 100 symbols!");
+            return;
+        }
+
+        if (model.Password != model.ConfirmPassword)
+        {
+            ShowError("Password doesn't match!"); return;
+        }
+
+
+
+
 
         using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
         register.CreatedOn = DateTime.UtcNow;
@@ -117,5 +137,13 @@
     void ToggleConfirmPassword()
     {
         hideConfirmPassword = !hideConfirmPassword;
+    }
+    void ShowError(string message)
+    {
+
+        showError = true;
+        errorMessage = message;
+        StateHasChanged();
+
     }
 }
