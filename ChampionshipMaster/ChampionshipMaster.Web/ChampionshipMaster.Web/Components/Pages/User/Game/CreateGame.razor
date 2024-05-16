@@ -1,0 +1,80 @@
+﻿@page "/createGame"
+
+
+@inject ITokenService tokenService
+@inject IHttpClientFactory httpClient
+@inject IWebHostEnvironment Environment
+@inject IConfiguration configuration
+@inject INotifier notifier
+
+@inject ProtectedLocalStorage _localStorage
+@inject NavigationManager NavigationManager
+
+@if (isLogged)
+{
+    <h1>CreateGame</h1>
+    <div style="justify-content:center;text-align:left;width:50%;">
+        <RadzenTemplateForm TItem="GameDto" Data=@game Submit=@OnSubmit InvalidSubmit=@OnInvalidSubmit>
+            <RadzenStack Gap="0.5rem" Class="rz-p-sm-12">
+                <RadzenFormField Text="Name" Variant="@variant">
+                    <ChildContent>
+                        <RadzenTextBox Name="Name" @bind-Value=@game.Name />
+                    </ChildContent>
+                    <Helper>
+                        <RadzenRequiredValidator Component="Name" Text="Name is required." />
+                        <RadzenLengthValidator Component="Name" Min="3" Max="32" Text="Name can be between 3 and 32 characters" />
+                    </Helper>
+                </RadzenFormField>
+
+                <RadzenDropDown Placeholder="Select team type" Name="Type" @bind-Value=@game.GameTypeName Data=@gameTypes.Select(x => x.Name).ToList() Style="width: 100%;" />
+
+                <RadzenButton ButtonType="ButtonType.Submit" Text="Create Team"></RadzenButton>
+
+            </RadzenStack>
+        </RadzenTemplateForm>
+    </div>
+}
+
+
+@code {
+    Variant variant = Variant.Outlined;
+    bool isLogged = false;
+    GameDto game;
+    List<GameTypeDto>? gameTypes = new List<GameTypeDto>();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (!await tokenService.ValidateToken())
+            {
+                notifier.SendWarningNotification("Your session has ran out or you're not logged in");
+                NavigationManager.NavigateTo("/login");
+            }
+
+            isLogged = true;
+
+            using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {await tokenService.GetToken()}");
+
+            gameTypes = await client.GetFromJsonAsync<List<GameTypeDto>>("api/GameTypes");
+            if (gameTypes == null || gameTypes.Count == 0)
+            {
+                notifier.SendErrorNotification("Couldn't retrieve game types!");
+                NavigationManager.NavigateTo("/");
+            }
+
+            StateHasChanged();
+        }
+    }
+
+    public void OnSubmit()
+    {
+
+    }
+
+    public void OnInvalidSubmit()
+    {
+
+    }
+}

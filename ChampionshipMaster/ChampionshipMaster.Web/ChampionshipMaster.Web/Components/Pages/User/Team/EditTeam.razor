@@ -58,7 +58,7 @@
         {
             if (!await tokenService.ValidateToken())
             {
-                notifier.SendErrorNotification("Your session has ran out or you're not logged in");
+                notifier.SendWarningNotification("Your session has ran out or you're not logged in");
                 NavigationManager.NavigateTo("/login");
             }
 
@@ -92,7 +92,7 @@
         await changeTeamName.OnClick();
         await changeTeamLogo.UploadImage();
         await changeTeamMembers.SetTeamMembers();
-        NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
+        NavigationManager.NavigateTo("/manageteams");
     }
     // Pass to this dictionary which has for key all choosen players list and for value username for the user which does it
     /*
