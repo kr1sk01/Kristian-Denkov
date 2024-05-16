@@ -1,101 +1,29 @@
 ﻿@page "/manageteams"
-@using ChampionshipMaster.Web.Components.Pages.User.Account
 
-@inject NavigationManager nManager
-@inject Radzen.DialogService dialogService
 
-@inject IHttpClientFactory httpClient
-@inject IConfiguration configuration
-@inject ITokenService tokenService
-@inject IHttpClientFactory httpClient
-@inject IWebHostEnvironment Environment
-
-@inject ProtectedLocalStorage _localStorage
-@inject NavigationManager NavigationManager
+@inherits ComponentBase
 
 @rendermode InteractiveServer
-@inject DialogService DialogService
+
 
 <center><h1>Manage Teams</h1></center>
 
-
-<div>
-    <RadzenButton Icon="note_add" Text="Create Team" ButtonStyle="ButtonStyle.Secondary" Click=@OpenCreateTeam />
-</div>
-<br />
-
-@code {
-    public async Task OpenCreateTeam()
-    {
-        await DialogService.OpenAsync<CreateTeam>($"Create Team",
-               new Dictionary<string, object>() { },
-               new DialogOptions() { Width = "65%", Height = "53%", Resizable = true, Draggable = true });
-    }
-}
-<RadzenDataGrid @ref="teamsList"
-                AllowFiltering="true"
+<RadzenDataGrid AllowFiltering="true"
                 FilterPopupRenderMode="PopupRenderMode.OnDemand"
+                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                 AllowPaging="true"
                 PageSize="7"
-                AllowSorting="true"
-                Data="@teams"
-                TItem="TeamDto">
-    <Columns>
-        @* <RadzenDataGridColumn Title="Photo" Frozen="true" Sortable="false" Filterable="false" Width="80px" TextAlign="TextAlign.Center">
-            <Template Context="data">
-                <RadzenImage Path="@teams." class="rz-gravatar" AlternateText="@(data.FirstName + " " + data.LastName)" />
-            </Template>
-        </RadzenDataGridColumn> *@
-        <RadzenDataGridColumn TItem="TeamDto" Property="Name" Title="Name">
-            <Template Context="teams">
-                @teams.Name
-            </Template>
-        </RadzenDataGridColumn>       
-        <RadzenDataGridColumn TItem="TeamDto" Property="CreatedOn" Title="Created On">
-            <Template Context="teams">
-                @teams.CreatedOn
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="TeamDto" Property="CreatedBy" Title="Created By">
-            <Template Context="teams">
-                @teams.CreatedBy
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="TeamDto" Property="TeamType" Title="Team Type">
-            <Template Context="teams">
-                @teams.TeamTypeName
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn Filterable=false Sortable=false Property="CreatedBy" TItem="TeamDto" Title="Edit">
-            <Template Context="teams">
-                <RadzenButton Visible="@(teams.CreatedBy == playerId || isAdmin ? true : false)" ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" Icon="build" class="m-1" Click="() => EditTeam(teams.Id.ToString())" />
-            </Template>
-        </RadzenDataGridColumn>
-    </Columns>
-</RadzenDataGrid>
-    
-<br />
-
-<div style="display: flex; align-items: center; margin-bottom: 16px">
-    <RadzenButton Style="margin-right:5px;" Icon="note_add" Text="Create Team" ButtonStyle="ButtonStyle.Secondary" Click=@OpenCreateTeam />
-    <RadzenButton Style="margin-right:5px;" Click="@ClearSelection" Text="Clear Selection" />
-    <RadzenButton Style="margin-right:5px;" Disabled=@(selecteTeam != null || isAdmin ? true : false) Click="@(()=> EditTeam(selecteTeam.FirstOrDefault()!.Id.ToString()))" Icon="edit" Text="Edit" />
-@if (selecteTeam?.Any() == true)
-{
-<div style="margin-left: 16px">
-    Selected Team: @selecteTeam[0].Name
-</div>
-}
-</div>
-
-<RadzenDataGrid AllowFiltering="true" 
-    FilterPopupRenderMode="PopupRenderMode.OnDemand" 
-    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
-    AllowPaging="true" 
-    PageSize="4"
+                TItem="TeamDto"
                 AllowSorting="true" Data="@teams" ColumnWidth="200px"
-            SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selecteTeam
- >
+                SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedTeam
+                RowClick="@(args => Update(args))"
+                CellContextMenu="@OnCellContextMenu">
+
+    <HeaderTemplate>
+        <RadzenButton Style="margin-right:5px;" Icon="note_add" Text="Create Team" ButtonStyle="ButtonStyle.Secondary" Click=@OpenCreateTeam />
+        <RadzenButton Style="margin-right:5px;" Click="@ClearSelection" Text="Clear Selection" />
+        <RadzenButton Style="margin-right:5px;" Disabled=@disabledEdit Click="@(()=> EditTeam(selectedTeam.FirstOrDefault()!.Id.ToString()))" Icon="edit" Text="Edit" />
+    </HeaderTemplate>
     <Columns>
         <RadzenDataGridColumn TItem="TeamDto" Property="Name" Title="Name" />
         <RadzenDataGridColumn TItem="TeamDto" Property="CreatedOn" Title="Created On" />
@@ -104,57 +32,4 @@
     </Columns>
 </RadzenDataGrid>
 
-@code {
-    //IEnumerable<TeamDto> employees;
-    IList<TeamDto> selecteTeam;
 
-    void ClearSelection()
-    {
-        selecteTeam = null;
-    }
-
-    void Update()
-    {
-        
-
-
-    }
-  
-    bool forceAdmin = true;
-    bool isAdmin = false;
-    bool myTeamOnlyMode = false;
-    string playerId = "";
-    private string username = "";
-    private string role = "";
-    RadzenDataGrid<TeamDto>? teamsList;
-
-    private List<TeamDto>? teams;
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            var token = new JwtSecurityTokenHandler().ReadJwtToken(await tokenService.GetToken());
-            username = token.Claims.FirstOrDefault(x => x.Type == "unique_name")?.Value ?? "";
-            playerId = token.Claims.FirstOrDefault(x => x.Type == "nameid")?.Value ?? "";
-            role = token.Claims.FirstOrDefault(x => x.Type == "role")?.Value ?? "";
-            isAdmin = role == "admin" || forceAdmin ? true : false;
-            await GetData();
-            selecteTeam = teams.Take(1).ToList();
-            StateHasChanged();
-        }
-    }
-
-
-    private async Task GetData()
-    {
-        using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
-        var test = await client.GetFromJsonAsync<List<TeamDto>>("/api/Teams");
-        teams = test;
-
-    }
-
-    async Task EditTeam(string id)
-    {
-        NavigationManager.NavigateTo($"/editteam/{id}");
-    }
-}
