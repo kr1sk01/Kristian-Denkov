@@ -82,30 +82,20 @@
             ShowError("Confirm password is required!");
             return;
         }
-
-
         if (model.Password == null)
         {
             ShowError("Password is required!");
             return;
         }
-
-
         if (model.Password != null && (model.Password.Length < 8 || model.Password.Length > 100))
         {
             ShowError("Password must be between 8 and 100 symbols!");
             return;
         }
-
         if (model.Password != model.ConfirmPassword)
         {
             ShowError("Password doesn't match!"); return;
         }
-
-
-
-
-
         using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
         register.CreatedOn = DateTime.UtcNow;
         register.CreatedBy = register.UserName;
