@@ -3,19 +3,19 @@ using ChampionshipMaster.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Radzen;
+using System.Net.Http.Json;
 
 namespace ChampionshipMaster.Web.Components.Pages.User.Game
 {
-    public partial class CreateGame : ComponentBase
+    public partial class CreateGame
     {
-        [Inject] ITokenService tokenService { get; set; } = default;
-        [Inject] IHttpClientFactory httpClient { get; set; } = default;
-        [Inject] IWebHostEnvironment Environment { get; set; } = default;
-        [Inject] IConfiguration configuration { get; set; } = default;
-        [Inject] INotifier notifier { get; set; } = default;
-
-        [Inject] ProtectedLocalStorage _localStorage { get; set; } = default;
-        [Inject] NavigationManager NavigationManager { get; set; } = default;
+        [Inject] ITokenService tokenService { get; set; } = default!;
+        [Inject] IHttpClientFactory httpClient { get; set; } = default!;
+        [Inject] IWebHostEnvironment Environment { get; set; } = default!;
+        [Inject] IConfiguration configuration { get; set; } = default!;
+        [Inject] INotifier notifier { get; set; } = default!;
+        [Inject] ProtectedLocalStorage _localStorage { get; set; } = default!;
+        [Inject] NavigationManager NavigationManager { get; set; } = default!;
 
         private Variant variant = Variant.Outlined;
         private bool isLogged = false;
@@ -31,29 +31,29 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Game
                 isFirstRender = false;
 
                 try
-            {
-                if (!await tokenService.ValidateToken())
                 {
+                    if (!await tokenService.ValidateToken())
+                    {
                         notifier.SendWarningNotification("Your session has run out or you're not logged in");
-                    NavigationManager.NavigateTo("/login");
+                        NavigationManager.NavigateTo("/login");
                         return;
-                }
+                    }
 
-                isLogged = true;
+                    isLogged = true;
 
-                using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
-                client.DefaultRequestHeaders.Add("Authorization", $"Bearer {await tokenService.GetToken()}");
+                    using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+                    client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", await tokenService.GetToken());
 
-                gameTypes = await client.GetFromJsonAsync<List<GameTypeDto>>("api/GameTypes");
-                if (gameTypes == null || gameTypes.Count == 0)
-                {
-                    notifier.SendErrorNotification("Couldn't retrieve game types!");
-                    NavigationManager.NavigateTo("/");
+                    gameTypes = await client.GetFromJsonAsync<List<GameTypeDto>>("api/GameTypes");
+                    if (gameTypes == null || gameTypes.Count == 0)
+                    {
+                        notifier.SendErrorNotification("Couldn't retrieve game types!");
+                        NavigationManager.NavigateTo("/");
                         return;
-                }
+                    }
 
-                StateHasChanged();
-            }
+                    StateHasChanged();
+                }
                 catch (Exception ex)
                 {
                     notifier.SendErrorNotification($"Error: {ex.Message}");

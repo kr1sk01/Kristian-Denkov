@@ -5,11 +5,11 @@
 <div class="col-md-6 p-3">
     <RadzenCard>
         <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H1">@Title</RadzenText>
-        <RadzenImage Path="@imagePath" AlternateText="Displayed Image" Style="margin: 16px; max-width: 256px;"></RadzenImage>
+        <RadzenImage Path="@imagePath" AlternateText="Displayed Image"></RadzenImage>
         <RadzenStack Orientation="Orientation.Vertical" Gap="1rem">
             <RadzenUpload Icon="upload" @ref="upload" Accept=".png,.jpeg,.jpg" Auto="false" Multiple="false" Change=@(args => OnChange(args)) InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})"
                           Progress=@(args => OnProgress(args)) class="w-100" />
-            <RadzenImage Path="@newImagePath" Visible="@(!string.IsNullOrEmpty(newImagePath))" AlternateText="New Image" Style="max-width: 64px; max-height: 64px; align-self: center"></RadzenImage>
+            <RadzenImage Path="@newImagePath" Visible="@(!string.IsNullOrEmpty(newImagePath))" AlternateText="New Image"></RadzenImage>
         </RadzenStack>
     </RadzenCard>
 </div>

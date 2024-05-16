@@ -3,8 +3,6 @@
 @rendermode InteractiveServer
 
 <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
-    <h2>Select Team Members</h2>
-
     <RadzenStack Orientation="Orientation.Vertical">
         <RadzenLabel Component="DropDownFiltering" Text="Player 1"></RadzenLabel>
         <RadzenDropDown @ref=@(dropDowns[0])
@@ -70,7 +68,3 @@
     </RadzenStack>
     
 </RadzenStack>
-
-@code {
-    
-}

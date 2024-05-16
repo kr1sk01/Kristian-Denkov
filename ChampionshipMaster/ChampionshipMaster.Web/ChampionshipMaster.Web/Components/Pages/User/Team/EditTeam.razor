@@ -4,30 +4,84 @@
 
 @rendermode InteractiveServer
 
-<h3>Edit Team</h3>
+<h3 class="titleEdit">Edit Team</h3>
 
 @if (isLogged)
 {
-        <center><div class="mainProfile">
-            
+    <div class="edit-team-container">
+        <div class="left-container">
             <ChangeName @ref=@changeTeamName
                         Title="Change Team Name"
                         RequestUrl="@nameRequestUrl"
                         StateChange=@CheckButtonState />
+            <ChangeTeamMembers @ref=@changeTeamMembers id="@id" StateChange="@CheckButtonState" RequestUrl="@teamMembersRequestUrl" />
+        </div>
 
+        <div class="right-container">
             <ImageUpload @ref=@changeTeamLogo
                          Title="Team Logo"
                          SetImageFor="@ImageUpload.SetImageForOptions.Team"
                          RequestUrl="@logoRequestUrl"
                          StateChange=@CheckButtonState />
-        <ChangeTeamMembers @ref=@changeTeamMembers id="@id" StateChange="@CheckButtonState" RequestUrl="@teamMembersRequestUrl" /><br />
-
-            <RadzenButton Click=@OnClick Text="Save Changes" ButtonStyle="ButtonStyle.Primary" Disabled="@isValueInitial" />
         </div>
+    </div>
+
+    <center>
+        <RadzenButton Click=@OnClick Text="Save Changes" ButtonStyle="ButtonStyle.Primary" Disabled="@isValueInitial" Class="SaveButtonEdit" />
     </center>
 }
 
-@code {
+<style>
 
-    
-}
+    .titleEdit {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .edit-team-container {
+        display: flex;
+        justify-content: space-between;
+        padding: 20px;
+        height: 70vh; /* Adjust height as needed */
+    }
+
+    .left-container, .right-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+
+    .left-container {
+        align-items: center;
+    }
+
+    .dropdowns-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+        .dropdowns-container > * {
+            flex: 1 1 calc(50% - 10px); /* Adjust width to create two columns */
+        }
+
+    .right-container {
+        justify-content: center; /* Center the image upload component */
+    }
+
+    .right-container img {
+        margin: 0 auto;
+    }
+
+        .right-container .rz-card {
+            display: flex;
+            flex-direction: column;
+        }
+
+    SaveButtonEdit {
+        margin-top: 20px;
+    }
+</style>
