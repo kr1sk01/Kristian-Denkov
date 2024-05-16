@@ -98,14 +98,26 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             var dto = teams.Adapt<List<TeamDto>>();
             return dto;
         }
-        public async Task<List<TeamDto>> GetTeamIparticipate(string username)
+        public async Task<List<TeamDto>> GetAllActiveTeams()
         {
             var teams = await _context.Teams
                 .Include(x => x.TeamType)
-                //.Where(x=>x.CreatedBy.ToUpper() == username.ToUpper())
+                .Where(x => x.Active == true)
                 .ToListAsync();
 
             var dto = teams.Adapt<List<TeamDto>>();
+
+            return dto;
+        }
+        public async Task<List<TeamDto>> GetAllTeamsPlayerParticipation(string userId)
+        {
+            var teams = await _context.Teams
+                .Include(x => x.TeamType)
+                .Where(x => x.CreatedBy == userId)
+                .ToListAsync();
+
+            var dto = teams.Adapt<List<TeamDto>>();
+
             return dto;
         }
 
@@ -132,7 +144,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                 await Console.Out.WriteLineAsync(ex.Message);
             }
             return BadRequest();
-            
+
         }
         public async Task<ActionResult<TeamDto>> SetTeamMembers(string teamId, List<string> playerIds, StringValues authHeader)
         {
@@ -199,7 +211,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             }
         }
         public async Task<ActionResult<TeamDto>> PostTeam(TeamDto team, StringValues authHeader)
-        {           
+        {
             if (await TeamNameExists(team.Name))
             {
                 return BadRequest("There is already a team with that name");
@@ -209,8 +221,9 @@ namespace ChampionshipMaster.API.Services.ControllerServices
 
             var id = token.Claims.First(c => c.Type == "nameid").Value;
             var username = token.Claims.First(c => c.Type == "unique_name").Value;
-            
-            var result = new Team {
+
+            var result = new Team
+            {
                 Name = team.Name,
                 TeamType = _context.TeamTypes.FirstOrDefault(x => x.Name == team.TeamTypeName),
                 CreatedBy = team.CreatedBy,

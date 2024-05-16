@@ -23,10 +23,17 @@ namespace ChampionshipMaster.API.Controllers
             return Ok(result);
         }
 
-        [HttpGet("team/{username}")]
-        public async Task<ActionResult<IEnumerable<TeamDto>>> GetTeamIparticipate(string username)
+        [HttpGet("active")]
+        public async Task<ActionResult<IEnumerable<TeamDto>>> GetAllActiveTeams()
         {
-            var result = await _teamService.GetTeamIparticipate(username);
+            var result = await _teamService.GetAllActiveTeams();
+            return Ok(result);
+        }
+
+        [HttpGet("teams/{userId}")]
+        public async Task<ActionResult<IEnumerable<TeamDto>>> GetAllTeamsPlayerParticipation(string userId)
+        {
+            var result = await _teamService.GetAllTeamsPlayerParticipation(userId);
             return Ok(result);
         }
 
