@@ -23,18 +23,30 @@ public partial class ManageTeams : ComponentBase
     [Inject] ContextMenuService ContextMenuService { get; set; } = default!;
     [Inject] DialogService DialogService { get; set; } = default!;
 
+    IList<TeamDto>? selectedTeam;
+    private bool disabledEdit = true;
+    bool isAdmin = false;
+    string playerId = "";
+    private string role = "";
+    private List<TeamDto>? teams;
+
     public async Task OpenCreateTeam()
     {
         await DialogService.OpenAsync<CreateTeam>($"Create Team",
                new Dictionary<string, object>() { },
-               new DialogOptions() { Width = "45%", Height = "53%", Resizable = true, Draggable = true });
+               new DialogOptions() { Width = "45%", Height = "53%", Draggable = true, CloseDialogOnEsc = true });
     }
-    IList<TeamDto>? selectedTeam;
-    private bool disabledEdit = true;
 
+    public async Task OpenEditTeam(string id)
+    {
+        await DialogService.OpenAsync<EditTeam>($"Create Team",
+               new Dictionary<string, object>() { { "id", id } },
+               new DialogOptions() { Width = "75%", Height = "75%", CloseDialogOnEsc = true });
+    }
+    
     void Update(DataGridRowMouseEventArgs<TeamDto> args)
     {
-        if (args.Data.CreatedBy == playerId)
+        if (args.Data.CreatedBy == playerId || isAdmin)
             disabledEdit = false;
         else
             disabledEdit = true;
@@ -42,30 +54,19 @@ public partial class ManageTeams : ComponentBase
         StateHasChanged();
     }
 
-    bool forceAdmin = true;
-    bool isAdmin = false;
-    bool myTeamOnlyMode = false;
-    string playerId = "";
-    private string username = "";
-    private string role = "";
-    RadzenDataGrid<TeamDto>? teamsList;
-
-    private List<TeamDto>? teams;
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             var token = new JwtSecurityTokenHandler().ReadJwtToken(await tokenService.GetToken());
-            username = token.Claims.FirstOrDefault(x => x.Type == "unique_name")?.Value ?? "";
             playerId = token.Claims.FirstOrDefault(x => x.Type == "nameid")?.Value ?? "";
             role = token.Claims.FirstOrDefault(x => x.Type == "role")?.Value ?? "";
-            isAdmin = role == "admin" || forceAdmin ? true : false;
+            isAdmin = role == "admin";
             await GetData();
             selectedTeam = null;
             StateHasChanged();
         }
     }
-
 
     private async Task GetData()
     {
@@ -75,10 +76,10 @@ public partial class ManageTeams : ComponentBase
 
     }
 
-    void EditTeam(string id)
-    {
-        NavigationManager.NavigateTo($"/editteam/{id}");
-    }
+    //void EditTeam(string id)
+    //{
+    //    NavigationManager.NavigateTo($"/editteam/{id}");
+    //}
     void OnCellContextMenu(DataGridCellMouseEventArgs<TeamDto> args)
     {
         if (args == null)
@@ -87,17 +88,17 @@ public partial class ManageTeams : ComponentBase
             return;
 
         selectedTeam = new List<TeamDto>() { args.Data };
-        if (args.Data.CreatedBy == playerId)
+        if (args.Data.CreatedBy == playerId || isAdmin)
         {
             ContextMenuService.Open(args,
        new List<ContextMenuItem> {
                 new ContextMenuItem(){ Text = "Edit", Value = 1, Icon = "edit" },
                                        },
-       (e) =>
+       async (e) =>
        {
            if (e.Text == "Edit")
            {
-               EditTeam(args.Data.Id.ToString());
+               await OpenEditTeam(args.Data.Id.ToString());
                ContextMenuService.Close();
            }
        }

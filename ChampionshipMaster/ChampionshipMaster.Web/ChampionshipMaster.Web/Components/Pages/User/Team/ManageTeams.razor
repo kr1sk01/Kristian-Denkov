@@ -21,7 +21,7 @@
 
     <HeaderTemplate>
         <RadzenButton Style="margin-right:5px;" Icon="note_add" Text="Create Team" ButtonStyle="ButtonStyle.Secondary" Click=@OpenCreateTeam />
-        <RadzenButton Style="margin-right:5px;" Disabled=@disabledEdit Click="@(()=> EditTeam(selectedTeam.FirstOrDefault()!.Id.ToString()))" Icon="edit" Text="Edit" />
+        <RadzenButton Style="margin-right:5px;" Disabled=@disabledEdit Click="@(()=> OpenEditTeam(selectedTeam.FirstOrDefault()!.Id.ToString()))" Icon="edit" Text="Edit" />
     </HeaderTemplate>
     <Columns>
         <RadzenDataGridColumn TItem="TeamDto" Property="Name" Title="Name" />
