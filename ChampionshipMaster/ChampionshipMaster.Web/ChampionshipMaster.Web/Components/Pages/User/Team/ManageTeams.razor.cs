@@ -32,12 +32,6 @@ public partial class ManageTeams : ComponentBase
     IList<TeamDto>? selectedTeam;
     private bool disabledEdit = true;
 
-    void ClearSelection()
-    {
-        selectedTeam = null;
-        StateHasChanged();
-    }
-
     void Update(DataGridRowMouseEventArgs<TeamDto> args)
     {
         if (args.Data.CreatedBy == playerId)
@@ -67,7 +61,7 @@ public partial class ManageTeams : ComponentBase
             role = token.Claims.FirstOrDefault(x => x.Type == "role")?.Value ?? "";
             isAdmin = role == "admin" || forceAdmin ? true : false;
             await GetData();
-            selectedTeam = teams.Take(1).ToList();
+            selectedTeam = null;
             StateHasChanged();
         }
     }

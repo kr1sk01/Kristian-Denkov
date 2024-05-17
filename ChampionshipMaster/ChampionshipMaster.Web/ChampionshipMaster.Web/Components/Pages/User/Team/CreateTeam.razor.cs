@@ -11,10 +11,7 @@ using System.Text.Json;
 
 public partial class CreateTeam : ComponentBase
 {
-
-    [Inject] NavigationManager nManager {  get; set; } = default!;
     [Inject] Radzen.DialogService dialogService { get; set; } = default!;
-
     [Inject] IConfiguration configuration { get; set; } = default!;
     [Inject] ITokenService tokenService { get; set; } = default!;
     [Inject] IHttpClientFactory httpClient { get; set; } = default!;
@@ -25,9 +22,7 @@ public partial class CreateTeam : ComponentBase
 
     Variant variant = Variant.Outlined;
 
-    string username = "";
     string playerId = "";
-    string teamid = "";
 
     TeamDto model = new TeamDto();
 
@@ -54,7 +49,6 @@ public partial class CreateTeam : ComponentBase
         if (await tokenService.ValidateToken())
         {
             var token = new JwtSecurityTokenHandler().ReadJwtToken(await tokenService.GetToken());
-            username = token.Claims.FirstOrDefault(x => x.Type == "unique_name")?.Value ?? "";
             playerId = token.Claims.FirstOrDefault(x => x.Type == "nameid")?.Value ?? "";
         }
         model.CreatedBy = playerId;
@@ -65,12 +59,19 @@ public partial class CreateTeam : ComponentBase
         var response = await client.PostAsJsonAsync("/api/Teams", model);
 
         var content = await response.Content.ReadAsStringAsync();
-        var TeamTypeResponse = JsonSerializer.Deserialize<Dictionary<string, object>>(content);
-        var id = TeamTypeResponse!["id"].ToString();
 
-        notifier.SendSuccessNotification("Team created successfully!");
+        if (response.IsSuccessStatusCode)
+        {
+            var TeamTypeResponse = JsonSerializer.Deserialize<Dictionary<string, object>>(content);
+            var id = TeamTypeResponse!["id"].ToString();
 
-        NavigationManager.NavigateTo($"/editteam/{id}");
-        //TeamDto team = new TeamDto { };
+            notifier.SendSuccessNotification("Team created successfully!");
+
+            NavigationManager.NavigateTo($"/editteam/{id}");
+        }
+
+        notifier.SendErrorNotification(content);
+
+        NavigationManager.NavigateTo($"/manageteams");
     }
 }

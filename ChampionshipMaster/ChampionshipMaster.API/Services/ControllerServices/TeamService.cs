@@ -230,17 +230,8 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                 CreatedOn = DateTime.UtcNow,
                 Active = true
             };
-            ;
-            //TeamPlayers tp = new TeamPlayers
-            //{
-            //    Team = result,
-            //    Player = await _userManager.FindByIdAsync(id),
-            //    CreatedBy = username,
-            //    CreatedOn = DateTime.UtcNow,
 
-            //};
             await _context.Teams.AddAsync(result);
-            //await _context.TeamPlayers.AddAsync(tp);
 
             try
             {
