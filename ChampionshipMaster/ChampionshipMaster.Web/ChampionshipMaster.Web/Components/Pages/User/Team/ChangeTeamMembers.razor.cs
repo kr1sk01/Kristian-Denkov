@@ -76,7 +76,7 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Team
                 }
             }
 
-            if (selectedPlayers.Count() != 0)
+            if (selectedPlayers.Count != 0)
             {
                 int i = 0;
                 foreach (var selectedPlayer in selectedPlayers)

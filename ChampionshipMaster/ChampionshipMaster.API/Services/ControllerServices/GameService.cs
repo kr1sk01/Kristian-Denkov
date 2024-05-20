@@ -1,5 +1,7 @@
 ﻿using ChampionshipMaster.API.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace ChampionshipMaster.API.Services.ControllerServices
 {
@@ -94,12 +96,30 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             return Ok(dto);
         }
 
-        public async Task<ActionResult<Game>> PostGame(Game game)
+        public async Task<ActionResult<Game>> PostGame(GameDto game, StringValues authHeader)
         {
-            await _context.Games.AddAsync(game);
             try
             {
+                var tokenString = authHeader.ToString().Split(' ')[1];
+                var token = new JwtSecurityToken(tokenString);
+
+                var userId = token.Claims.First(x => x.Type == "nameid").Value;
+
+                Game newGame = new Game()
+                {
+                    Name = game.Name,
+                    GameType = await _context.GameTypes.FirstAsync(x => x.Name == game.GameTypeName),
+                    BlueTeam = await _context.Teams.FirstAsync(x => x.Name == game.BlueTeamName),
+                    RedTeam = await _context.Teams.FirstAsync(x => x.Name == game.RedTeamName),
+                    Date = game.Date!.Value.ToUniversalTime(),
+                    CreatedBy = userId,
+                    CreatedOn = DateTime.UtcNow
+                };
+
+                await _context.Games.AddAsync(newGame);
                 await _context.SaveChangesAsync();
+
+                return CreatedAtAction(nameof(PostGame), new { id = newGame.Id }, newGame);
             }
             catch (DbUpdateException)
             {
@@ -112,25 +132,11 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                     throw;
                 }
             }
-
-            if (game.RedTeamId != null && game.BlueTeamId != null)
+            catch (Exception ex)
             {
-                var names = await _context.Teams
-                    .Where(x => x.Id == game.RedTeamId || x.Id == game.BlueTeamId)
-                    .Select(x => x.Name)
-                    .ToListAsync();
-
-                game.Name = $"{names[0]} vs {names[1]}";
+                await Console.Out.WriteLineAsync(ex.Message);
+                return BadRequest("Something went wrong!");
             }
-            else
-            {
-                game.Name = $"Game{game.Id}";
-            }
-
-            _context.Entry(game).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(PostGame), new { id = game.Id }, game);
         }
     }
 }
