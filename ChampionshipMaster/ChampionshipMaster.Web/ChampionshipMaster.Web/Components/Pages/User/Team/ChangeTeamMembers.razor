@@ -4,7 +4,7 @@
 
 <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
     <RadzenStack Orientation="Orientation.Vertical">
-        <RadzenLabel Component="DropDownFiltering" Text="Player 1"></RadzenLabel>
+        <RadzenLabel Component="DropDownFiltering" Text="Player 1" Style="color:white;"></RadzenLabel>
         <RadzenDropDown @ref=@(dropDowns[0])
                         TValue="string"
                         ClearSearchAfterSelection="true"
@@ -20,7 +20,7 @@
     </RadzenStack>
 
     <RadzenStack Orientation="Orientation.Vertical" Visible=@(teamMaxPlayers > 1)>
-        <RadzenLabel Component="DropDownFiltering2" Text="Player 2"></RadzenLabel>
+        <RadzenLabel Component="DropDownFiltering2" Text="Player 2" Style="color:white;"></RadzenLabel>
         <RadzenDropDown @ref=@(dropDowns[1])
                         TValue="string"
                         ClearSearchAfterSelection="true"
@@ -36,7 +36,7 @@
     </RadzenStack>
 
     <RadzenStack Orientation="Orientation.Vertical" Visible=@(teamMaxPlayers > 2)>
-        <RadzenLabel Component="DropDownFiltering3" Text="Player 3"></RadzenLabel>
+        <RadzenLabel Component="DropDownFiltering3" Text="Player 3" Style="color:white;"></RadzenLabel>
         <RadzenDropDown @ref=@(dropDowns[2])
                         TValue="string"
                         ClearSearchAfterSelection="true"
@@ -52,7 +52,7 @@
     </RadzenStack>
 
     <RadzenStack Orientation="Orientation.Vertical" Visible=@(teamMaxPlayers > 3)>
-        <RadzenLabel Component="DropDownFiltering4" Text="Player 4"></RadzenLabel>
+        <RadzenLabel Component="DropDownFiltering4" Text="Player 4" Style="color:white;"></RadzenLabel>
         <RadzenDropDown @ref=@(dropDowns[3])
                         TValue="string"
                         ClearSearchAfterSelection="true"

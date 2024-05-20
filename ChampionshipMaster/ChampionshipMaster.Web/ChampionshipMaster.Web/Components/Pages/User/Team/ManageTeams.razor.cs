@@ -39,7 +39,7 @@ public partial class ManageTeams : ComponentBase
 
     public async Task OpenEditTeam(string id)
     {
-        await DialogService.OpenAsync<EditTeam>($"Create Team",
+        await DialogService.OpenAsync<EditTeam>($"",
                new Dictionary<string, object>() { { "id", id } },
                new DialogOptions() { Width = "75%", Height = "75%", CloseDialogOnEsc = true });
     }
