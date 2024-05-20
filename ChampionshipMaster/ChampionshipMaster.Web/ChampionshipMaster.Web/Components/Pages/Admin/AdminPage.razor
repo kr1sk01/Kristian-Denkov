@@ -6,7 +6,7 @@
 
 @if (isAdmin)
 {
-    <h1>Adminceto BACE!</h1>
+    <center><h1 style="color:white;">Admin Panel</h1></center>
     <RadzenButton Click="@(() => NavigationManager.NavigateTo("/GameStatusMain"))" Text="Manage Game Statuses" ButtonStyle="ButtonStyle.Secondary" />
     <RadzenButton Click="@(() => NavigationManager.NavigateTo("/GameTypeMain"))" Text="Manage Game Types" ButtonStyle="ButtonStyle.Secondary" />
     <RadzenButton Click="@(() => NavigationManager.NavigateTo("/TeamTypeMain"))" Text="Manage Team Types" ButtonStyle="ButtonStyle.Secondary" />

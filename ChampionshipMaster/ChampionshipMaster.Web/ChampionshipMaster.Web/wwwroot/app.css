@@ -22,15 +22,18 @@
         width: 100%;
     }
 }
+
 .table-row {
 }
+
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    
 }
-body{
-    background-color:dimgrey;
+
+body {
+    background-color: dimgrey;
 }
+
 a, .btn-link {
     color: #006bb7;
 }
@@ -42,7 +45,7 @@ a, .btn-link {
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 .content {
@@ -78,23 +81,24 @@ h1:focus {
 .darker-border-checkbox.form-check-input {
     border-color: #929292;
 }
-.rz-navigation-item-link.active 
-{
-    color:red !important; 
+
+.rz-navigation-item-link.active {
+    color: red !important;
 }
-.rz-navigation-item-link
-{
+
+.rz-navigation-item-link {
     font-size: 20px;
 }
-.rz-menu.rz-profile-menu
-{
-    margin-left:auto;
-    padding:0 0 0 10px;
+
+.rz-menu.rz-profile-menu {
+    margin-left: auto;
+    padding: 0 0 0 10px;
 }
-.mainProfile{
-    background-color:#38474E;
-    border-radius:2.5%;
-    padding:1%;
+
+.mainProfile {
+    background-color: #38474E;
+    border-radius: 2.5%;
+    padding: 1%;
 }
 
 .form-container {
@@ -217,4 +221,8 @@ h1:focus {
 
 SaveButtonEdit {
     margin-top: 20px;
+}
+
+.pageTitle {
+    color: white;
 }

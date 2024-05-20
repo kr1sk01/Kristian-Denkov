@@ -12,9 +12,7 @@
         <RadzenMenuItem Text="Home" Icon="home" Path="home" Visible=@isLogged></RadzenMenuItem>
         <RadzenMenuItem Text="Championships" Icon="emoji_events" Path="championshipsmain" Visible=@isLogged></RadzenMenuItem>
         <RadzenMenuItem Text="Teams" Path="manageteams" Icon="groups" Visible=@isLogged></RadzenMenuItem>
-        <RadzenMenuItem Text="Games" Path="createGame" Icon="sports_soccer" Visible=@isLogged>
-            <RadzenMenuItem Text="Create Game" Path="createGame"></RadzenMenuItem>
-        </RadzenMenuItem>
+        <RadzenMenuItem Text="Games" Path="managegames" Icon="sports_soccer" Visible=@isLogged></RadzenMenuItem>       
         <RadzenMenuItem Icon="help_outline" Visible=@isLogged Text="Info" Path="info"></RadzenMenuItem>
         <RadzenMenuItem Icon="admin_panel_settings" Text="Admin Panel" Visible=@isAdmin Path="admin"></RadzenMenuItem>
         <RadzenProfileMenu Visible=@isLogged>
