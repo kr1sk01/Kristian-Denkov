@@ -1,0 +1,35 @@
+﻿@page "/managegames"
+
+
+@inherits ComponentBase
+
+@rendermode InteractiveServer
+
+
+<center><h1 style="color:white;">Manage Games</h1></center>
+
+<RadzenDataGrid AllowFiltering="true"
+                FilterPopupRenderMode="PopupRenderMode.OnDemand"
+                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                AllowPaging="true"
+                PageSize="7"
+                TItem="GameDto"
+                AllowSorting="true" Data="@games" ColumnWidth="200px"
+                SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedTeam
+                RowClick="@(args => Update(args))"
+                CellContextMenu="@OnCellContextMenu">
+
+    <HeaderTemplate>
+        <RadzenButton Style="margin-right:5px;" Icon="note_add" Text="Create Game" ButtonStyle="ButtonStyle.Secondary" Click=@OpenCreateTeam />
+        <RadzenButton Style="margin-right:5px;" Disabled=@disabledEdit Click="@(()=> OpenEditGame(selectedTeam.FirstOrDefault()!.Id.ToString()))" Icon="edit" Text="Edit" />
+    </HeaderTemplate>
+    <Columns>
+        <RadzenDataGridColumn TItem="GameDto" Property="Name" Title="Name" />
+        <RadzenDataGridColumn TItem="GameDto" Property="CreatedOn" Title="Created On" />
+        <RadzenDataGridColumn TItem="GameDto" Property="CreatedBy" Title="Created By" />
+        <RadzenDataGridColumn TItem="GameDto" Property="BlueTeamName" Title="Team 1" />
+        <RadzenDataGridColumn TItem="GameDto" Property="RedTeamName" Title="Team 2" />
+    </Columns>
+</RadzenDataGrid>
+
+
