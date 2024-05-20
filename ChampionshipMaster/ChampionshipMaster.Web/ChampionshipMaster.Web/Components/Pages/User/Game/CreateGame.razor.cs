@@ -44,13 +44,13 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Game
                     using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
                     client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", await tokenService.GetToken());
 
-                    gameTypes = await client.GetFromJsonAsync<List<GameTypeDto>>("api/GameTypes");
-                    if (gameTypes == null || gameTypes.Count == 0)
-                    {
-                        notifier.SendErrorNotification("Couldn't retrieve game types!");
-                        NavigationManager.NavigateTo("/");
-                        return;
-                    }
+                    //gameTypes = await client.GetFromJsonAsync<List<GameTypeDto>>("api/GameTypes");
+                    //if (gameTypes == null || gameTypes.Count == 0)
+                    //{
+                    //    notifier.SendErrorNotification("Couldn't retrieve game types!");
+                    //    NavigationManager.NavigateTo("/");
+                    //    return;
+                    //}
 
                     StateHasChanged();
                 }
