@@ -14,29 +14,65 @@
         <div class="form-row">
             <div class="form-group half-width">
                 <RadzenLabel Text="Game Name" Class="form-label" />
-                <RadzenTextBox @bind-Value="game.Name" Style="width: 100%;" Class="form-control" />
-                <RadzenRequiredValidator Component="@(nameof(game.Name))" Text="Game Name is required" />
+                <RadzenTextBox Name="Name" @bind-Value="game.Name" Style="width: 100%;" Class="form-control" />
+                <RadzenRequiredValidator Component="Name" Text="Game Name is required" />
             </div>
             <div class="form-group half-width">
                 <RadzenLabel Text="Game Type" Class="form-label" />
-                <RadzenDropDown @bind-Value="game.GameTypeName" Data="gameTypes.Select(x => x.Id).ToList()" Style="width: 100%;" Class="form-control" />
-                <RadzenRequiredValidator Component="@(nameof(game.GameTypeName))" Text="Game Type is required" />
+                <RadzenDropDown Name="GameType" @ref="gameTypeDropDown" TValue="GameTypeDto" TextProperty="Name" Data="gameTypes" ValueChanged="@(args => OnGameTypeSelect(args))" Style="width: 100%;" />
+                <RadzenCustomValidator Validator="@(() => gameTypeDropDown.SelectedItem != null)" Component="GameType" Text="Game Type is required" />
             </div>
         </div>
         <div class="form-row">
             <div class="form-group half-width">
                 <RadzenLabel Text="Date" Class="form-label" />
-                <RadzenDatePicker Class="form-control"
+                <RadzenDatePicker Kind="DateTimeKind.Local" Class="form-control"
+                                  Name="Date"
                                   ShowTime="true"
-                                  HourFormat="12"
-                                  DateFormat="MM/dd/yyyy h:mm tt"
+                                  DateFormat="dd/MM/yyyy HH:mm"
                                   @bind-Value="game.Date"
-                                  Style="width: 100%;" />
+                                  Style="width: 100%;"
+                                  DateRender="DateRender"/>
+                <RadzenRequiredValidator Component="Date" Text="Date is required"/>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group half-width" style="@(gameTypeDropDown.SelectedItem == null ? "display: none;" : "display: block;")">
+                <RadzenLabel Text="Team 1" Class="form-label" />
+                <RadzenDropDown TValue="int"
+                                @ref="@(teamDropDowns[0])"
+                                TextProperty="Name"
+                                ValueProperty="Id"
+                                Data="selectableTeams"
+                                ClearSearchAfterSelection="true"
+                                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                FilterOperator="StringFilterOperator.StartsWith"
+                                AllowFiltering="true"
+                                ValueChanged="@(args => OnTeamSelect(args, 0))"
+                                Style="width: 100%;"
+                                Name="Team1"/>
+                <RadzenRequiredValidator Component="Team1" Text="Team 1 is required"/>
+            </div>
+            <div class="form-group half-width" style="@(gameTypeDropDown.SelectedItem == null ? "display: none;" : "display: block;")">
+                <RadzenLabel Text="Team 2" Class="form-label" />
+                <RadzenDropDown TValue="int"
+                                @ref="@(teamDropDowns[1])"
+                                TextProperty="Name"
+                                ValueProperty="Id"
+                                Data="selectableTeams"
+                                ClearSearchAfterSelection="true"
+                                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                FilterOperator="StringFilterOperator.StartsWith"
+                                AllowFiltering="true"
+                                ValueChanged="@(args => OnTeamSelect(args, 1))" 
+                                Style="width: 100%;"
+                                Name="Team2"/>
+                <RadzenRequiredValidator Component="Team2" Text="Team 2 is required" />
             </div>
         </div>
         <div class="form-actions">
-            <RadzenButton ButtonType="ButtonType.Submit" Icon="save" Text="Save" Style="margin-right: 10px;" Class="btn btn-primary" />
-            <RadzenButton ButtonType="ButtonType.Reset" Icon="refresh" Text="Reset" Class="btn btn-secondary" />
+            <RadzenButton ButtonType="ButtonType.Submit" Icon="save" Text="Save" Style="margin-right: 10px;" Class="btn btn-primary"  />
+            <RadzenButton ButtonType="ButtonType.Reset" Icon="refresh" Text="Reset" Class="btn btn-secondary" Click="OnResetClicked" />
         </div>
     </RadzenTemplateForm>
 

@@ -21,7 +21,10 @@ namespace ChampionshipMaster.API.Data
 
             TypeAdapterConfig<TeamDto, Team>.NewConfig()
                 .Map(dest => dest.TeamType, src => _context.TeamTypes.FirstOrDefault(x => x.Name == src.TeamTypeName));
-                
+
+            TypeAdapterConfig<GameType, GameTypeDto>.NewConfig()
+                .Map(dest => dest.TeamTypeName, src => src.TeamType!.Name);
+
             TypeAdapterConfig.GlobalSettings.Scan(Assembly.GetExecutingAssembly());
         }
     }

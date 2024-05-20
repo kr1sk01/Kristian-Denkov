@@ -9,6 +9,6 @@
 
         public int? MaxPoints { get; set; }
 
-        public TeamDto? TeamTypeName { get; set; }
+        public string? TeamTypeName { get; set; }
     }
 }

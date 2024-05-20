@@ -69,9 +69,11 @@ public partial class CreateTeam : ComponentBase
 
             NavigationManager.NavigateTo($"/editteam/{id}");
         }
+        else
+        {
+            notifier.SendErrorNotification(content);
 
-        notifier.SendErrorNotification(content);
-
-        NavigationManager.NavigateTo($"/manageteams");
+            NavigationManager.NavigateTo($"/manageteams");
+        }
     }
 }
