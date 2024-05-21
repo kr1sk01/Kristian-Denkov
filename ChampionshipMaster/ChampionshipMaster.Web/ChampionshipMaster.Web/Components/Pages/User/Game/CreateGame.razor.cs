@@ -19,6 +19,7 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Game
         [Inject] NavigationManager NavigationManager { get; set; } = default!;
 
         private bool isLogged = false;
+        public GameTypeDto? gameType;
         public GameDto game = new();
         private List<GameTypeDto>? gameTypes = new List<GameTypeDto>();
         private RadzenDropDown<GameTypeDto> gameTypeDropDown = new();
@@ -139,7 +140,7 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Game
             notifier.SendErrorNotification("Please correct the errors and try again.");
         }
 
-        public async Task OnGameTypeSelect(GameTypeDto args)
+        public async Task OnGameTypeSelect(object args)
         {
             foreach(var teamDropDown in teamDropDowns)
             {
@@ -147,7 +148,7 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Game
                 teamDropDown.Value = null;
             }
 
-            selectableTeams = allTeams!.Where(x => x.TeamTypeName == args.TeamTypeName).ToList();
+            selectableTeams = allTeams!.Where(x => x.TeamTypeName == gameType!.TeamTypeName).ToList();
             for (int i = 0; i < selectedTeams.Count; i++)
             {
                 selectedTeams[i] = null;
@@ -155,14 +156,14 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Game
             StateHasChanged();
         }
 
-        public void OnTeamSelect(int args, int dropDownIndex)
+        public void OnTeamSelect(object args, int dropDownIndex)
         {
-            var selectedTeam = selectableTeams.FirstOrDefault(x => x.Id == args);
+            var selectedTeam = selectableTeams.FirstOrDefault(x => x.Id == (int)args);
             if (selectedTeam == null)
             {
                 return;
             }
-            selectableTeams.RemoveAll(x => x.Id == args);
+            selectableTeams.RemoveAll(x => x.Id == (int)args);
 
             if (teamDropDowns[dropDownIndex].Value != null)
             {
