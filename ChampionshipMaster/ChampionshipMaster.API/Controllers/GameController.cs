@@ -33,15 +33,18 @@ namespace ChampionshipMaster.API.Controllers
 
         // PUT: api/Game/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutGame(int id, Game game)
+        [Authorize]
+        [HttpPut]
+        public async Task<IActionResult> PutGame([FromQuery] string gameId, [FromBody] GameDto game)
         {
-            var result = await _gameService.EditGame(id, game);
+            var authHeader = HttpContext.Request.Headers.Authorization;
+            var result = await _gameService.EditGame(gameId, game, authHeader);
             return result;
         }
 
         // POST: api/Game
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult> PostGame(GameDto game)
         {
@@ -51,7 +54,7 @@ namespace ChampionshipMaster.API.Controllers
         }
         [Authorize]
         [HttpPost("changeGameName")]
-        public async Task<IActionResult> ChangeTeamName([FromQuery] string gameId, [FromBody] Dictionary<string, string> content)
+        public async Task<IActionResult> ChangeGameName([FromQuery] string gameId, [FromBody] Dictionary<string, string> content)
         {
             var authHeader = HttpContext.Request.Headers.Authorization;
             string newName = content.FirstOrDefault().Value;

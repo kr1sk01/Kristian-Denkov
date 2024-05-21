@@ -33,34 +33,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             return NoContent();
         }
 
-        public async Task<IActionResult> EditGame(int id, Game game)
-        {
-            if (id != game.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(game).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!await GameExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-        public async Task<ActionResult> ChangeGameName(string gameId, string newName, StringValues authHeader)
+        public async Task<IActionResult> EditGame(string gameId, GameDto game, StringValues authHeader)
         {
             try
             {
@@ -69,7 +42,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
 
                 var userId = token.Claims.First(x => x.Type == "nameid").Value;
                 var userRole = token.Claims.First(x => x.Type == "role").Value;
-                var gameToEdit = await _context.Teams.FirstOrDefaultAsync(x => x.Id == int.Parse(gameId));
+                var gameToEdit = await _context.Games.Include(x => x.GameType).FirstOrDefaultAsync(x => x.Id == int.Parse(gameId));
 
                 if (gameToEdit == null)
                 {
@@ -81,7 +54,57 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                     return Forbid("You do not have permission for this operation!");
                 }
 
-                bool isNewNameExist = await _context.Teams.AnyAsync(x => x.Name == newName && x.Id != gameToEdit.Id);
+                gameToEdit.GameStatus = await _context.GameStatuses.FirstAsync(x => x.Name == game.GameStatusName);
+
+                if (game.WinnerName != null)
+                {
+                    gameToEdit.Winner = await _context.Teams.FirstAsync(x => x.Name == game.WinnerName);
+                }
+
+                if (game.BluePoints != null)
+                {
+                    gameToEdit.BluePoints = game.BluePoints;
+                    gameToEdit.RedPoints = game.RedPoints;
+
+                    if (game.BluePoints == gameToEdit.GameType!.MaxPoints || game.RedPoints == gameToEdit.GameType!.MaxPoints)
+                    {
+                        gameToEdit.GameStatus = await _context.GameStatuses.FirstAsync(x => x.Name == "Finished");
+                    }
+                }
+
+                _context.Entry(gameToEdit).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                await Console.Out.WriteLineAsync(ex.Message);
+                return BadRequest("Something went wrong!");
+            }
+        }
+        public async Task<ActionResult> ChangeGameName(string gameId, string newName, StringValues authHeader)
+        {
+            try
+            {
+                var tokenString = authHeader.ToString().Split(' ')[1];
+                var token = new JwtSecurityToken(tokenString);
+
+                var userId = token.Claims.First(x => x.Type == "nameid").Value;
+                var userRole = token.Claims.First(x => x.Type == "role").Value;
+                var gameToEdit = await _context.Games.FirstOrDefaultAsync(x => x.Id == int.Parse(gameId));
+
+                if (gameToEdit == null)
+                {
+                    return NotFound("This game doesn't exist!");
+                }
+
+                if (gameToEdit.CreatedBy != userId && userRole != "admin")
+                {
+                    return Forbid("You do not have permission for this operation!");
+                }
+
+                bool isNewNameExist = await _context.Games.AnyAsync(x => x.Name == newName && x.Id != gameToEdit.Id);
                 if (isNewNameExist)
                 {
                     return BadRequest("There is already a game with that name!");
@@ -98,7 +121,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             catch (Exception ex)
             {
                 await Console.Out.WriteLineAsync(ex.Message);
-                return BadRequest("Something went wrong");
+                return BadRequest("Something went wrong!");
             }
         }
         public async Task<bool> GameExists(int id)

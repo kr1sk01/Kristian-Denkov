@@ -23,19 +23,29 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Game
         bool isLogged = false;
 
         ChangeName changeGameName;
+        RadzenRadioButtonList<string> radioButtonList = new RadzenRadioButtonList<string>();
+        List<RadzenNumeric<int>> radzenNumerics = new()
+        {
+            new(),
+            new()
+        };
 
         string nameRequestUrl = "api/Game/changeGameName";
-        //string logoRequestUrl = "api/Teams/changeTeamLogo";
-        //string teamMembersRequestUrl = "api/Teams/setPlayers";
 
-        int team1Points = 0;
-        int team2Points = 0;
+        //int teamPoints[0] = 0;
+        //int teamPoints[1] = 0;
+        List<int> teamPoints = new() { 0, 0 };
+
+        int team1InitialPoints = 0;
+        int team2InitialPoints = 0;
 
         int maxTeamPoints;
 
-        string status = "";
-
-        List<string> teams = new List<string>();
+        string? currentGameStatus;
+        string? initialGameStatus;
+        List<string> teams = new() { "", "" };
+        //string team1 = "";
+        //string team2 = "";
         string? winnerTeamName;
         List<GameStatusDto>? gameStatuses;
 
@@ -57,57 +67,181 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Game
 
                 var game = await client.GetFromJsonAsync<GameDto>($"api/Game/{id}");
                 var statuses = await client.GetFromJsonAsync<List<GameStatusDto>>($"api/GameStatus");
+
                 if(statuses != null)
                 {
                     gameStatuses = statuses;
+                }
+                else
+                {
+                    notifier.SendErrorNotification("Couldn't retrieve game statuses");
+                    NavigationManager.NavigateTo("/managegames");
                 }
                 
                 if (game != null)
                 {
                     changeGameName.SetInitialValue(game.Name!);
+                    nameRequestUrl += $"?gameId={id}";
+
+                    initialGameStatus = game.GameStatusName;
+                    currentGameStatus = initialGameStatus;
+
+                    teamPoints[0] = game.BluePoints ?? 0;
+                    teamPoints[1] = game.RedPoints ?? 0;
+                    team1InitialPoints = game.BluePoints ?? 0;
+                    team2InitialPoints = game.RedPoints ?? 0;
+
                     var maxPoints = game.MaxPoints;
                     if (maxPoints != null)
                     {
                         maxTeamPoints = maxPoints.Value;
-                        teams.Add(game.BlueTeamName!);
-                        teams.Add(game.RedTeamName!);
+                        teams[0] = game.BlueTeamName!;
+                        teams[1] = game.RedTeamName!;
                     }
 
                     StateHasChanged();
                 }
+                else
+                {
+                    notifier.SendErrorNotification("Couldn't retrieve game info");
+                    NavigationManager.NavigateTo("/managegames");
+                }
             }
+
+            //for (int i = 0; i < 2; i++)
+            //{
+            //    radzenNumerics[i].Value = teamPoints[i];
+            //}
+
+            //StateHasChanged();
         }
         public void CheckButtonState()
         {
-            isValueInitial = changeGameName.isValueInitial && changeGameName.isValueInitial && changeGameName.isValueInitial;
+            isValueInitial = changeGameName.isValueInitial 
+                && (winnerTeamName == null) 
+                && (initialGameStatus == currentGameStatus || currentGameStatus == null)
+                && (teamPoints[0] == team1InitialPoints && teamPoints[1] == team2InitialPoints);
         }
 
-        public async Task OnClick()
+        public async Task OnClickSave()
         {
+            if (!await tokenService.ValidateToken())
+            {
+                notifier.SendInformationalNotification("You're not logged in or your session has expired");
+                NavigationManager.NavigateTo("/login");
+            }
 
             await changeGameName.OnClick();
-            return;
+            await SendGameInfo();
+            NavigationManager.NavigateTo("/managegames");
         }
-        void OnChange(object value)
+
+        void OnChangeRadio(object value)
         {
             if (value != null)
             {
                 string selectedValue = value.ToString();
                 winnerTeamName = selectedValue; // Update the selected value
 
-                // Assuming teams.FirstOrDefault() and teams.Skip(1).FirstOrDefault() are strings
-                if (selectedValue == teams.FirstOrDefault())
+                if (selectedValue == teams[0])
                 {
-                    team1Points = maxTeamPoints;
-                    team2Points = 0; // Clear points for the other team
+                    teamPoints[0] = maxTeamPoints;
+                    teamPoints[1] = teamPoints[1] < 10 ? teamPoints[1] : 9;
                 }
-                else if (selectedValue == teams.Skip(1).FirstOrDefault())
+                else if (selectedValue == teams[1])
                 {
-                    team2Points = maxTeamPoints;
-                    team1Points = 0; // Clear points for the other team
+                    teamPoints[1] = maxTeamPoints;
+                    teamPoints[0] = teamPoints[0] < 10 ? teamPoints[0] : 9;
                 }
             }
+
+            isValueInitial = changeGameName.isValueInitial
+                && (winnerTeamName == null)
+                && (initialGameStatus == currentGameStatus || currentGameStatus == null)
+                && (teamPoints[0] == team1InitialPoints && teamPoints[1] == team2InitialPoints);
+
+            StateHasChanged();
         }
 
+        void OnChangeDropDown(object args)
+        {
+            if (args.ToString() == "Finished")
+            {
+                radioButtonList.Change.InvokeAsync(teams[0]);
+            }
+
+            isValueInitial = changeGameName.isValueInitial
+                && (winnerTeamName == null)
+                && (initialGameStatus == currentGameStatus || currentGameStatus == null)
+                && (teamPoints[0] == team1InitialPoints && teamPoints[1] == team2InitialPoints);
+
+            StateHasChanged();
+        }
+
+        void OnChangeNumeric(int args, int teamIndex)
+        {
+            //Check if input equals 10 when the team is not selected as winner
+            if (args >= 10 && (radioButtonList.Value != null && teams[teamIndex] != radioButtonList.Value))
+            {
+                teamPoints[teamIndex] = 9;
+                radzenNumerics[teamIndex].Value = 9;
+            }
+
+            //Check if input is different than 10 when the team is selected as winner
+            if (args < 10 && teams[teamIndex] == radioButtonList.Value)
+            {
+                radioButtonList.Change.InvokeAsync(arg:null);
+            }
+
+            //Check if input is 10 and the winner is not set
+            if (args == 10 && radioButtonList.Value == null)
+            {
+                radioButtonList.Change.InvokeAsync(teams[teamIndex]);
+            }
+
+            isValueInitial = changeGameName.isValueInitial
+                && (winnerTeamName == null)
+                && (initialGameStatus == currentGameStatus || currentGameStatus == null)
+                && (teamPoints[0] == team1InitialPoints && teamPoints[1] == team2InitialPoints);
+
+            StateHasChanged();
+        }
+
+        async Task SendGameInfo()
+        {
+            GameDto gameInfo = new GameDto()
+            {
+                GameStatusName = currentGameStatus,
+                WinnerName = winnerTeamName
+            };
+
+            if (currentGameStatus == null)
+            {
+                return;
+            }
+
+            if (!radioButtonList.Disabled)
+            {
+                //gameInfo.BluePoints = teamPoints[0];
+                //gameInfo.RedPoints = teamPoints[1];
+                gameInfo.BluePoints = radioButtonList.Value == teams[0] ? 10 : teamPoints[0];
+                gameInfo.RedPoints = radioButtonList.Value == teams[1] ? 10 : teamPoints[1];
+            }
+
+            var token = await tokenService.GetToken();
+            using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+            var request = await client.PutAsJsonAsync($"/api/Game?gameId={id}", gameInfo);
+
+            if (request.IsSuccessStatusCode)
+            {
+                notifier.SendSuccessNotification("Game details updated successfully!");
+            }
+            else
+            {
+                notifier.SendErrorNotification("Something went wrong!");
+            }
+        }
     }
 }

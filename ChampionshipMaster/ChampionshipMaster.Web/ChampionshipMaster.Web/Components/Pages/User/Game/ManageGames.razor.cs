@@ -26,7 +26,7 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Game
 
         void Update(DataGridRowMouseEventArgs<GameDto> args)
         {
-            if (args.Data.CreatedBy == playerId || isAdmin)
+            if ((args.Data.CreatedBy == playerId || isAdmin) && args.Data.GameStatusName != "Finished")
                 disabledEdit = false;
             else
                 disabledEdit = true;
