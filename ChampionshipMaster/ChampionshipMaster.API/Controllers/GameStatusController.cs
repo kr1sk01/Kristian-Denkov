@@ -16,7 +16,7 @@ namespace ChampionshipMaster.API.Controllers
 
         // GET: api/GameStatus
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<GameStatus>>> GetGameStatuses()
+        public async Task<ActionResult<IEnumerable<GameStatusDto>>> GetGameStatuses()
         {
             var result = await _gameStatusService.GetAllGameStatuses();
             return Ok(result);

@@ -25,6 +25,9 @@ namespace ChampionshipMaster.API.Data
             TypeAdapterConfig<GameType, GameTypeDto>.NewConfig()
                 .Map(dest => dest.TeamTypeName, src => src.TeamType!.Name);
 
+            TypeAdapterConfig<Game, GameDto>.NewConfig()
+                .Map(dest => dest.MaxPoints, src => src.GameType!.MaxPoints);
+
             TypeAdapterConfig.GlobalSettings.Scan(Assembly.GetExecutingAssembly());
         }
     }

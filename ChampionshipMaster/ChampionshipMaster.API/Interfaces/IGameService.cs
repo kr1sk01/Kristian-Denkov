@@ -11,5 +11,6 @@ namespace ChampionshipMaster.API.Interfaces
         Task<IActionResult> EditGame(int id, Game game);
         Task<bool> GameExists(int id);
         Task<IActionResult> DeleteGame(int id);
+        Task<ActionResult> ChangeGameName(string gameId, string newName, StringValues authHeader);
     }
 }

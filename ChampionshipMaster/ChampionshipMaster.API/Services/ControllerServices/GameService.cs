@@ -55,7 +55,47 @@ namespace ChampionshipMaster.API.Services.ControllerServices
 
             return NoContent();
         }
+        public async Task<ActionResult> ChangeGameName(string gameId, string newName, StringValues authHeader)
+        {
+            try
+            {
+                var tokenString = authHeader.ToString().Split(' ')[1];
+                var token = new JwtSecurityToken(tokenString);
 
+                var userId = token.Claims.First(x => x.Type == "nameid").Value;
+                var userRole = token.Claims.First(x => x.Type == "role").Value;
+                var gameToEdit = await _context.Teams.FirstOrDefaultAsync(x => x.Id == int.Parse(gameId));
+
+                if (gameToEdit == null)
+                {
+                    return NotFound("This game doesn't exist!");
+                }
+
+                if (gameToEdit.CreatedBy != userId && userRole != "admin")
+                {
+                    return Forbid("You do not have permission for this operation!");
+                }
+
+                bool isNewNameExist = await _context.Teams.AnyAsync(x => x.Name == newName && x.Id != gameToEdit.Id);
+                if (isNewNameExist)
+                {
+                    return BadRequest("There is already a game with that name!");
+                }
+
+                gameToEdit.Name = newName;
+                gameToEdit.ModifiedBy = userId;
+                gameToEdit.ModifiedOn = DateTime.UtcNow;
+                _context.Entry(gameToEdit).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+
+                return Ok("Changed game name successfully!");
+            }
+            catch (Exception ex)
+            {
+                await Console.Out.WriteLineAsync(ex.Message);
+                return BadRequest("Something went wrong");
+            }
+        }
         public async Task<bool> GameExists(int id)
         {
             return await _context.Games.AnyAsync(x => x.Id == id);

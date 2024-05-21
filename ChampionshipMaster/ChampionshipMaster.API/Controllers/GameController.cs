@@ -1,4 +1,6 @@
 ﻿using ChampionshipMaster.API.Interfaces;
+using ChampionshipMaster.API.Services.ControllerServices;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ChampionshipMaster.API.Controllers
 {
@@ -45,6 +47,15 @@ namespace ChampionshipMaster.API.Controllers
         {
             var authHeader = HttpContext.Request.Headers.Authorization;
             var result = await _gameService.PostGame(game, authHeader);
+            return result;
+        }
+        [Authorize]
+        [HttpPost("changeGameName")]
+        public async Task<IActionResult> ChangeTeamName([FromQuery] string gameId, [FromBody] Dictionary<string, string> content)
+        {
+            var authHeader = HttpContext.Request.Headers.Authorization;
+            string newName = content.FirstOrDefault().Value;
+            var result = await _gameService.ChangeGameName(gameId, newName, authHeader);
             return result;
         }
 

@@ -226,3 +226,39 @@ SaveButtonEdit {
 .pageTitle {
     color: white;
 }
+
+.GameEditTeamsContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.GameEditTeamsContainerFlex {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 800px; /* Adjust this value as needed */
+    color:white;
+    gap:10px;
+    width:40%;
+}
+
+.GameEditTeamsContainerDiv {
+    flex: 1;
+    padding: 10px;
+    background-color: #38474E;
+    border-radius: 25px 25px;
+    border: 1px solid black;
+}
+.radio-button-list .rz-radiobutton-list {
+    margin-bottom:0px;
+    display: flex;
+ 
+}
+
+.radio-button-list .rz-radiobutton {
+    margin-bottom: 0px;
+    display: flex;
+    align-items: center;
+    padding-right:20px;
+}

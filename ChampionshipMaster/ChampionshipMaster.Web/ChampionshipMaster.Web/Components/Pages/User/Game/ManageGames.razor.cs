@@ -42,9 +42,9 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Game
 
         public async Task OpenEditGame(string id)
         {
-            //await DialogService.OpenAsync<EditTeam>($"",
-            //       new Dictionary<string, object>() { { "id", id } },
-            //       new DialogOptions() { Width = "75%", Height = "75%", CloseDialogOnEsc = true });
+            await DialogService.OpenAsync<EditGame>($"",
+                  new Dictionary<string, object>() { { "id", id } },
+                  new DialogOptions() { Width = "75%", Height = "75%", CloseDialogOnEsc = true });
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
