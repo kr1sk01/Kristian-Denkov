@@ -1,4 +1,5 @@
 ﻿using ChampionshipMaster.API.Interfaces;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using System.IdentityModel.Tokens.Jwt;
@@ -8,10 +9,14 @@ namespace ChampionshipMaster.API.Services.ControllerServices
     public class GameService : ControllerBase, IGameService
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<Player> _userManager;
+        private readonly IEmailSender _emailSender;
 
-        public GameService(ApplicationDbContext context)
+        public GameService(ApplicationDbContext context, IEmailSender emailSender, UserManager<Player> userManager)
         {
             _context = context;
+            _userManager = userManager;
+            _emailSender = emailSender;
         }
 
         public async Task<IActionResult> DeleteGame(int id)
@@ -136,7 +141,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             return Ok(dto);
         }
 
-        public async Task<ActionResult<Game>> PostGame(GameDto game, StringValues authHeader)
+        public async Task<ActionResult> PostGame(GameDto game, StringValues authHeader)
         {
             try
             {
@@ -144,13 +149,15 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                 var token = new JwtSecurityToken(tokenString);
 
                 var userId = token.Claims.First(x => x.Type == "nameid").Value;
+                //var userEmail = token.Claims.First(x => x.Type == "email").Value;
+                //var userName = token.Claims.First(x => x.Type == "unique_name").Value;
 
                 Game newGame = new Game()
                 {
                     Name = game.Name,
                     GameType = await _context.GameTypes.FirstAsync(x => x.Name == game.GameTypeName),
-                    BlueTeam = await _context.Teams.FirstAsync(x => x.Name == game.BlueTeamName),
-                    RedTeam = await _context.Teams.FirstAsync(x => x.Name == game.RedTeamName),
+                    BlueTeam = await _context.Teams.Include(x => x.TeamPlayers).ThenInclude(x => x.Player).FirstAsync(x => x.Name == game.BlueTeamName),
+                    RedTeam = await _context.Teams.Include(x => x.TeamPlayers).ThenInclude(x => x.Player).FirstAsync(x => x.Name == game.RedTeamName),
                     Date = game.Date!.Value.ToUniversalTime(),
                     CreatedBy = userId,
                     CreatedOn = DateTime.UtcNow
@@ -159,7 +166,26 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                 await _context.Games.AddAsync(newGame);
                 await _context.SaveChangesAsync();
 
-                return CreatedAtAction(nameof(PostGame), new { id = newGame.Id }, newGame);
+                foreach (var teamPlayer in newGame.BlueTeam.TeamPlayers.ToList())
+                {
+                    var userName = teamPlayer.Player!.UserName;
+                    var email = teamPlayer.Player!.Email;
+                    var userTeam = newGame.BlueTeam.Name;
+                    var opponentTeam = newGame.RedTeam.Name;
+                    await _emailSender.SendGameScheduledEmail(email!, userName!, game.Name!, userTeam!, opponentTeam!, game.Date ?? DateTime.MaxValue);
+                }
+
+                foreach (var teamPlayer in newGame.RedTeam.TeamPlayers.ToList())
+                {
+                    var userName = teamPlayer.Player!.UserName;
+                    var email = teamPlayer.Player!.Email;
+                    var userTeam = newGame.BlueTeam.Name;
+                    var opponentTeam = newGame.BlueTeam.Name;
+                    await _emailSender.SendGameScheduledEmail(email!, userName!, game.Name!, userTeam!, opponentTeam!, game.Date ?? DateTime.MaxValue);
+                }
+
+
+                return CreatedAtAction(nameof(PostGame), new { id = newGame.Id });
             }
             catch (DbUpdateException)
             {

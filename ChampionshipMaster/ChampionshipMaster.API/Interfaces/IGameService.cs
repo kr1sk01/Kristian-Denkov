@@ -7,7 +7,7 @@ namespace ChampionshipMaster.API.Interfaces
     {
         Task<List<GameDto>> GetAllGames();
         Task<ActionResult<GameDto?>> GetGame(int id);
-        Task<ActionResult<Game>> PostGame(GameDto game, StringValues authHeader);
+        Task<ActionResult> PostGame(GameDto game, StringValues authHeader);
         Task<IActionResult> EditGame(int id, Game game);
         Task<bool> GameExists(int id);
         Task<IActionResult> DeleteGame(int id);
