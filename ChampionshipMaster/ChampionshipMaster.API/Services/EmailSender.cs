@@ -1,5 +1,6 @@
 ﻿using ChampionshipMaster.API.Interfaces;
 using MailKit.Net.Smtp;
+using Microsoft.Identity.Client;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using MimeKit;
 
@@ -69,6 +70,20 @@ namespace ChampionshipMaster.API.Services
             {
                 return reader.ReadToEnd();
             }
+        }
+
+        public async Task SendGameScheduledEmail(string userEmail, string userName, string gameName, string userTeam, string opponentTeam, DateTime date)
+        {
+            var templatePath = "Services/EmailTemplates/GameScheduledTemplate.html";
+            var template = GetEmailTemplate(templatePath);
+
+            var body = template.Replace("[User Name]", userName)
+                .Replace("[Game Name]", gameName)
+                .Replace("[User Team]", userTeam)
+                .Replace("[Opponent Team]", opponentTeam)
+                .Replace("[Game Date]", date.ToUniversalTime().ToString("dd/MM/yyyy HH:mm"));
+
+            await SendEmailAsync(userEmail, $"Game scheduled", body);
         }
     }
 }

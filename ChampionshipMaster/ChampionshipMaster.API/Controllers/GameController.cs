@@ -41,7 +41,7 @@ namespace ChampionshipMaster.API.Controllers
         // POST: api/Game
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Game>> PostGame(GameDto game)
+        public async Task<ActionResult> PostGame(GameDto game)
         {
             var authHeader = HttpContext.Request.Headers.Authorization;
             var result = await _gameService.PostGame(game, authHeader);
