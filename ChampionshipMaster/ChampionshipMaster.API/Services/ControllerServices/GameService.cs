@@ -42,7 +42,11 @@ namespace ChampionshipMaster.API.Services.ControllerServices
 
                 var userId = token.Claims.First(x => x.Type == "nameid").Value;
                 var userRole = token.Claims.First(x => x.Type == "role").Value;
-                var gameToEdit = await _context.Games.Include(x => x.GameType).FirstOrDefaultAsync(x => x.Id == int.Parse(gameId));
+                var gameToEdit = await _context.Games
+                    .Include(x => x.GameType)
+                    .Include(x => x.BlueTeam)
+                    .Include(x => x.RedTeam)
+                    .FirstOrDefaultAsync(x => x.Id == int.Parse(gameId));
 
                 if (gameToEdit == null)
                 {
@@ -69,6 +73,20 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                     if (game.BluePoints == gameToEdit.GameType!.MaxPoints || game.RedPoints == gameToEdit.GameType!.MaxPoints)
                     {
                         gameToEdit.GameStatus = await _context.GameStatuses.FirstAsync(x => x.Name == "Finished");
+
+                        var teamPlayers = await _context.TeamPlayers
+                            .Include(x => x.Player)
+                            .Where(x => x.TeamId == gameToEdit.BlueTeamId || x.TeamId == gameToEdit.RedTeamId)
+                            .ToListAsync();
+
+                        if (teamPlayers != null)
+                        {
+                            foreach (var teamPlayer in teamPlayers)
+                            {
+                                await _emailSender.SendGameFinishedEmail(teamPlayer.Player!.Email!, gameToEdit.Name!, gameToEdit.BlueTeam!.Name!, gameToEdit.BluePoints ?? 0, gameToEdit.RedTeam!.Name!, gameToEdit.RedPoints ?? 0);
+                            }
+                        }
+                        
                     }
                 }
 
@@ -172,8 +190,6 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                 var token = new JwtSecurityToken(tokenString);
 
                 var userId = token.Claims.First(x => x.Type == "nameid").Value;
-                //var userEmail = token.Claims.First(x => x.Type == "email").Value;
-                //var userName = token.Claims.First(x => x.Type == "unique_name").Value;
 
                 Game newGame = new Game()
                 {

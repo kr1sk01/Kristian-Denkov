@@ -3,6 +3,7 @@ using MailKit.Net.Smtp;
 using Microsoft.Identity.Client;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using MimeKit;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ChampionshipMaster.API.Services
 {
@@ -84,6 +85,20 @@ namespace ChampionshipMaster.API.Services
                 .Replace("[Game Date]", date.ToUniversalTime().ToString("dd/MM/yyyy HH:mm"));
 
             await SendEmailAsync(userEmail, $"Game scheduled", body);
+        }
+
+        public async Task SendGameFinishedEmail(string userEmail, string gameName, string blueTeam, int bluePoints, string redTeam, int redPoints)
+        {
+            var templatePath = "Services/EmailTemplates/GameFinishedTemplate.html";
+            var template = GetEmailTemplate(templatePath);
+
+            var body = template.Replace("[Game Name]", gameName)
+                .Replace("[Blue Team]", blueTeam)
+                .Replace("[Blue Points]", bluePoints.ToString())
+                .Replace("[Red Team]", redTeam)
+                .Replace("[Red Points]", redPoints.ToString());
+
+            await SendEmailAsync(userEmail, $"Game finished", body);
         }
     }
 }
