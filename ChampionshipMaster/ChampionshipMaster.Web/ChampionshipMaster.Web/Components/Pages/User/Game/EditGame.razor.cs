@@ -115,6 +115,21 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Game
 
             //StateHasChanged();
         }
+        private bool highlightedLeft = false;
+        private bool highlightedRight = false;
+
+        // Other variables and methods...
+
+        private void HighLightLeft(bool state)
+        {
+            highlightedLeft = state;
+        }
+
+        private void HighLightRight(bool state)
+        {
+            highlightedRight = state;
+        }
+
         public void CheckButtonState()
         {
             isValueInitial = changeGameName.isValueInitial 
@@ -145,16 +160,19 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Game
 
                 if (selectedValue == teams[0])
                 {
+                    highlightedLeft = true;
+                    highlightedRight = false;
                     teamPoints[0] = maxTeamPoints;
                     teamPoints[1] = teamPoints[1] < 10 ? teamPoints[1] : 9;
                 }
                 else if (selectedValue == teams[1])
                 {
+                    highlightedLeft = false;
+                    highlightedRight = true;
                     teamPoints[1] = maxTeamPoints;
                     teamPoints[0] = teamPoints[0] < 10 ? teamPoints[0] : 9;
                 }
             }
-
             isValueInitial = changeGameName.isValueInitial
                 && (winnerTeamName == null)
                 && (initialGameStatus == currentGameStatus || currentGameStatus == null)
