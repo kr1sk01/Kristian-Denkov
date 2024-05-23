@@ -202,7 +202,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                 {
                     var userName = teamPlayer.Player!.UserName;
                     var email = teamPlayer.Player!.Email;
-                    var userTeam = newGame.BlueTeam.Name;
+                    var userTeam = newGame.RedTeam.Name;
                     var opponentTeam = newGame.BlueTeam.Name;
                     await _emailSender.SendGameScheduledEmail(email!, userName!, game.Name!, userTeam!, opponentTeam!, game.Date ?? DateTime.MaxValue);
                 }
