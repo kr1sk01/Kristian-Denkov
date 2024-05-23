@@ -13,5 +13,6 @@ namespace ChampionshipMaster.API.Interfaces
         Task<IActionResult> ChangeAvatar(string newAvatar, StringValues authHeader);
         Task<IActionResult> ChangeUsername(string newUsername, StringValues authHeader);
         Task<List<PlayerDto>> GetAllActivePlayers();
+        Task<ActionResult<List<string?>>> GetPlayerUsernamesById(List<string> playerIds);
     }
 }

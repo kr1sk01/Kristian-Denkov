@@ -7,6 +7,7 @@ using ChampionshipMaster.SHARED.DTO;
 using Radzen.Blazor;
 using System.IdentityModel.Tokens.Jwt;
 using ChampionshipMaster.Web.Components.Pages.User.Account;
+using System.Text.Json;
 namespace ChampionshipMaster.Web.Components.Pages.User.Team;
 
 public partial class ManageTeams : ComponentBase
@@ -17,7 +18,7 @@ public partial class ManageTeams : ComponentBase
     [Inject] ITokenService tokenService { get; set; } = default!;
     [Inject] IHttpClientFactory httpClient { get; set; } = default!;
     [Inject] IWebHostEnvironment Environment { get; set; } = default!;
-
+    [Inject] INotifier notifier { get; set; } = default!;
     [Inject] ProtectedLocalStorage _localStorage { get; set; } = default!;
     [Inject] NavigationManager NavigationManager { get; set; } = default!;
     [Inject] ContextMenuService ContextMenuService { get; set; } = default!;
@@ -71,8 +72,48 @@ public partial class ManageTeams : ComponentBase
     private async Task GetData()
     {
         using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {await tokenService.GetToken()}");
         var test = await client.GetFromJsonAsync<List<TeamDto>>("/api/Teams/active");
-        teams = test;
+        if (test == null || test.Count == 0)
+        {
+            notifier.SendErrorNotification("Couldn't retrieve games");
+            NavigationManager.NavigateTo("/");
+        }
+        teams = test!;
+
+        int i = 0;
+        foreach (var team in teams)
+        {
+            if (team.CreatedOn != null)
+            {
+                teams[i].CreatedOn = team.CreatedOn.Value.ToLocalTime();
+            }
+
+            i++;
+        }
+
+        var jsonString = JsonSerializer.Serialize(test!.Select(x => x.CreatedBy).ToList());
+        var content = new StringContent(jsonString, System.Text.Encoding.UTF8, "application/json");
+        var request = await client.PostAsync("api/Player/getPlayersById", content);
+        var body = await request.Content.ReadAsStringAsync();
+
+        if (request.IsSuccessStatusCode)
+        {
+            var playerUsernames = JsonSerializer.Deserialize<List<string>>(body);
+
+            i = 0;
+            foreach (var team in teams)
+            {
+                if (team.CreatedBy != null)
+                {
+                    teams[i].CreatedByUsername = playerUsernames[i];
+                }
+
+                i++;
+            }
+        }
+
+        StateHasChanged();
 
     }
 

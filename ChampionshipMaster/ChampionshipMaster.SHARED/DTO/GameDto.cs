@@ -25,6 +25,8 @@
 
         public string? CreatedBy { get; set; }
 
+        public string? CreatedByUsername { get; set; }
+
         public int? MaxPoints { get; set; }
 
         public DateTime? CreatedOn { get; set; }

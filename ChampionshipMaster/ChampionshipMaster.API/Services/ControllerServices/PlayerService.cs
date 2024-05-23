@@ -296,5 +296,28 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                 return BadRequest("Something went wrong!");
             }
         }
+
+        public async Task<ActionResult<List<string?>>> GetPlayerUsernamesById(List<string> playerIds)
+        {
+            var players = new List<Player?>();
+            foreach (var playerId in playerIds)
+            {
+                players.Add(await _context.Users.FirstOrDefaultAsync(x => x.Id == playerId));
+            }
+            var usernames = new List<string?>();
+
+            foreach (var player in players)
+            {
+                if (player == null)
+                {
+                    usernames.Add(null);
+                }
+                else
+                {
+                    usernames.Add(player.UserName);
+                }
+            }
+            return Ok(usernames);
+        }
     }
 }

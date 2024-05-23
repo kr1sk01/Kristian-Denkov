@@ -81,5 +81,13 @@ namespace ChampionshipMaster.API.Controllers
             var result = await _playerService.ChangeUsername(newUsername, authHeader);
             return result;
         }
+
+        [Authorize]
+        [HttpPost("getPlayersById")]
+        public async Task<ActionResult<List<string?>>> GetPlayerUsernamesById([FromBody] List<string> content)
+        {
+            var result = await _playerService.GetPlayerUsernamesById(content);
+            return result;
+        }
     }
 }
