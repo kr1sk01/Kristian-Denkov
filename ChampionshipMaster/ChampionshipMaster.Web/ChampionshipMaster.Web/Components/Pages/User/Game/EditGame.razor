@@ -11,57 +11,56 @@
 {
 
     <div class="GameEditTeamsContainer">
+    <ChangeName @ref=@changeGameName
+                Title="Change Game Name"
+                RequestUrl="@nameRequestUrl"
+                StateChange=@CheckButtonState />
+    <RadzenLabel Style="margin-right: 8px; vertical-align: middle;color:white;" Text="Select GameStatus" Component="DropDownBindValue" />
 
-        <ChangeName @ref=@changeGameName
-                    Title="Change Game Name"
-                    RequestUrl="@nameRequestUrl"
-                    StateChange=@CheckButtonState />
-        <RadzenLabel Style="margin-right: 8px; vertical-align: middle;color:white;" Text="Select GameStatus" Component="DropDownBindValue" />
-
-        <RadzenDropDown Change="@(args => OnChangeDropDown(args))" @bind-Value=@currentGameStatus Data=@(gameStatuses !=null ? gameStatuses.Select(x=>
-                    x.Name):"") Style="width: 100%; max-width: 400px;" Name="DropDownBindValue" /><br />
+    <RadzenDropDown Change="@(args => OnChangeDropDown(args))" @bind-Value=@currentGameStatus Data=@(gameStatuses != null ? gameStatuses.Select(x => x.Name) : "") Style="width: 100%; max-width: 400px;" Name="DropDownBindValue" /><br />
         <RadzenRadioButtonList Disabled="@(currentGameStatus == "Coming" || currentGameStatus == "Cancelled" || currentGameStatus == null)"
-            @ref=@radioButtonList Change="@OnChangeRadio" Value=@winnerTeamName TValue="string">
+                               @ref="@radioButtonList" Change="@OnChangeRadio" Value="@winnerTeamName" TValue="string">
             <Items>
                 <RadzenText TextStyle="TextStyle.Subtitle2" TextAlign="TextAlign.Center" Text="Choose winner:"></RadzenText>
-                <RadzenRadioButtonListItem Style="padding-left:0.8vw;padding-right:11.6vw;" Value="@teams[0]" />
-                <RadzenRadioButtonListItem Value="@teams[1]" />
+                <RadzenRadioButtonListItem  Style="padding-left:0.8vw;padding-right:11.6vw;" Value="@teams[0]" />
+                <RadzenRadioButtonListItem  Value="@teams[1]" />
             </Items>
-        </RadzenRadioButtonList>
-        <div class="GameEditTeamsContainerFlex">
-            <div class="GameEditTeamsContainerDiv">
-                <center>
-                    <RadzenLabel Text="@teams[0]" Component="DropDownBindValue" Style="margin-right: 8px; vertical-align: middle;" />
-                </center>
-                <br />
-                <RadzenLabel Text="Points: " Component="DropDownBindValue" Style="margin-right: 8px; vertical-align: middle;" />
-                <RadzenNumeric Disabled="@(currentGameStatus == "Coming" || currentGameStatus == "Cancelled" || currentGameStatus == null)"
-                               TValue="int"
-                               Min="0"
-                               Max="@maxTeamPoints"
-                               @bind-Value=@teamPoints[0]
-                               Change="@(args => OnChangeNumeric(args, 0))"
-                               @ref=@radzenNumerics[0]
-                               InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "Team 1" }})" />
-            </div>
-            <div class="GameEditTeamsContainerDiv">
-                <center>
-                    <RadzenLabel Text="@teams[1]" Component="DropDownBindValue" Style="margin-right: 8px; vertical-align: middle;" />
-                </center>
-                <br />
-                <RadzenLabel Text="Points: " Component="DropDownBindValue" Style="margin-right: 8px; vertical-align: middle;" />
-                <RadzenNumeric Disabled="@(currentGameStatus == "Coming" || currentGameStatus == "Cancelled" || currentGameStatus == null)"
-                               TValue="int"
-                               Min="0"
-                               Max="@maxTeamPoints"
-                               @bind-Value=@teamPoints[1]
-                               Change="@(args => OnChangeNumeric(args, 1))"
-                               @ref=@radzenNumerics[1]
-                               InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "Team 2" }})" />
-            </div>
-        </div><br />
-        <center><RadzenButton Text="Save Changes" Disabled="@isValueInitial" Click="OnClickSave"></RadzenButton></center>
-    </div>
+        </RadzenRadioButtonList><br />
+    <div class="GameEditTeamsContainerFlex">
+        <div class="@(highlightedLeft ? "GameEditTeamsContainerDivActive" : "GameEditTeamsContainerDiv")">
+            <center>
+                <RadzenLabel Text="@teams[0]" Component="DropDownBindValue" Style="margin-right: 8px; vertical-align: middle;" />
+            </center>
+            <br />
+            <RadzenLabel Text="Points: " Component="DropDownBindValue" Style="margin-right: 8px; vertical-align: middle;" />
+            <RadzenNumeric Disabled="@(currentGameStatus == "Coming" || currentGameStatus == "Cancelled" || currentGameStatus == null)"
+                           TValue="int"
+                           Min="0"
+                           Max="@maxTeamPoints"
+                           @bind-Value=@teamPoints[0]
+                           Change="@(args => OnChangeNumeric(args, 0))"
+                           @ref=@radzenNumerics[0]
+                           InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "Team 1" }})" />
+        </div>
+        <div class="@(highlightedRight ? "GameEditTeamsContainerDivActive" : "GameEditTeamsContainerDiv")">
+            <center>
+                <RadzenLabel Text="@teams[1]" Component="DropDownBindValue" Style="margin-right: 8px; vertical-align: middle;" />
+            </center>
+            <br />
+            <RadzenLabel Text="Points: " Component="DropDownBindValue" Style="margin-right: 8px; vertical-align: middle;" />
+            <RadzenNumeric Disabled="@(currentGameStatus == "Coming" || currentGameStatus == "Cancelled" || currentGameStatus == null)"
+                           TValue="int"
+                           Min="0"
+                           Max="@maxTeamPoints"
+                           @bind-Value=@teamPoints[1]
+                           Change="@(args => OnChangeNumeric(args, 1))"
+                           @ref=@radzenNumerics[1]
+                           InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "Team 2" }})" />
+        </div>
+    </div><br />
+    <center><RadzenButton Text="Save Changes" Disabled="@isValueInitial" Click="OnClickSave"></RadzenButton></center>
+</div>
+
 
 
 
