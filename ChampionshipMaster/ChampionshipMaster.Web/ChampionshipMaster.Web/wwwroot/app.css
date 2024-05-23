@@ -17,11 +17,7 @@
     column-gap: 20px; /* Разстояние между колоните */
 }
 
-@media (max-width: 768px) {
-    .box {
-        width: 100%;
-    }
-}
+
 
 .table-row {
 }
@@ -231,31 +227,36 @@ SaveButtonEdit {
     display: flex;
     flex-direction: column;
     align-items: center;
+    max-width:90%;
 }
 
 
 
 .radio-button-list .rz-radiobutton-list {
-    margin-bottom:0px;
+    margin-bottom: 0px;
     display: flex;
- 
 }
 
 .radio-button-list .rz-radiobutton {
     margin-bottom: 0px;
     display: flex;
     align-items: center;
-    padding-right:20px;
+    padding-right: 20px;
 }
+
+.p-3 {
+    padding: 0 !important;
+}
+
 .GameEditTeamsContainerFlex {
     display: flex;
-    justify-content: space-between;
     width: 100%;
-    max-width: 800px; /* Adjust this value as needed */
     color: white;
-    gap: 7.5%;
+    gap: 10%;
     width: 40%;
 }
+
+
 
 .GameEditTeamsContainerDiv {
     flex: 1;
@@ -276,4 +277,23 @@ SaveButtonEdit {
     transform: scale(1.3); /* Scale up the div */
     transition: transform 0.3s ease-in, flex 0.3s ease-in, background-color 0.3s ease-in, box-shadow 0.3s ease-in;
     color: black;
+}
+.EditGameDropDown{
+    width:40vw;
+}
+.Edit-Game-DropDown-Label {
+    width: 40vw; 
+}
+.ChangeGameName{
+    width: 40vw;  
+}
+
+@media (max-width: 768px) {
+    .box {
+        width: 100%;
+
+    }
+    .GameEditTeamsContainerFlex {
+
+    }
 }

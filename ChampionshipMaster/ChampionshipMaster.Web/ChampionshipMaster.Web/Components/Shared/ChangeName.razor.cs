@@ -32,6 +32,10 @@ namespace ChampionshipMaster.Web.Components.Shared
         public string? ToLocalStorage { get; set; }
         [Parameter]
         public bool ReloadPageOnComplete { get; set; } = false;
+        [Parameter]
+        public string? Style { get; set; }
+        [Parameter]
+        public string? Class { get; set; }
 
         RadzenTextBox textBox = default!;
         string? currentValue = "";

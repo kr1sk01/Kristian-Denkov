@@ -46,7 +46,7 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Game
         {
             await DialogService.OpenAsync<EditGame>($"",
                   new Dictionary<string, object>() { { "id", id } },
-                  new DialogOptions() { Width = "75%", Height = "93%", CloseDialogOnEsc = true });
+                  new DialogOptions() { Width = "75vw", Height = "95%", CloseDialogOnEsc = true });
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -111,11 +111,37 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Game
             StateHasChanged();
         }
 
+
         void OnCellContextMenu(DataGridCellMouseEventArgs<GameDto> args)
         {
-            
+            if (args == null)
+                return;
+            if (args.Data == null)
+                return;
+
+            selectedTeam = new List<GameDto>() { args.Data };
+            if (args.Data.CreatedBy == playerId || isAdmin)
+            {
+                ContextMenuService.Open(args,
+           new List<ContextMenuItem> {
+                new ContextMenuItem(){ Text = "Edit", Value = 1, Icon = "edit" },
+                                           },
+           async (e) =>
+           {
+               if (e.Text == "Edit")
+               {
+                   await OpenEditGame(args.Data.Id.ToString());
+                   ContextMenuService.Close();
+               }
+           }
+        );
+            }
+            else
+                return;
 
         }
+
+
     }
 
 }
