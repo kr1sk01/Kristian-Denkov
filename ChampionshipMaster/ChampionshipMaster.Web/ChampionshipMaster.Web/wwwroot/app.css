@@ -233,15 +233,6 @@ SaveButtonEdit {
     align-items: center;
 }
 
-.GameEditTeamsContainerFlex {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    max-width: 800px; /* Adjust this value as needed */
-    color:white;
-    gap:10px;
-    width:40%;
-}
 
 
 .radio-button-list .rz-radiobutton-list {
@@ -256,6 +247,16 @@ SaveButtonEdit {
     align-items: center;
     padding-right:20px;
 }
+.GameEditTeamsContainerFlex {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 800px; /* Adjust this value as needed */
+    color: white;
+    gap: 7.5%;
+    width: 40%;
+}
+
 .GameEditTeamsContainerDiv {
     flex: 1;
     padding: 10px;
@@ -272,7 +273,7 @@ SaveButtonEdit {
     border-radius: 25px;
     border: 1px solid black;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
-    transform: scale(1.1); /* Scale up the div */
-    transition: transform 0.3s ease, flex 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+    transform: scale(1.3); /* Scale up the div */
+    transition: transform 0.3s ease-in, flex 0.3s ease-in, background-color 0.3s ease-in, box-shadow 0.3s ease-in;
     color: black;
 }
