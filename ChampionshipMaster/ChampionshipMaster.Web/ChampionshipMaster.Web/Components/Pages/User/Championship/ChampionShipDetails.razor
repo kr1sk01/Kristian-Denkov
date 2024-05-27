@@ -12,47 +12,14 @@
     <center><h1 style="color:white;">@championshipWithDetails.Name</h1></center>
 }
 
-<RadzenDataGrid @ref="gamesList"
-                AllowFiltering="true"
-                FilterPopupRenderMode="PopupRenderMode.OnDemand"
-                AllowPaging="true"
-                PageSize="100000"
-                AllowSorting="true"
-                Data="@games"
-                TItem="GameDto">
-    <Columns>
-        <RadzenDataGridColumn TItem="GameDto" Property="Name" Title="Name">
-            <Template Context="game">
-                @game.Name
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="GameDto" Property="Date" Title="Date">
-            <Template Context="game">
-                @game.Date
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="GameDto" Property="BlueTeamName" Title="Blue Team Name">
-            <Template Context="game">
-                @game.BlueTeamName
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="GameDto" Property="RedTeamName" Title="Red Team Name">
-            <Template Context="game">
-                @game.RedTeamName
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="GameDto" Property="WinnerName" Title="Winner">
-            <Template Context="game">
-                @game.WinnerName
-            </Template>
-        </RadzenDataGridColumn>
-
-    </Columns>
-
-</RadzenDataGrid><br />
-<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem">
-    <RadzenButton Click="@((args) => dialogService.Close(true))" Variant="Variant.Flat" Text="Close" Style="width: 120px" />
-</RadzenStack>
+<RadzenDataList AllowVirtualization=@true
+                Style="height:550px;overflow:auto;"
+                WrapItems=@false AllowPaging=@false
+                Data="@games" TItem="GameDto">
+    <Template Context="game">
+        <GameCard Game="@game" Style="max-height:250px;"></GameCard>
+    </Template>
+</RadzenDataList>
 
 @code {
 

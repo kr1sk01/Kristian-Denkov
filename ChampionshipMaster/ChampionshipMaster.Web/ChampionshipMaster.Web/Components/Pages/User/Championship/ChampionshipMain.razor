@@ -17,7 +17,13 @@
                 PageSize="7"
                 AllowSorting="true"
                 Data="@championships"
-                TItem="ChampionshipDto">
+                SelectionMode="DataGridSelectionMode.Single" 
+                @bind-Value=@selectedChampionship
+                TItem="ChampionshipDto"
+                CellContextMenu="@OnCellContextMenu">
+    <HeaderTemplate>
+        <RadzenButton Style="margin-right:5px;" Icon="note_add" Text="Create Championship" ButtonStyle="ButtonStyle.Secondary" />
+    </HeaderTemplate>
     <Columns>
         <RadzenDataGridColumn TItem="ChampionshipDto" Property="Name" Title="Name">
             <Template Context="championship">
