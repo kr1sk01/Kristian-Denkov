@@ -12,11 +12,14 @@ namespace ChampionshipMaster.API.Services
     {
         private readonly SymmetricSecurityKey _signingKey;
         private readonly UserManager<Player> _userManager;
+        private readonly IConfiguration _configuration;
 
-        public JwtService(UserManager<Player> userManager)
+        public JwtService(UserManager<Player> userManager, IConfiguration configuration)
         {
-            _signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("Jwt_Key")!));
+            _configuration = configuration;
+            _signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt_Key"]!));
             _userManager = userManager;
+            
         }
 
         public async Task<string> GenerateToken(Player request)

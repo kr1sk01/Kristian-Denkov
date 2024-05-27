@@ -1,0 +1,138 @@
+﻿.game-card {
+    border: 1px solid black;
+    display: flex;
+    flex-direction: column;
+    max-width: 600px;
+    margin: 0 auto;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to bottom, #333 0%, #696969 100%);
+    color: #fff;
+    height: 100%;
+}
+
+.championship-name {
+    text-align: center;
+    color: red;
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.game-name-box {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    flex: 1;
+}
+
+.game-name {
+    font-size: 2rem;
+    margin: 0.5rem 0;
+}
+
+.game-details {
+    display: flex;
+    flex: 3;
+    border-top: 1px solid black;
+}
+
+.left-column {
+    flex: 1;
+    border-right: 1px solid black;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0.5rem;
+}
+
+.date-status {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.team-info {
+    flex: 3;
+    display: flex;
+    flex-direction: column;
+}
+
+.team-row {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid black;
+    padding: 0.5rem;
+    flex: 1;
+}
+
+    .team-row:last-child {
+        border-bottom: none;
+    }
+
+.team-logo {
+    width: 3rem;
+    height: 3rem;
+    margin-right: 0.5rem;
+}
+
+.team-name {
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.team-points {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 0.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 300px) {
+    .championship-name {
+        font-size: 1rem;
+    }
+
+    .game-name {
+        font-size: 1.5rem;
+    }
+
+    .left-column {
+        padding: 0.2rem;
+    }
+
+    .team-row {
+        padding: 0.2rem;
+    }
+
+    .team-logo {
+        width: 2rem;
+        height: 2rem;
+        margin-right: 0.2rem;
+    }
+
+    .team-points {
+        padding: 0 0.2rem;
+    }
+}
+
+@media (max-height: 250px) {
+    .game-card {
+        font-size: 0.8rem;
+    }
+
+    .championship-name {
+        margin-bottom: 0.2rem;
+    }
+
+    .game-name-box {
+        align-items: center;
+    }
+
+    .game-name {
+        margin: 0.2rem 0;
+    }
+}

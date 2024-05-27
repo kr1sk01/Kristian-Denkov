@@ -41,7 +41,7 @@ namespace ChampionshipMaster.API.Services
                 throw new Exception("Invalid Ssl configuration for email server!");
             }
             var senderAddress = _configuration["Email:Username"]!;
-            var password = Environment.GetEnvironmentVariable("Email_Password")!;
+            var password = _configuration["Email_Password"]!;
 
             using var client = new SmtpClient();
 

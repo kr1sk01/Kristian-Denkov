@@ -20,7 +20,7 @@ public class Program
             options.TokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuerSigningKey = true, // Validate the signing key
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("Jwt_Key")!)),
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt_Key"]!)),
                 ValidateAudience = false,
                 ValidateIssuer = false,
                 ValidateLifetime = true
@@ -71,10 +71,10 @@ public class Program
 
 
 
-       
+
 
         var app = builder.Build();
-        
+
 
 
         //Creating Db if it hasn't created already
@@ -96,10 +96,10 @@ public class Program
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
-            app.UseSwagger();
-            app.UseSwaggerUI();
-        }
 
+        }
+        app.UseSwagger();
+        app.UseSwaggerUI();
         app.UseCors(policy => policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 
         app.UseHttpsRedirection();

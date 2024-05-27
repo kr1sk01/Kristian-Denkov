@@ -190,13 +190,20 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                 var token = new JwtSecurityToken(tokenString);
 
                 var userId = token.Claims.First(x => x.Type == "nameid").Value;
+                var blueTeam = await _context.Teams.Include(x => x.TeamPlayers).ThenInclude(x => x.Player).FirstAsync(x => x.Name == game.BlueTeamName);
+                var redTeam = await _context.Teams.Include(x => x.TeamPlayers).ThenInclude(x => x.Player).FirstAsync(x => x.Name == game.RedTeamName);
+
+                if (blueTeam.TeamPlayers.Any(x => redTeam.TeamPlayers.Any(y => y.PlayerId == x.PlayerId)))
+                {
+                    return BadRequest("The teams you've selected contain 1 or more repeating players!");
+                }
 
                 Game newGame = new Game()
                 {
                     Name = game.Name,
                     GameType = await _context.GameTypes.FirstAsync(x => x.Name == game.GameTypeName),
-                    BlueTeam = await _context.Teams.Include(x => x.TeamPlayers).ThenInclude(x => x.Player).FirstAsync(x => x.Name == game.BlueTeamName),
-                    RedTeam = await _context.Teams.Include(x => x.TeamPlayers).ThenInclude(x => x.Player).FirstAsync(x => x.Name == game.RedTeamName),
+                    BlueTeam = blueTeam,
+                    RedTeam = redTeam,
                     Date = game.Date!.Value.ToUniversalTime(),
                     CreatedBy = userId,
                     CreatedOn = DateTime.UtcNow
