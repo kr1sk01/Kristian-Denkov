@@ -16,10 +16,7 @@
                     StateChange=@CheckButtonState />
         
         <ImageUpload @ref=@playerAvatar
-                     Title="Avatar"
                      SetImageFor="@ImageUpload.SetImageForOptions.Avatar"
-                     RequestUrl="api/Player/changeAvatar/"
-                     ToLocalStorage="playerAvatar"
                      StateChange=@CheckButtonState />
 
         <RadzenButton Text="Save Changes" Disabled="@isValueInitial" Click="OnClick"></RadzenButton>

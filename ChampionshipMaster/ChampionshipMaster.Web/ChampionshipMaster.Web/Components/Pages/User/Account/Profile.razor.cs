@@ -1,6 +1,7 @@
 ﻿using ChampionshipMaster.Web.Components.Shared;
 using ChampionshipMaster.Web.Services;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+using System.Diagnostics.Tracing;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text.Json;
 
@@ -16,6 +17,8 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Account
         INotifier notifier { get; set; } = default!;
         [Inject]
         IConfiguration configuration { get; set; } = default!;
+        [Inject]
+        IImageService imageService { get; set; } = default!;
         [Inject]
         NavigationManager NavigationManager { get; set; } = default!;
         [Inject]
@@ -67,6 +70,13 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Account
 
         public async Task OnClick()
         {
+            await ChangeUsername();
+            await ChangeAvatar();
+            NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
+        }
+
+        public async Task ChangeUsername()
+        {
             if (!await tokenService.ValidateToken())
             {
                 notifier.SendInformationalNotification("You're not logged in or your session has expired");
@@ -109,16 +119,53 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Account
                     notifier.SendErrorNotification(body);
                 }
             }
+        }
 
+        public async Task ChangeAvatar()
+        {
+            if (!playerAvatar.IsValueInitial)
+            {
+                if (!await tokenService.ValidateToken())
+                {
+                    notifier.SendInformationalNotification("You're not logged in or your session has expired");
+                    NavigationManager.NavigateTo("/login");
+                }
 
-            //await changeUsername.OnClick();
-            await playerAvatar.UploadImage();
-            NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
+                var token = await tokenService.GetToken();
+                using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+                client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+                var imageBase64 = await imageService.ConvertToBase64String(playerAvatar.UploadedImage!);
+                Dictionary<string, string> content = new Dictionary<string, string>
+                {
+                    { "newImage", imageBase64 }
+                };
+
+                var response = await client.PostAsJsonAsync("api/Player/changeAvatar/", content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    try
+                    {
+                        await _localStorage.SetAsync("playerAvatar", imageBase64);
+                        var body = await response.Content.ReadAsStringAsync();
+                        notifier.SendSuccessNotification(body);
+                    }
+                    catch
+                    {
+                        notifier.SendErrorNotification("Something went wrong!");
+                    }
+                }
+                else
+                {
+                    var body = await response.Content.ReadAsStringAsync();
+                    notifier.SendErrorNotification(body);
+                }
+            }
         }
 
         public async Task CheckButtonState()
         {
-            isValueInitial = playerAvatar.isValueInitial && changeUsername.IsValueInitial;
+            isValueInitial = playerAvatar.IsValueInitial && changeUsername.IsValueInitial;
         }
     }
 }

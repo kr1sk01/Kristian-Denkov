@@ -23,15 +23,6 @@ namespace ChampionshipMaster.Web.Components.Shared
         [Parameter]
         public string? InitialValue { get; set; }
 
-        //[Parameter]
-        //public required string RequestUrl { get; set; }
-        //[Parameter]
-        //public string? ResponseProperty { get; set; }
-        //[Parameter]
-        //public string? ToLocalStorage { get; set; }
-        //[Parameter]
-        //public bool ReloadPageOnComplete { get; set; } = false;
-
         [Parameter]
         public string? Style { get; set; }
         [Parameter]

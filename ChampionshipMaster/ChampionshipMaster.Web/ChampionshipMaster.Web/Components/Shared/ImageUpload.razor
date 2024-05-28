@@ -2,18 +2,11 @@
 
 @rendermode InteractiveServer
 
-<div class="col-md-6 p-3">
-    <RadzenCard>
-        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H1">@Title</RadzenText>
+<div class="@Class">
         <RadzenImage Path="@imagePath" AlternateText="Displayed Image"></RadzenImage>
         <RadzenStack Orientation="Orientation.Vertical" Gap="1rem">
             <RadzenUpload Icon="upload" @ref="upload" Accept=".png,.jpeg,.jpg" Auto="false" Multiple="false" Change=@(args => OnChange(args)) InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})"
-                          Progress=@(args => OnProgress(args)) class="w-100" />
+                          Progress=@(args => OnProgress(args)) />
             <RadzenImage Path="@newImagePath" Visible="@(!string.IsNullOrEmpty(newImagePath))" AlternateText="New Image"></RadzenImage>
         </RadzenStack>
-    </RadzenCard>
 </div>
-
-@code {
-    
-}
