@@ -37,7 +37,7 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Game
         }
         public async Task OpenCreateGame()
         {
-            await DialogService.OpenAsync<CreateGame>($"Create Game",
+            await DialogService.OpenAsync<CreateGame>($"",
                    new Dictionary<string, object>() { },
                    new DialogOptions() { Width = "45%", Height = "53%", Draggable = true, CloseDialogOnEsc = true });
         }

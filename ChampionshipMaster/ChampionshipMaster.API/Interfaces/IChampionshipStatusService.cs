@@ -2,7 +2,7 @@
 {
     public interface IChampionshipStatusService
     {
-        Task<List<ChampionshipStatus>> GetAllChampionshipStatuses();
+        Task<List<ChampionshipStatusDto>> GetAllChampionshipStatuses();
         Task<ActionResult<ChampionshipStatus?>> GetChampionshipStatus(int id);
         Task<ActionResult<ChampionshipStatus>> PostChampionshipStatus(ChampionshipStatus game);
         Task<bool> ChampionshipStatusNameExists(string? name);

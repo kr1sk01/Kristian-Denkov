@@ -1,4 +1,5 @@
 ﻿using ChampionshipMaster.DATA.Models;
+using ChampionshipMaster.Web.Components.Pages.User.Game;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace ChampionshipMaster.Web.Components.Pages.User.Championship
@@ -15,12 +16,19 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Championship
         IConfiguration configuration { get; set; } = default!;
         [Inject]
         NavigationManager NavigationManager { get; set; } = default!;
-
+        [Inject] DialogService DialogService { get; set; } = default!;
         [Inject] ContextMenuService ContextMenuService { get; set; } = default!;
         RadzenDataGrid<ChampionshipDto>? championshipList;
 
         string StatusColor = "white";
         IList<ChampionshipDto>? selectedChampionship;
+
+
+        public bool isAdmin = false;
+        public bool isLogged = false;
+
+        bool disabledEdit = true;
+        bool disabledJoin = true;
         private void Sort()
         {
             if (championships != null)
@@ -42,13 +50,30 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Championship
                     StateHasChanged();
                 }
                 else { NavigationManager.NavigateTo("/login"); }
-
+                if(await tokenService.ValidateToken(true))
+                {
+                    isAdmin = true;
+                }
                 using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
                 var test = await client.GetFromJsonAsync<List<ChampionshipDto>>("api/championship/details");
                 if (test != null)
                     championships = test;
                 StateHasChanged();
             }
+        }
+        void Update(DataGridRowMouseEventArgs<ChampionshipDto> args)
+        {
+            if (args != null && args.Data.ChampionshipStatusName == "Coming")
+                disabledJoin = false;
+            else
+                disabledJoin = true;
+
+            if (args != null)
+                disabledEdit = false;
+            else
+                disabledEdit = true;
+
+            StateHasChanged();
         }
         void OnCellContextMenu(DataGridCellMouseEventArgs<ChampionshipDto> args)
         {
@@ -80,6 +105,13 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Championship
         void OpenChampionship(string id)
         {
             NavigationManager.NavigateTo($"/championshipDetails/{id}");
+        }
+
+        public async Task OpenChampionshipCreatePage()
+        {
+            await DialogService.OpenAsync<CreateChampionship>($"",
+                   new Dictionary<string, object>() { },
+                   new DialogOptions() { Width = "45%", Height = "60%", Draggable = true, CloseDialogOnEsc = true });
         }
     }
 }

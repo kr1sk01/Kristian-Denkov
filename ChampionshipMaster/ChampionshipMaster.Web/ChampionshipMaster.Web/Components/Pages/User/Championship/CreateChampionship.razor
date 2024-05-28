@@ -1,74 +1,129 @@
 ﻿@page "/createchampionship"
 
-<center><h1 style="color:white;">CreateChampionship</h1></center>
 
+
+@rendermode InteractiveServer
 @inherits ComponentBase
 
-@* <div class="form-container">
-    <RadzenTemplateForm TItem="GameDto" Data="@game" Submit="@OnSubmit" InvalidSubmit="@OnInvalidSubmit">
+<center><h1 style="color:white;">Create Championship</h1></center>
+
+<div class="form-container">
+    <RadzenTemplateForm TItem="ChampionshipDto" Data="@championshipToAdd" Submit="@OnSubmit" InvalidSubmit="@OnInvalidSubmit">
         <div class="form-row">
             <div class="form-group half-width">
-                <RadzenLabel Text="Game Name" Class="form-label" />
-                <RadzenTextBox Name="Name" @bind-Value="game.Name" Style="width: 100%;" Class="form-control" />
-                <RadzenRequiredValidator Component="Name" Text="Game Name is required" />
+                <RadzenLabel Style="color:white;" Text="Championship Name" Class="form-label" />
+                <RadzenTextBox Name="ChampionshipName" @bind-Value="championshipToAdd.Name" Style="width: 100%;" Class="form-control" />
+                <RadzenRequiredValidator Component="ChampionshipName" Text="Championship Name is required" />
             </div>
+
+        </div>
+        <div class="form-row">
             <div class="form-group half-width">
-                <RadzenLabel Text="Game Type" Class="form-label" />
-                <RadzenDropDown Name="GameType" @bind-Value="gameType" @ref="gameTypeDropDown" TValue="GameTypeDto" TextProperty="Name" Data="gameTypes" Style="width: 100%;" Change="@(args => OnGameTypeSelect(args))" />
-                <RadzenRequiredValidator Component="GameType" Text="Game Type is required" />
+                <RadzenLabel Style="color:white;" Text="Championship Type" Class="form-label" />
+                <RadzenDropDown Data="championshipTypes"
+                                @bind-Value="championshipToAdd.ChampionshipTypeName"
+                                Name="ChampionshipTypeName"
+                                TextProperty="Name"
+                                ValueProperty="Name"
+                                TValue="string"
+                                Style="width: 100%;" />
+                <RadzenRequiredValidator Component="ChampionshipTypeName" Text="Championship Type is required" />
             </div>
         </div>
         <div class="form-row">
             <div class="form-group half-width">
-                <RadzenLabel Text="Date" Class="form-label" />
-                <RadzenDatePicker Kind="DateTimeKind.Local" Class="form-control"
+                <RadzenLabel Style="color:white;" Text="Game Type" Class="form-label" />
+                <RadzenDropDown Data="gameTypes"
+                                @bind-Value="championshipToAdd.GameTypeName"
+                                Name="GameTypeName"
+                                TextProperty="Name"
+                                ValueProperty="Name"
+                                TValue="string"
+                                Style="width: 100%;" />
+                <RadzenRequiredValidator Component="GameTypeName" Text="Game Type is required" />
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group half-width">
+                <RadzenLabel Style="color:white;" Text="Lot Date" Class="form-label" />
+                <RadzenDatePicker Kind="DateTimeKind.Local"
+                                  Name="LotDate"
+                                  ShowTime="true"
+                                  DateFormat="dd/MM/yyyy HH:mm"
+                                  @bind-Value="championshipToAdd.LotDate"
+                                  Style="width: 100%;"
+                                  DateRender="LotDateRender" />
+            </div>
+            <div class="form-group half-width">
+                <RadzenLabel Style="color:white;" Text="Championship Date" Class="form-label" />
+                <RadzenDatePicker Kind="DateTimeKind.Local"
                                   Name="Date"
                                   ShowTime="true"
                                   DateFormat="dd/MM/yyyy HH:mm"
-                                  @bind-Value="game.Date"
+                                  @bind-Value="championshipToAdd.Date"
                                   Style="width: 100%;"
-                                  DateRender="DateRender" />
-                <RadzenRequiredValidator Component="Date" Text="Date is required" />
+                                  DateRender="DateRender"
+                                  Disabled=@(championshipToAdd.LotDate == null ? true : false) />
+                
+                <RadzenCompareValidator Text="Date should be greater than Lot Date!" Value=@championshipToAdd.LotDate Component="Date" Style="position: absolute" Operator=CompareOperator.GreaterThanEqual />                
+            </div>
+
+        </div>   <br />
+        <div class="form-row">
+            <div class="form-group half-width">
+                <center><RadzenButton ButtonType="ButtonType.Submit" Text="Create Championship" /></center>
             </div>
         </div>
+
+        @* <div class="form-row">
+        <RadzenLabel Text="Date" Class="form-label" />
+        <RadzenDatePicker Kind="DateTimeKind.Local"
+        Name="Date"
+        ShowTime="true"
+        DateFormat="dd/MM/yyyy HH:mm"
+        @bind-Value="game.Date"
+        Style="width: 100%;"
+        DateRender="DateRender" />
+        <RadzenRequiredValidator Component="Date" Text="Date is required" />
+        </div>   <br />
         <div class="form-row">
-            <div class="form-group half-width" style="@(gameTypeDropDown.SelectedItem == null ? "display: none;" : "display: block;")">
-                <RadzenLabel Text="Team 1" Class="form-label" />
-                <RadzenDropDown TValue="int"
-                                @ref="@(teamDropDowns[0])"
-                                TextProperty="Name"
-                                ValueProperty="Id"
-                                Data="selectableTeams"
-                                ClearSearchAfterSelection="true"
-                                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                                FilterOperator="StringFilterOperator.StartsWith"
-                                AllowFiltering="true"
-                                Change="@(args => OnTeamSelect(args, 0))"
-                                Style="width: 100%;"
-                                Name="Team1" />
-                <RadzenRequiredValidator Component="Team1" Text="Team 1 is required" />
-            </div>
-            <div class="form-group half-width" style="@(gameTypeDropDown.SelectedItem == null ? "display: none;" : "display: block;")">
-                <RadzenLabel Text="Team 2" Class="form-label" />
-                <RadzenDropDown TValue="int"
-                                @ref="@(teamDropDowns[1])"
-                                TextProperty="Name"
-                                ValueProperty="Id"
-                                Data="selectableTeams"
-                                ClearSearchAfterSelection="true"
-                                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                                FilterOperator="StringFilterOperator.StartsWith"
-                                AllowFiltering="true"
-                                Change="@(args => OnTeamSelect(args, 1))"
-                                Style="width: 100%;"
-                                Name="Team2" />
-                <RadzenRequiredValidator Component="Team2" Text="Team 2 is required" />
-            </div>
+        <div class="form-group half-width" style="@(gameTypeDropDown.SelectedItem == null ? "display: none;" : "display: block;")">
+        <RadzenLabel Text="Team 1" Class="form-label" />
+        <RadzenDropDown TValue="int"
+        @ref="@(teamDropDowns[0])"
+        TextProperty="Name"
+        ValueProperty="Id"
+        Data="selectableTeams"
+        ClearSearchAfterSelection="true"
+        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+        FilterOperator="StringFilterOperator.StartsWith"
+        AllowFiltering="true"
+        Change="@(args => OnTeamSelect(args, 0))"
+        Style="width: 100%;"
+        Name="Team1" />
+        <RadzenRequiredValidator Component="Team1" Text="Team 1 is required" />
+        </div>
+        <div class="form-group half-width" style="@(gameTypeDropDown.SelectedItem == null ? "display: none;" : "display: block;")">
+        <RadzenLabel Text="Team 2" Class="form-label" />
+        <RadzenDropDown TValue="int"
+        @ref="@(teamDropDowns[1])"
+        TextProperty="Name"
+        ValueProperty="Id"
+        Data="selectableTeams"
+        ClearSearchAfterSelection="true"
+        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+        FilterOperator="StringFilterOperator.StartsWith"
+        AllowFiltering="true"
+        Change="@(args => OnTeamSelect(args, 1))"
+        Style="width: 100%;"
+        Name="Team2" />
+        <RadzenRequiredValidator Component="Team2" Text="Team 2 is required" />
+        </div>
         </div>
         <div class="form-actions">
-            <RadzenButton ButtonType="ButtonType.Submit" Icon="save" Text="Save" Style="margin-right: 10px;" Class="btn btn-primary" />
-            <RadzenButton ButtonType="ButtonType.Reset" Icon="refresh" Text="Reset" Class="btn btn-secondary" Click="OnResetClicked" />
-        </div>
+        <RadzenButton ButtonType="ButtonType.Submit" Icon="save" Text="Save" Style="margin-right: 10px;" Class="btn btn-primary" />
+        <RadzenButton ButtonType="ButtonType.Reset" Icon="refresh" Text="Reset" Class="btn btn-secondary" Click="OnResetClicked" />
+        </div> *@
     </RadzenTemplateForm>
 
     <RadzenNotification />
@@ -79,10 +134,4 @@
             You are not logged in. Please log in to create a game.
         </div>
     }
-</div> *@
-
-
-
-@code {
-
-}
+</div>

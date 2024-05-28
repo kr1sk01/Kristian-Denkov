@@ -75,9 +75,12 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             return NoContent();
         }
 
-        public async Task<List<ChampionshipStatus>> GetAllChampionshipStatuses()
+        public async Task<List<ChampionshipStatusDto>> GetAllChampionshipStatuses()
         {
-            return await _context.ChampionshipStatuses.ToListAsync();
+            var statuses = await _context.ChampionshipStatuses.ToListAsync();
+            var result = statuses.Adapt<List<ChampionshipStatusDto>>();
+
+            return result;
         }
 
         public async Task<ActionResult<ChampionshipStatus?>> GetChampionshipStatus(int id)

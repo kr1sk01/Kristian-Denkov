@@ -18,7 +18,7 @@ public class ChampionshipTypesController : Controller
 
     // GET: ChampionshipTypes
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ChampionshipType>>> Get()
+    public async Task<ActionResult<IEnumerable<ChampionshipTypeDto>>> Get()
     {
         var result = await _championshipTypeService.GetAllChampionshipTypes();
         return Ok(result);

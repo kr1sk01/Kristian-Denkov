@@ -33,7 +33,7 @@ public partial class ManageTeams : ComponentBase
 
     public async Task OpenCreateTeam()
     {
-        await DialogService.OpenAsync<CreateTeam>($"Create Team",
+        await DialogService.OpenAsync<CreateTeam>($"",
                new Dictionary<string, object>() { },
                new DialogOptions() { Width = "45%", Height = "53%", Draggable = true, CloseDialogOnEsc = true });
     }

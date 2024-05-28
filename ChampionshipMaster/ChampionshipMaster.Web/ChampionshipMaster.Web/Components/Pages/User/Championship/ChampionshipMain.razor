@@ -20,9 +20,12 @@
                 SelectionMode="DataGridSelectionMode.Single" 
                 @bind-Value=@selectedChampionship
                 TItem="ChampionshipDto"
+                RowClick="@(args => Update(args))"
                 CellContextMenu="@OnCellContextMenu">
     <HeaderTemplate>
-        <RadzenButton Style="margin-right:5px;" Icon="note_add" Text="Create Championship" ButtonStyle="ButtonStyle.Secondary" />
+        <RadzenButton Disabled=@disabledEdit Visible =@isAdmin Style="margin-right:5px;" Icon="note_add" Text="Create Championship" ButtonStyle="ButtonStyle.Secondary" Click="OpenChampionshipCreatePage" />
+        <RadzenButton Disabled=@disabledEdit Visible=@isAdmin Style="margin-right:5px;" Icon="edit" Text="Edit" ButtonStyle="ButtonStyle.Primary" />
+        <RadzenButton Disabled=@disabledJoin Style="margin-right:5px;" Icon="groups" Text="Join Championship" ButtonStyle="ButtonStyle.Success" />
     </HeaderTemplate>
     <Columns>
         <RadzenDataGridColumn TItem="ChampionshipDto" Property="Name" Title="Name">
