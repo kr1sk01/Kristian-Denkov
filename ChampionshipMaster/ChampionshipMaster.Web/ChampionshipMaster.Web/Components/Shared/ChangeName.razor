@@ -2,6 +2,7 @@
 
 @rendermode InteractiveServer
 
-
-<RadzenText>@Title</RadzenText>
-    <RadzenTextBox class="@Class" @ref="@textBox" Value="@currentValue" @oninput=@(args => OnChange(args.Value?.ToString())) />
+<div style="@Style">
+    <RadzenTextBox class="@Class" Value="@CurrentValue" @oninput=@(args => OnChange(args.Value?.ToString())) />
+</div>
+    

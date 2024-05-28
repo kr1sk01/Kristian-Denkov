@@ -57,12 +57,45 @@
 
         public void CheckButtonState()
         {
-            isValueInitial = changeTeamName.isValueInitial && changeTeamLogo.isValueInitial && changeTeamMembers.isValueInitial;
+            isValueInitial = changeTeamName.IsValueInitial && changeTeamLogo.isValueInitial && changeTeamMembers.isValueInitial;
         }
 
         public async Task OnClick()
         {
-            await changeTeamName.OnClick();
+            if (!await tokenService.ValidateToken())
+            {
+                notifier.SendInformationalNotification("You're not logged in or your session has expired");
+                NavigationManager.NavigateTo("/login");
+            }
+
+            var token = await tokenService.GetToken();
+            using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+
+
+            if (!changeTeamName.IsValueInitial)
+            {
+                var newName = changeTeamName.CurrentValue;
+                Dictionary<string, string> content = new Dictionary<string, string>
+                {
+                    { "newName", newName! }
+                };
+
+                var request = await client.PostAsJsonAsync(nameRequestUrl, content);
+                var body = await request.Content.ReadAsStringAsync();
+
+                if (request.IsSuccessStatusCode)
+                {
+                    notifier.SendSuccessNotification("Game name updated successfully!");
+                }
+                else
+                {
+                    notifier.SendErrorNotification(body);
+                }
+            }
+
+            //await changeTeamName.OnClick();
             await changeTeamLogo.UploadImage();
             await changeTeamMembers.SetTeamMembers();
             NavigationManager.NavigateTo("/manageteams");

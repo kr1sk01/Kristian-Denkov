@@ -1,6 +1,7 @@
 ﻿using ChampionshipMaster.Web.Services;
 using Radzen.Blazor;
 using System.Net.Http;
+using System.Text.Json;
 
 namespace ChampionshipMaster.Web.Components.Pages.User.Game
 {
@@ -132,7 +133,7 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Game
 
         public void CheckButtonState()
         {
-            isValueInitial = changeGameName.isValueInitial 
+            isValueInitial = changeGameName.IsValueInitial 
                 && (winnerTeamName == null) 
                 && (initialGameStatus == currentGameStatus || currentGameStatus == null)
                 && (teamPoints[0] == team1InitialPoints && teamPoints[1] == team2InitialPoints);
@@ -146,7 +147,35 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Game
                 NavigationManager.NavigateTo("/login");
             }
 
-            await changeGameName.OnClick();
+            var token = await tokenService.GetToken();
+            using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+            
+
+            if (!changeGameName.IsValueInitial)
+            {
+                var newName = changeGameName.CurrentValue;
+                Dictionary<string, string> content = new Dictionary<string, string>
+                {
+                    { "newName", newName! }
+                };
+
+                var request = await client.PostAsJsonAsync(nameRequestUrl, content);
+                var body = await request.Content.ReadAsStringAsync();
+
+                if (request.IsSuccessStatusCode)
+                {
+                    notifier.SendSuccessNotification("Game name updated successfully!");
+                }
+                else
+                {
+                    notifier.SendErrorNotification(body);
+                }
+            }
+            
+
+            //await changeGameName.OnClick();
             await SendGameInfo();
             NavigationManager.NavigateTo("/managegames");
         }
@@ -173,7 +202,7 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Game
                     teamPoints[0] = teamPoints[0] < 10 ? teamPoints[0] : 9;
                 }
             }
-            isValueInitial = changeGameName.isValueInitial
+            isValueInitial = changeGameName.IsValueInitial
                 && (winnerTeamName == null)
                 && (initialGameStatus == currentGameStatus || currentGameStatus == null)
                 && (teamPoints[0] == team1InitialPoints && teamPoints[1] == team2InitialPoints);
@@ -188,7 +217,7 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Game
                 radioButtonList.Change.InvokeAsync(teams[0]);
             }
 
-            isValueInitial = changeGameName.isValueInitial
+            isValueInitial = changeGameName.IsValueInitial
                 && (winnerTeamName == null)
                 && (initialGameStatus == currentGameStatus || currentGameStatus == null)
                 && (teamPoints[0] == team1InitialPoints && teamPoints[1] == team2InitialPoints);
@@ -217,7 +246,7 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Game
                 radioButtonList.Change.InvokeAsync(teams[teamIndex]);
             }
 
-            isValueInitial = changeGameName.isValueInitial
+            isValueInitial = changeGameName.IsValueInitial
                 && (winnerTeamName == null)
                 && (initialGameStatus == currentGameStatus || currentGameStatus == null)
                 && (teamPoints[0] == team1InitialPoints && teamPoints[1] == team2InitialPoints);

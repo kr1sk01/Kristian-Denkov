@@ -13,10 +13,6 @@
         <h2>Email: @email</h2>
         
         <ChangeName @ref=@changeUsername
-                    Title="Change Username"
-                    RequestUrl="api/Player/changeUsername"
-                    ResponseProperty="jwtToken"
-                    ToLocalStorage="jwtToken"
                     StateChange=@CheckButtonState />
         
         <ImageUpload @ref=@playerAvatar

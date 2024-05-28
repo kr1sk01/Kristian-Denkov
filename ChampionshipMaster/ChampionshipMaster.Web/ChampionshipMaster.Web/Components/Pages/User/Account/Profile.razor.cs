@@ -2,6 +2,7 @@
 using ChampionshipMaster.Web.Services;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using System.IdentityModel.Tokens.Jwt;
+using System.Text.Json;
 
 namespace ChampionshipMaster.Web.Components.Pages.User.Account
 {
@@ -66,14 +67,58 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Account
 
         public async Task OnClick()
         {
-            await changeUsername.OnClick();
+            if (!await tokenService.ValidateToken())
+            {
+                notifier.SendInformationalNotification("You're not logged in or your session has expired");
+                NavigationManager.NavigateTo("/login");
+            }
+
+            //Submit New Username
+            var token = await tokenService.GetToken();
+            using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+            if (!changeUsername.IsValueInitial)
+            {
+                var newName = changeUsername.CurrentValue;
+                Dictionary<string, string> content = new Dictionary<string, string>
+                {
+                    { "newName", newName! }
+                };
+
+                var request = await client.PostAsJsonAsync("api/Player/changeUsername", content);
+                var body = await request.Content.ReadAsStringAsync();
+
+                if (request.IsSuccessStatusCode)
+                {
+                    try
+                    {
+                        var responseValue = JsonSerializer.Deserialize<Dictionary<string, string>>(body)!["jwtToken"];
+                        await _localStorage.SetAsync("jwtToken", responseValue);
+
+                        NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
+                    }
+                    catch (Exception ex)
+                    {
+                        notifier.SendErrorNotification("Something went wrong!");
+                        Console.WriteLine(ex.Message);
+                    }
+                }
+                else
+                {
+                    notifier.SendErrorNotification(body);
+                }
+            }
+
+
+            //await changeUsername.OnClick();
             await playerAvatar.UploadImage();
             NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
         }
 
         public async Task CheckButtonState()
         {
-            isValueInitial = playerAvatar.isValueInitial && changeUsername.isValueInitial;
+            isValueInitial = playerAvatar.isValueInitial && changeUsername.IsValueInitial;
         }
     }
 }
