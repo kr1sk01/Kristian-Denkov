@@ -1,13 +1,15 @@
 ﻿.game-card {
-    border: 1px solid black;
+    border: 1px solid #38474e; /* Slightly darker shade of the gray background */
     display: flex;
     flex-direction: column;
     max-width: 600px;
     margin: 0 auto;
     font-family: Arial, sans-serif;
-    background: linear-gradient(to bottom, #333 0%, #696969 100%);
+    background: #45565e; /* Gray background */
     color: #fff;
     height: 100%;
+    border-radius: 10px; /* Slightly rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle 3D effect */
 }
 
 .championship-name {
@@ -32,12 +34,12 @@
 .game-details {
     display: flex;
     flex: 3;
-    border-top: 1px solid black;
+    border-top: 1px solid #38474e;
 }
 
 .left-column {
     flex: 1;
-    border-right: 1px solid black;
+    border-right: 1px solid #38474e; /* Slightly darker shade of the gray background */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -62,7 +64,7 @@
 .team-row {
     display: flex;
     align-items: center;
-    border-bottom: 1px solid black;
+    border-bottom: 1px solid #38474e; /* Slightly darker shade of the gray background */
     padding: 0.5rem;
     flex: 1;
 }

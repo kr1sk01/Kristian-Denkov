@@ -36,7 +36,8 @@
     </Columns>
 </RadzenDataGrid>
 
-<RadzenDataList AllowVirtualization=@true
+<RadzenDataList class="custom-datalist"
+                AllowVirtualization=@true
                 Style="height:550px;overflow:auto;"
                 WrapItems=@false AllowPaging=@false
                 Data="@games" TItem="GameDto">
@@ -44,5 +45,25 @@
         <GameCard Game="@game" Style="max-height:250px;"></GameCard>
     </Template>
 </RadzenDataList>
+
+<style>
+    .custom-datalist {
+        --rz-datalist-background-color: var(--rz-base-background-color);
+        --rz-datalist-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.01);
+        --rz-datalist-padding: none;
+        --rz-datalist-border: var(--rz-border-base-700);
+        --rz-datalist-border-radius: var(--rz-border-radius);
+        --rz-datalist-item-shadow: none; /* Remove the shadow */
+        --rz-datalist-item-border: none;
+        --rz-datalist-item-vertical-margin: 0.5rem;
+        --rz-datalist-item-horizontal-margin: 0.5rem;
+        --rz-datalist-item-padding: 1rem;
+        --rz-datalist-item-background-color: var(--rz-base-background-color);
+    }
+
+        .custom-datalist .rz-datalist-data > li {
+            border-radius: 0; /* Remove border-radius */
+        }
+</style>
 
 

@@ -16,6 +16,7 @@
                 AllowPaging="true"
                 PageSize="7"
                 AllowSorting="true"
+                ColumnWidth="200px"
                 Data="@championships"
                 SelectionMode="DataGridSelectionMode.Single" 
                 @bind-Value=@selectedChampionship
@@ -50,27 +51,7 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="ChampionshipDto" Property="ChampionshipStatusName" Title="Status">
             <Template Context="championship">
-                @switch (championship.ChampionshipStatusName)
-                {
-                    case "Finished":
-                        StatusColor = "blue";
-                        break;
-                    case "Coming":
-                        StatusColor = "green";
-                        break;
-                    case "Live":
-                        StatusColor = "red";
-                        break;
-                    case "Cancelled":
-                        StatusColor = "darkgray";
-                        break;
-                    case "In Progress":
-                        StatusColor = "orange";
-                        break;
-                    default:
-                        break;
-                }
-                <span style="color:@StatusColor">@championship.ChampionshipStatusName</span>
+                <StatusBadge Status="@championship.ChampionshipStatusName" />
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="ChampionshipDto" Property="ChampionshipTypeName" Title="Championship Type">

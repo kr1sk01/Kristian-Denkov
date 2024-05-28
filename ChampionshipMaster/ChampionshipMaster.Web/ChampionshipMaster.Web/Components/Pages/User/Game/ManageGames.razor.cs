@@ -108,6 +108,8 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Game
                 }
             }
 
+            games = games.OrderByDescending<GameDto, DateTime?>(x => x.Date).ToList();
+
             StateHasChanged();
         }
 

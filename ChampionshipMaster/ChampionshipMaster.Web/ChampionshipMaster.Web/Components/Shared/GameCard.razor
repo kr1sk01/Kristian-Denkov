@@ -1,6 +1,4 @@
-﻿@page "/game-card"
-
-@inherits ComponentBase
+﻿@inherits ComponentBase
 
 @rendermode InteractiveServer
 
@@ -13,19 +11,19 @@
         <div class="left-column">
             <div class="date-status">
                 <div>@(Game.Date == null ? "" : Game.Date.Value.ToString("dd/MM/yyyy"))</div>
-                <div>@Game.GameStatusName</div>
+                <StatusBadge Status="@Game.GameStatusName"></StatusBadge>
             </div>
         </div>
         <div class="team-info">
             <div class="team-row">
                 <img src="images/defaultTeam.png" alt="Blue Team Logo" class="team-logo" />
-                <div class="team-name">@Game.BlueTeamName</div>
-                <div class="team-points">@Game.BluePoints</div>
+                <div class="team-name">@(Game.BlueTeamName ?? "N/A")</div>
+                <div class="team-points">@(Game.BluePoints ?? (Game.GameStatusName == "Live" ? 0 : null))</div>
             </div>
             <div class="team-row">
                 <img src="images/defaultTeam.png" alt="Red Team Logo" class="team-logo" />
-                <div class="team-name">@Game.RedTeamName</div>
-                <div class="team-points">@Game.RedPoints</div>
+                <div class="team-name">@(Game.RedTeamName ?? "N/A")</div>
+                <div class="team-points">@(Game.RedPoints ?? (Game.GameStatusName == "Live" ? 0 : null))</div>
             </div>
         </div>
     </div>
