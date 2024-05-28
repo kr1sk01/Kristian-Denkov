@@ -14,5 +14,9 @@
   {
     "Id": 4,
     "Name": "Cancelled"
+  },
+  {
+    "Id": 5,
+    "Name": "In Progress"
   }
 ]
