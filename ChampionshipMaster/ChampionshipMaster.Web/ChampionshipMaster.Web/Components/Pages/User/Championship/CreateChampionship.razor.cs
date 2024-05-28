@@ -99,7 +99,28 @@ public partial class CreateChampionship : ComponentBase
     }
     public async Task OnSubmit()
     {
-        notifier.SendInformationalNotification("Data submitted! dasiu ydsa iyasgd hauisyd gdusgdaouy asdou ygdsou yasou iytdgas dou ydgouyas saioduy hgia sdy dosaasd");
+        if (!await tokenService.ValidateToken())
+        {
+            notifier.SendInformationalNotification("You're not logged in or your session has expired");
+            NavigationManager.NavigateTo("/login");
+        }
+
+        var token = await tokenService.GetToken();
+        using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+        var request = await client.PostAsJsonAsync("api/Championship", championshipToAdd);
+
+        if (request.IsSuccessStatusCode)
+        {
+            notifier.SendSuccessNotification("Championship created successfully!");
+            NavigationManager.NavigateTo("/championshipMain");
+        }
+        else
+        {
+            var body = await request.Content.ReadAsStringAsync();
+            notifier.SendErrorNotification(body);
+        }
     }
 
     public void OnInvalidSubmit()

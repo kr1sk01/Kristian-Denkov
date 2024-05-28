@@ -23,7 +23,7 @@
                 RowClick="@(args => Update(args))"
                 CellContextMenu="@OnCellContextMenu">
     <HeaderTemplate>
-        <RadzenButton Disabled=@disabledEdit Visible =@isAdmin Style="margin-right:5px;" Icon="note_add" Text="Create Championship" ButtonStyle="ButtonStyle.Secondary" Click="OpenChampionshipCreatePage" />
+        <RadzenButton Disabled=@(!isAdmin) Visible =@isAdmin Style="margin-right:5px;" Icon="note_add" Text="Create Championship" ButtonStyle="ButtonStyle.Secondary" Click="OpenChampionshipCreatePage" />
         <RadzenButton Disabled=@disabledEdit Visible=@isAdmin Style="margin-right:5px;" Icon="edit" Text="Edit" ButtonStyle="ButtonStyle.Primary" />
         <RadzenButton Disabled=@disabledJoin Style="margin-right:5px;" Icon="groups" Text="Join Championship" ButtonStyle="ButtonStyle.Success" />
     </HeaderTemplate>

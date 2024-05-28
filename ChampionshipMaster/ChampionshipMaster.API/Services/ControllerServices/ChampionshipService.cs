@@ -67,21 +67,50 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             return championshipClass;
         }
 
-        public async Task<ActionResult<Championship>> PostChampionship(Championship championship)
+        public async Task<ActionResult> PostChampionship(ChampionshipDto championship, StringValues authHeader)
         {
-            if (await ChampionshipNameExists(championship.Name))
+            try
             {
-                return BadRequest("There is already a championship with that name");
+                var tokenString = authHeader.ToString().Split(' ')[1];
+                var token = new JwtSecurityToken(tokenString);
+
+                var userId = token.Claims.First(x => x.Type == "nameid").Value;
+                var userRole = token.Claims.First(x => x.Type == "role").Value;
+
+                if (userRole.ToLower() != "admin")
+                {
+                    return Forbid("You do not have permission for this operation");
+                }
+
+                if (await _context.Championships.AnyAsync(x => x.Name == championship.Name))
+                {
+                    return BadRequest("There is already a championship with that name!");
+                }
+
+                // Could be refactored to pass the objects instead of looking in the DB
+                Championship newChampionship = new Championship()
+                {
+                    Name = championship.Name,
+                    ChampionshipType = await _context.ChampionshipTypes.FirstAsync(x => x.Name == championship.ChampionshipTypeName),
+                    ChampionshipStatus = await _context.ChampionshipStatuses.FirstAsync(x => x.Name == championship.ChampionshipStatusName),
+                    GameType = await _context.GameTypes.FirstAsync(x => x.Name == championship.GameTypeName),
+                    LotDate = championship.LotDate,
+                    Date = championship.Date,
+                    ModifiedBy = userId,
+                    ModifiedOn = DateTime.UtcNow
+                };
+
+                await _context.Championships.AddAsync(newChampionship);
+                await _context.SaveChangesAsync();
+
+
+                return CreatedAtAction(nameof(PostChampionship), new { id = newChampionship.Id });
             }
-
-            await _context.Championships.AddAsync(championship);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(PostChampionship), new
+            catch (Exception ex)
             {
-                id = championship.Id
-            },
-                championship);
+                await Console.Out.WriteLineAsync(ex.Message);
+                return BadRequest("Something went wrong!");
+            }
         }
 
         public async Task<bool> ChampionshipNameExists(string? name)

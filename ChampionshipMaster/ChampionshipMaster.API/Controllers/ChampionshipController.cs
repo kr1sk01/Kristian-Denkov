@@ -46,10 +46,12 @@ public class ChampionshipController : ControllerBase
     }
 
     // POST: api/Championship
+    [Authorize]
     [HttpPost]
-    public async Task<ActionResult<Championship>> PostChampionship(Championship championship)
+    public async Task<ActionResult> PostChampionship(ChampionshipDto championship)
     {
-        var result = await _championshipService.PostChampionship(championship);
+        var authHeader = HttpContext.Request.Headers.Authorization;
+        var result = await _championshipService.PostChampionship(championship, authHeader);
         return result;
     }
 
