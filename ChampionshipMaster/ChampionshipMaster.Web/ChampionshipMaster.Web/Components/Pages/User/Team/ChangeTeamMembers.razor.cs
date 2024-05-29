@@ -19,8 +19,6 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Team
         public EventCallback StateChange { get; set; }
         [Parameter]
         public string id { get; set; }
-        [Parameter]
-        public required string RequestUrl { get; set; }
 
         List<RadzenDropDown<string>> dropDowns = new List<RadzenDropDown<string>>(4)
     {
@@ -41,7 +39,7 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Team
         string userToAdd_Id = "";
         int teamMaxPlayers = 0;
 
-        public bool isValueInitial = true;
+        public bool IsValueInitial = true;
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -114,40 +112,9 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Team
 
             dropDowns[dropDownIndex].Value = selectedPlayer.Id;
 
-            isValueInitial = initialPlayers.Select(p => p.Id).ToHashSet().SetEquals(selectedPlayers.Where(x => x != null).Select(p => p.Id).ToHashSet());
+            IsValueInitial = initialPlayers.Select(p => p.Id).ToHashSet().SetEquals(selectedPlayers.Where(x => x != null).Select(p => p.Id).ToHashSet());
             StateHasChanged();
             await StateChange.InvokeAsync();
-        }
-
-        public async Task SetTeamMembers()
-        {
-            if (isValueInitial)
-                return;
-
-            if (!await tokenService.ValidateToken())
-            {
-                notifier.SendInformationalNotification("You're not logged in or your session has expired");
-                NavigationManager.NavigateTo("/login");
-            }
-
-            var token = await tokenService.GetToken();
-            using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
-            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
-
-            var selectedPlayersIds = selectedPlayers.Where(x => x != null).Select(x => x.Id).ToList();
-            var jsonString = JsonSerializer.Serialize(selectedPlayersIds);
-            var content = new StringContent(jsonString, System.Text.Encoding.UTF8, "application/json");
-            var request = await client.PostAsync(RequestUrl, content);
-            var body = await request.Content.ReadAsStringAsync();
-
-            if (request.IsSuccessStatusCode)
-            {
-                notifier.SendSuccessNotification(body);
-            }
-            else
-            {
-                notifier.SendErrorNotification(body);
-            }
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using ChampionshipMaster.API.Interfaces;
+using ChampionshipMaster.API.Services.ControllerServices;
 using ChampionshipMaster.DATA.Models;
 using Microsoft.AspNetCore.Authorization;
 
@@ -54,12 +55,12 @@ namespace ChampionshipMaster.API.Controllers
 
         // PUT: api/Teams/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutTeam(int id, Team team)
-        {
-            var result = await _teamService.EditTeam(id, team);
-            return result;
-        }
+        //[HttpPut("{id}")]
+        //public async Task<IActionResult> PutTeam(int id, Team team)
+        //{
+        //    var result = await _teamService.EditTeam(id, team);
+        //    return result;
+        //}
 
         // POST: api/Teams
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -72,13 +73,13 @@ namespace ChampionshipMaster.API.Controllers
             return result;
         }
         [Authorize]
-        [HttpPost("setPlayers")]
-        public async Task<ActionResult<TeamDto>> SetTeamMembers([FromQuery] string teamId, [FromBody] List<string> playerIds)
-        {
-            var authHeader = HttpContext.Request.Headers.Authorization;
-            var result = await _teamService.SetTeamMembers(teamId, playerIds, authHeader);
-            return result;
-        }
+        //[HttpPost("setPlayers")]
+        //public async Task<ActionResult<TeamDto>> SetTeamMembers([FromQuery] string teamId, [FromBody] List<string> playerIds)
+        //{
+        //    var authHeader = HttpContext.Request.Headers.Authorization;
+        //    var result = await _teamService.SetTeamMembers(teamId, playerIds, authHeader);
+        //    return result;
+        //}
 
         // DELETE: api/Teams/5
         [HttpDelete("{id}")]
@@ -88,23 +89,32 @@ namespace ChampionshipMaster.API.Controllers
             return result;
         }
 
-        [Authorize]
-        [HttpPost("changeTeamName")]
-        public async Task<IActionResult> ChangeTeamName([FromQuery] string teamId, [FromBody] Dictionary<string, string> content)
-        {
-            var authHeader = HttpContext.Request.Headers.Authorization;
-            string newName = content.FirstOrDefault().Value;
-            var result = await _teamService.ChangeTeamName(teamId, newName, authHeader);
-            return result;
-        }
+        //[Authorize]
+        //[HttpPost("changeTeamName")]
+        //public async Task<IActionResult> ChangeTeamName([FromQuery] string teamId, [FromBody] Dictionary<string, string> content)
+        //{
+        //    var authHeader = HttpContext.Request.Headers.Authorization;
+        //    string newName = content.FirstOrDefault().Value;
+        //    var result = await _teamService.ChangeTeamName(teamId, newName, authHeader);
+        //    return result;
+        //}
+
+        //[Authorize]
+        //[HttpPost("changeTeamLogo")]
+        //public async Task<IActionResult> ChangeTeamLogo([FromQuery] string teamId, [FromBody] Dictionary<string, string> content)
+        //{
+        //    var authHeader = HttpContext.Request.Headers.Authorization;
+        //    string newLogo = content.FirstOrDefault().Value;
+        //    var result = await _teamService.ChangeTeamLogo(teamId, newLogo, authHeader);
+        //    return result;
+        //}
 
         [Authorize]
-        [HttpPost("changeTeamLogo")]
-        public async Task<IActionResult> ChangeTeamLogo([FromQuery] string teamId, [FromBody] Dictionary<string, string> content)
+        [HttpPut]
+        public async Task<IActionResult> EditPlayer([FromQuery] string teamId, [FromBody] TeamDto team)
         {
             var authHeader = HttpContext.Request.Headers.Authorization;
-            string newLogo = content.FirstOrDefault().Value;
-            var result = await _teamService.ChangeTeamLogo(teamId, newLogo, authHeader);
+            var result = await _teamService.EditTeam(teamId, team, authHeader);
             return result;
         }
     }

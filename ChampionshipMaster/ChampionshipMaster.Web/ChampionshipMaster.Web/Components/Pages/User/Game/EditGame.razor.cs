@@ -147,36 +147,34 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Game
                 NavigationManager.NavigateTo("/login");
             }
 
+            GameDto gameInfo = new GameDto()
+            {
+                Name = changeGameName.IsValueInitial ? null : changeGameName.CurrentValue,
+                GameStatusName = currentGameStatus,
+                WinnerName = winnerTeamName
+            };
+
+            if (!radioButtonList.Disabled)
+            {
+                gameInfo.BluePoints = radioButtonList.Value == teams[0] ? 10 : teamPoints[0];
+                gameInfo.RedPoints = radioButtonList.Value == teams[1] ? 10 : teamPoints[1];
+            }
+
             var token = await tokenService.GetToken();
             using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 
-            
+            var request = await client.PutAsJsonAsync($"/api/Game?gameId={id}", gameInfo);
 
-            if (!changeGameName.IsValueInitial)
+            if (request.IsSuccessStatusCode)
             {
-                var newName = changeGameName.CurrentValue;
-                Dictionary<string, string> content = new Dictionary<string, string>
-                {
-                    { "newName", newName! }
-                };
-
-                var request = await client.PostAsJsonAsync(nameRequestUrl, content);
-                var body = await request.Content.ReadAsStringAsync();
-
-                if (request.IsSuccessStatusCode)
-                {
-                    notifier.SendSuccessNotification("Game name updated successfully!");
-                }
-                else
-                {
-                    notifier.SendErrorNotification(body);
-                }
+                notifier.SendSuccessNotification("Game details updated successfully!");
             }
-            
+            else
+            {
+                notifier.SendErrorNotification("Something went wrong!");
+            }
 
-            //await changeGameName.OnClick();
-            await SendGameInfo();
             NavigationManager.NavigateTo("/managegames");
         }
 
@@ -252,43 +250,6 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Game
                 && (teamPoints[0] == team1InitialPoints && teamPoints[1] == team2InitialPoints);
 
             StateHasChanged();
-        }
-
-        async Task SendGameInfo()
-        {
-            GameDto gameInfo = new GameDto()
-            {
-                GameStatusName = currentGameStatus,
-                WinnerName = winnerTeamName
-            };
-
-            if (currentGameStatus == null)
-            {
-                return;
-            }
-
-            if (!radioButtonList.Disabled)
-            {
-                //gameInfo.BluePoints = teamPoints[0];
-                //gameInfo.RedPoints = teamPoints[1];
-                gameInfo.BluePoints = radioButtonList.Value == teams[0] ? 10 : teamPoints[0];
-                gameInfo.RedPoints = radioButtonList.Value == teams[1] ? 10 : teamPoints[1];
-            }
-
-            var token = await tokenService.GetToken();
-            using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
-            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
-
-            var request = await client.PutAsJsonAsync($"/api/Game?gameId={id}", gameInfo);
-
-            if (request.IsSuccessStatusCode)
-            {
-                notifier.SendSuccessNotification("Game details updated successfully!");
-            }
-            else
-            {
-                notifier.SendErrorNotification("Something went wrong!");
-            }
         }
     }
 }

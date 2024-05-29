@@ -24,10 +24,8 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Team
         ChangeTeamMembers changeTeamMembers;
         ChangeName changeTeamName;
         ImageUpload changeTeamLogo;
-
-        string nameRequestUrl = "api/Teams/changeTeamName";
-        string logoRequestUrl = "api/Teams/changeTeamLogo";
-        string teamMembersRequestUrl = "api/Teams/setPlayers";
+        TeamDto editedTeam = new();
+        string requestUrl = "api/Teams";
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -47,32 +45,35 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Team
                 var team = await client.GetFromJsonAsync<TeamDto>($"api/Teams/{id}");
                 if (team != null)
                 {
+                    editedTeam.Id = team.Id;
+
                     changeTeamName.SetInitialValue(team.Name!);
-                    nameRequestUrl += $"?teamId={id}";
 
                     changeTeamLogo.UpdateDisplayedImagePath(Convert.ToBase64String(team.Logo ?? new byte[0]));
-                    logoRequestUrl += $"?teamId={id}";
 
-                    teamMembersRequestUrl += $"?teamId={id}";
+                    requestUrl += $"?teamId={id}";
                     StateHasChanged();
                 }
             }
         }
 
-        public void CheckButtonState()
+        public async Task CheckButtonState()
         {
-            isValueInitial = changeTeamName.IsValueInitial && changeTeamLogo.IsValueInitial && changeTeamMembers.isValueInitial;
+            isValueInitial = changeTeamName.IsValueInitial && changeTeamLogo.IsValueInitial && changeTeamMembers.IsValueInitial;
+
+            editedTeam.Name = changeTeamName.IsValueInitial ? null : changeTeamName.CurrentValue;
+            editedTeam.Logo = changeTeamLogo.IsValueInitial ? null : Convert.FromBase64String(await imageService.ConvertToBase64String(changeTeamLogo.UploadedImage!));
+
+            if (!changeTeamMembers.IsValueInitial)
+            {
+                foreach (var player in changeTeamMembers.selectedPlayers)
+                {
+                    if (player != null) { editedTeam.Players.Add(player); }
+                }
+            }
         }
 
         public async Task OnClick()
-        {
-            await SubmitNewTeamName();
-            await SubmitNewTeamLogo();
-            await changeTeamMembers.SetTeamMembers();
-            NavigationManager.NavigateTo("/manageteams");
-        }
-
-        public async Task SubmitNewTeamName()
         {
             if (!await tokenService.ValidateToken())
             {
@@ -84,60 +85,17 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Team
             using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 
+            var request = await client.PutAsJsonAsync(requestUrl, editedTeam);
+            var body = await request.Content.ReadAsStringAsync();
 
-
-            if (!changeTeamName.IsValueInitial)
+            if (request.IsSuccessStatusCode)
             {
-                var newName = changeTeamName.CurrentValue;
-                Dictionary<string, string> content = new Dictionary<string, string>
-                {
-                    { "newName", newName! }
-                };
-
-                var request = await client.PostAsJsonAsync(nameRequestUrl, content);
-                var body = await request.Content.ReadAsStringAsync();
-
-                if (request.IsSuccessStatusCode)
-                {
-                    notifier.SendSuccessNotification("Game name updated successfully!");
-                }
-                else
-                {
-                    notifier.SendErrorNotification(body);
-                }
+                notifier.SendSuccessNotification(body);
+                NavigationManager.NavigateTo("/manageteams");
             }
-        }
-
-        public async Task SubmitNewTeamLogo()
-        {
-            if (!changeTeamLogo.IsValueInitial)
+            else
             {
-                if (!await tokenService.ValidateToken())
-                {
-                    notifier.SendInformationalNotification("You're not logged in or your session has expired");
-                    NavigationManager.NavigateTo("/login");
-                }
-
-                var token = await tokenService.GetToken();
-                using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
-                client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
-                var imageBase64 = await imageService.ConvertToBase64String(changeTeamLogo.UploadedImage!);
-                Dictionary<string, string> content = new Dictionary<string, string>
-                {
-                    { "newImage", imageBase64 }
-                };
-
-                var response = await client.PostAsJsonAsync(logoRequestUrl, content);
-                var body = await response.Content.ReadAsStringAsync();
-
-                if (response.IsSuccessStatusCode)
-                {
-                    notifier.SendSuccessNotification(body);
-                }
-                else
-                {
-                    notifier.SendErrorNotification(body);
-                }
+                notifier.SendErrorNotification(body);
             }
         }
     }

@@ -288,7 +288,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                 if (user.Avatar.IsNullOrEmpty()) { imageString = ""; }
                 else { imageString = Convert.ToBase64String(user.Avatar!); }
 
-                return Ok(new { message = "Login successful!", jwtToken = newToken, image = imageString });
+                return Ok(new { message = "Username changed successfully!", jwtToken = newToken, image = imageString });
             }
             catch (Exception ex)
             {
@@ -318,6 +318,69 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                 }
             }
             return Ok(usernames);
+        }
+
+        public async Task<IActionResult> EditPlayer(string playerId, PlayerDto player, StringValues authHeader)
+        {
+            try
+            {
+                var tokenString = authHeader.ToString().Split(' ')[1];
+                var token = new JwtSecurityToken(tokenString);
+
+                var userId = token.Claims.First(x => x.Type == "nameid").Value;
+                var userRole = token.Claims.First(x => x.Type == "role").Value;
+                var playerToEdit = await _userManager.FindByIdAsync(playerId);
+
+                if (playerToEdit == null)
+                {
+                    return NotFound("This player doesn't exist!");
+                }
+
+                if (playerToEdit.Id != userId && userRole != "admin")
+                {
+                    return Forbid("You do not have permission for this operation!");
+                }
+
+                if (player.Name != playerToEdit.UserName && player.Name != null)
+                {
+                    if (await _userManager.FindByNameAsync(player.Name) != null)
+                    {
+                        return BadRequest("The username is already taken!");
+                    }
+
+                    playerToEdit.UserName = player.Name;
+                    playerToEdit.NormalizedUserName = player.Name.ToUpper();
+                }
+
+                if (player.Avatar != null)
+                {
+                    playerToEdit.Avatar = player.Avatar;
+                }
+
+                if (player.Active != null)
+                {
+                    playerToEdit.Active = player.Active;
+                }
+
+                playerToEdit.ModifiedBy = userId;
+                playerToEdit.ModifiedOn = DateTime.UtcNow;
+
+                _context.Entry(playerToEdit).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+
+                var newToken = await _jwtService.GenerateToken(playerToEdit);
+
+                string imageString;
+                if (playerToEdit.Avatar.IsNullOrEmpty()) { imageString = ""; }
+                else { imageString = Convert.ToBase64String(playerToEdit.Avatar!); }
+
+                return Ok(new { message = "Login successful!", jwtToken = newToken, image = imageString });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return BadRequest("Something went wrong");
+            }
         }
     }
 }

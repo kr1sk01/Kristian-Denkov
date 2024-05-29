@@ -3,6 +3,7 @@ using ChampionshipMaster.DATA.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Primitives;
 using System.IdentityModel.Tokens.Jwt;
+using System.Numerics;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace ChampionshipMaster.API.Services.ControllerServices
@@ -343,5 +344,91 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                 return BadRequest("Something went wrong");
             }
         }
+
+        public async Task<IActionResult> EditTeam(string teamId, TeamDto team, StringValues authHeader)
+        {
+            try
+            {
+                var tokenString = authHeader.ToString().Split(' ')[1];
+                var token = new JwtSecurityToken(tokenString);
+
+                var userId = token.Claims.First(x => x.Type == "nameid").Value;
+                var userRole = token.Claims.First(x => x.Type == "role").Value;
+                var teamToEdit = await _context.Teams.FirstOrDefaultAsync(x => x.Id == int.Parse(teamId));
+
+                if (teamToEdit == null)
+                {
+                    return NotFound("This team doesn't exist!");
+                }
+
+                if (teamToEdit.CreatedBy != userId && userRole != "admin")
+                {
+                    return Forbid("You do not have permission for this operation!");
+                }
+
+                if (team.Name != teamToEdit.Name && team.Name != null)
+                {
+                    if (await _context.Teams.AnyAsync(x => x.Name == team.Name))
+                    {
+                        return BadRequest("There is already a team with that name!");
+                    }
+
+                    teamToEdit.Name = team.Name;
+                }
+
+                if (team.Logo != null)
+                {
+                    teamToEdit.Logo = team.Logo;
+                }
+
+                if (team.Active != null)
+                {
+                    teamToEdit.Active = team.Active;
+                }
+
+                if (team.Players != null && team.Players.Count > 0)
+                {
+                    TeamPlayers teamPlayer;
+                    var teamPlayerList = await _context.TeamPlayers.Where(x => x.TeamId == teamToEdit.Id).ToListAsync();
+                    foreach (var item in teamPlayerList)
+                    {
+                        if (!team.Players.Any(x => x.Id == item.PlayerId))
+                            _context.TeamPlayers.Remove(item);
+                    }
+
+                    //Add new ones
+                    foreach (var player in team.Players)
+                    {
+                        if (teamPlayerList.Any(x => x.PlayerId == player.Id))
+                            continue;
+
+                        var playerToAdd = await _userManager.FindByIdAsync(player.Id!);
+
+                        teamPlayer = new TeamPlayers
+                        {
+                            Team = teamToEdit,
+                            Player = playerToAdd,
+                            CreatedBy = userId,
+                            CreatedOn = DateTime.UtcNow,
+                        };
+                        await _context.TeamPlayers.AddAsync(teamPlayer);
+                    }
+                }
+
+                teamToEdit.ModifiedBy = userId;
+                teamToEdit.ModifiedOn = DateTime.UtcNow;
+
+                _context.Entry(teamToEdit).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+
+                return Ok("Edited team successfully!");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return BadRequest("Something went wrong");
+            }
+        }
     }
 }
+

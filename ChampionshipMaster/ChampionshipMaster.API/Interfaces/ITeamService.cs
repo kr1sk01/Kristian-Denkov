@@ -17,5 +17,6 @@ namespace ChampionshipMaster.API.Interfaces
         Task<IActionResult> DeleteTeam(int id);
         Task<ActionResult> ChangeTeamName(string teamId, string newName, StringValues authHeader);
         Task<ActionResult> ChangeTeamLogo(string teamId, string newLogo, StringValues authHeader);
+        Task<IActionResult> EditTeam(string teamId, TeamDto team, StringValues authHeader);
     }
 }

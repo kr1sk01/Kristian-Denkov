@@ -58,7 +58,15 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                     return Forbid("You do not have permission for this operation!");
                 }
 
-                gameToEdit.GameStatus = await _context.GameStatuses.FirstAsync(x => x.Name == game.GameStatusName);
+                if (game.Name != gameToEdit.Name && game.Name != null)
+                {
+                    gameToEdit.Name = game.Name;
+                }
+
+                if (game.GameStatusName != null)
+                {
+                    gameToEdit.GameStatus = await _context.GameStatuses.FirstAsync(x => x.Name == game.GameStatusName);
+                }
 
                 if (game.WinnerName != null)
                 {
@@ -89,6 +97,9 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                         
                     }
                 }
+
+                gameToEdit.ModifiedBy = userId;
+                gameToEdit.ModifiedOn = DateTime.UtcNow;
 
                 _context.Entry(gameToEdit).State = EntityState.Modified;
                 await _context.SaveChangesAsync();

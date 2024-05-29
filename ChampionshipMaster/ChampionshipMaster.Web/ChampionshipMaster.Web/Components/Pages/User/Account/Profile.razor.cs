@@ -28,9 +28,12 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Account
         ChangeName changeUsername;
         bool loggedIn = false;
         string username = string.Empty;
+        string userId = string.Empty;
         string email = string.Empty;
+        string requestUrl = "/api/Player";
         string? base64EncodedImageData;
         bool isValueInitial = true;
+        PlayerDto editedPlayer = new();
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -46,6 +49,8 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Account
                 username = token.Claims.FirstOrDefault(x => x.Type == "unique_name")?.Value ?? "";
                 changeUsername.SetInitialValue(username);
                 email = token.Claims.FirstOrDefault(x => x.Type == "email")?.Value ?? "";
+                userId = token.Claims.FirstOrDefault(x => x.Type == "nameid")?.Value ?? "";
+                requestUrl += $"?playerId={userId}";
 
                 try
                 {
@@ -70,102 +75,54 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Account
 
         public async Task OnClick()
         {
-            await ChangeUsername();
-            await ChangeAvatar();
-            NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
-        }
-
-        public async Task ChangeUsername()
-        {
             if (!await tokenService.ValidateToken())
             {
                 notifier.SendInformationalNotification("You're not logged in or your session has expired");
                 NavigationManager.NavigateTo("/login");
             }
 
-            //Submit New Username
             var token = await tokenService.GetToken();
             using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 
-            if (!changeUsername.IsValueInitial)
+            var request = await client.PutAsJsonAsync(requestUrl, editedPlayer);
+            var body = await request.Content.ReadAsStringAsync();
+
+            if (request.IsSuccessStatusCode)
             {
-                var newName = changeUsername.CurrentValue;
-                Dictionary<string, string> content = new Dictionary<string, string>
+                try
                 {
-                    { "newName", newName! }
-                };
-
-                var request = await client.PostAsJsonAsync("api/Player/changeUsername", content);
-                var body = await request.Content.ReadAsStringAsync();
-
-                if (request.IsSuccessStatusCode)
-                {
-                    try
+                    if (editedPlayer.Name != null)
                     {
                         var responseValue = JsonSerializer.Deserialize<Dictionary<string, string>>(body)!["jwtToken"];
                         await _localStorage.SetAsync("jwtToken", responseValue);
+                    }
 
-                        NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
-                    }
-                    catch (Exception ex)
+                    if (editedPlayer.Avatar != null)
                     {
-                        notifier.SendErrorNotification("Something went wrong!");
-                        Console.WriteLine(ex.Message);
+                        var responseValue = JsonSerializer.Deserialize<Dictionary<string, string>>(body)!["image"];
+                        await _localStorage.SetAsync("playerAvatar", responseValue);
                     }
+
+                    NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
                 }
-                else
+                catch
                 {
-                    notifier.SendErrorNotification(body);
+                    notifier.SendErrorNotification("Something went wrong! You might have to log out and log back in again", 10);
                 }
             }
-        }
-
-        public async Task ChangeAvatar()
-        {
-            if (!playerAvatar.IsValueInitial)
+            else
             {
-                if (!await tokenService.ValidateToken())
-                {
-                    notifier.SendInformationalNotification("You're not logged in or your session has expired");
-                    NavigationManager.NavigateTo("/login");
-                }
-
-                var token = await tokenService.GetToken();
-                using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
-                client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
-                var imageBase64 = await imageService.ConvertToBase64String(playerAvatar.UploadedImage!);
-                Dictionary<string, string> content = new Dictionary<string, string>
-                {
-                    { "newImage", imageBase64 }
-                };
-
-                var response = await client.PostAsJsonAsync("api/Player/changeAvatar/", content);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    try
-                    {
-                        await _localStorage.SetAsync("playerAvatar", imageBase64);
-                        var body = await response.Content.ReadAsStringAsync();
-                        notifier.SendSuccessNotification(body);
-                    }
-                    catch
-                    {
-                        notifier.SendErrorNotification("Something went wrong!");
-                    }
-                }
-                else
-                {
-                    var body = await response.Content.ReadAsStringAsync();
-                    notifier.SendErrorNotification(body);
-                }
+                notifier.SendErrorNotification(body);
             }
         }
 
         public async Task CheckButtonState()
         {
             isValueInitial = playerAvatar.IsValueInitial && changeUsername.IsValueInitial;
+
+            editedPlayer.Name = changeUsername.IsValueInitial ? null : changeUsername.CurrentValue;
+            editedPlayer.Avatar = playerAvatar.IsValueInitial ? null : Convert.FromBase64String(await imageService.ConvertToBase64String(playerAvatar.UploadedImage!));
         }
     }
 }

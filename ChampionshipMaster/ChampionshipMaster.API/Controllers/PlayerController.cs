@@ -1,4 +1,6 @@
 ﻿using ChampionshipMaster.API.Interfaces;
+using ChampionshipMaster.API.Services.ControllerServices;
+using ChampionshipMaster.DATA.Models;
 using ChampionshipMaster.SHARED.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 
@@ -62,23 +64,32 @@ namespace ChampionshipMaster.API.Controllers
             return result;
         }
 
-        [Authorize]
-        [HttpPost("changeAvatar")]
-        public async Task<IActionResult> ChangeAvatar([FromBody] Dictionary<string, string> content)
-        {
-            var authHeader = HttpContext.Request.Headers.Authorization;
-            var newAvatar = content.First().Value;
-            var result = await _playerService.ChangeAvatar(newAvatar, authHeader);
-            return result;
-        }
+        //[Authorize]
+        //[HttpPost("changeAvatar")]
+        //public async Task<IActionResult> ChangeAvatar([FromBody] Dictionary<string, string> content)
+        //{
+        //    var authHeader = HttpContext.Request.Headers.Authorization;
+        //    var newAvatar = content.First().Value;
+        //    var result = await _playerService.ChangeAvatar(newAvatar, authHeader);
+        //    return result;
+        //}
+
+        //[Authorize]
+        //[HttpPost("changeUsername")]
+        //public async Task<IActionResult> ChangeUsername([FromBody] Dictionary<string, string> content)
+        //{
+        //    var authHeader = HttpContext.Request.Headers.Authorization;
+        //    var newUsername = content.First().Value;
+        //    var result = await _playerService.ChangeUsername(newUsername, authHeader);
+        //    return result;
+        //}
 
         [Authorize]
-        [HttpPost("changeUsername")]
-        public async Task<IActionResult> ChangeUsername([FromBody] Dictionary<string, string> content)
+        [HttpPut]
+        public async Task<IActionResult> EditPlayer([FromQuery] string playerId, [FromBody] PlayerDto player)
         {
             var authHeader = HttpContext.Request.Headers.Authorization;
-            var newUsername = content.First().Value;
-            var result = await _playerService.ChangeUsername(newUsername, authHeader);
+            var result = await _playerService.EditPlayer(playerId, player, authHeader);
             return result;
         }
 
