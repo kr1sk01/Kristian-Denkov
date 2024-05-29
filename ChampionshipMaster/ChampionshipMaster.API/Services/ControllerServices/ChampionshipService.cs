@@ -167,5 +167,50 @@ namespace ChampionshipMaster.API.Services.ControllerServices
 
             return NoContent();
         }
+
+        public async Task<IActionResult> JoinChampionship(ChampionshipTeamsDto championshipTeam, StringValues authHeader)
+        {
+            try
+            {
+                var tokenString = authHeader.ToString().Split(' ')[1];
+                var token = new JwtSecurityToken(tokenString);
+
+                var userId = token.Claims.First(x => x.Type == "nameid").Value;
+                var userRole = token.Claims.First(x => x.Type == "role").Value;
+
+                var teamToAdd = await _context.Teams.FirstAsync(x => x.Id == championshipTeam.TeamId);
+
+                if (userId != teamToAdd.CreatedBy && userRole != "admin")
+                {
+                    return Forbid("You do not have permission for this operation");
+                }
+
+                var existingChampionshipTeams = await _context.ChampionshipTeams.Where(x => x.ChampionshipId == championshipTeam.ChampionshipId).ToListAsync();
+
+                if (existingChampionshipTeams.Any(x => x.TeamId == teamToAdd.Id)) 
+                {
+                    return BadRequest("This team is already registered for this championship");
+                }
+
+                ChampionshipTeams championshipTeamToAdd = new()
+                {
+                    Championship = await _context.Championships.FirstAsync(x => x.Id == championshipTeam.ChampionshipId),
+                    Team = teamToAdd,
+                    CreatedBy = userId,
+                    CreatedOn = DateTime.UtcNow,
+                };
+
+                await _context.ChampionshipTeams.AddAsync(championshipTeamToAdd);
+
+                await _context.SaveChangesAsync();
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                await Console.Out.WriteLineAsync(ex.Message);
+                return BadRequest("Something went wrong!");
+            }
+        }
     }
 }

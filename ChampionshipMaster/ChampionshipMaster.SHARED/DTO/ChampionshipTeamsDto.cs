@@ -5,11 +5,9 @@
 
         public int Id { get; set; }
 
-        public string? ChampionshipId { get; set; }
-        public virtual ChampionshipDto? Championship { get; set; }
+        public int? ChampionshipId { get; set; }
 
-        public string? TeamId { get; set; }
-        public virtual TeamDto? Team { get; set; }
+        public int? TeamId { get; set; }
 
         public string? CreatedBy { get; set; }
 

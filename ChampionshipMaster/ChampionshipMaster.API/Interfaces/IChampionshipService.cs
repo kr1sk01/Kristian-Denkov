@@ -10,5 +10,6 @@
         Task<IActionResult> EditChampionship(int id, Championship championship);
         Task<bool> ChampionshipExists(int id);
         Task<IActionResult> DeleteChampionship(int id);
+        Task<IActionResult> JoinChampionship(ChampionshipTeamsDto championshipTeam, StringValues authHeader);
     }
 }
