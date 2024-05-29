@@ -49,6 +49,11 @@
                 @championship.GameTypeName
             </Template>
         </RadzenDataGridColumn>
+        <RadzenDataGridColumn TextAlign="TextAlign.Center" Width="75px" TItem="ChampionshipDto" Property="LotDate" Title="Lot Date">
+            <Template Context="championship">
+                @championship.LotDate
+            </Template>
+        </RadzenDataGridColumn>
         <RadzenDataGridColumn TextAlign="TextAlign.Center" Width="75px" TItem="ChampionshipDto" Property="Date" Title="Date">
             <Template Context="championship">
                 @championship.Date
