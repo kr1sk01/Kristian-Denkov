@@ -8,7 +8,8 @@ namespace ChampionshipMaster.API.Data
         public static void ConfigureMappings(this IServiceCollection services)
         {
             TypeAdapterConfig<Championship, ChampionshipDto>.NewConfig()
-                .Map(dest => dest.Teams, src => src.ChampionshipTeams.Select(sc => sc.Team).Adapt<List<TeamDto>>());
+                .Map(dest => dest.Teams, src => src.ChampionshipTeams.Select(sc => sc.Team).Adapt<List<TeamDto>>())
+                .Map(dest => dest.WinnerLogo, src => src.Winner == null ? null : src.Winner.Logo);
 
             TypeAdapterConfig<Team, TeamDto>.NewConfig()
                 .Map(dest => dest.Players, src => src.TeamPlayers.Select(sc => sc.Player).Adapt<List<PlayerDto>>())

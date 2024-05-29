@@ -10,6 +10,7 @@
         public string? ChampionshipStatusName { get; set; }
         public string? GameTypeName { get; set; }
         public string? WinnerName { get; set; }
+        public byte[]? WinnerLogo { get; set; }
         public DateTime? LotDate { get; set; }
         public DateTime? Date { get; set; }
         public virtual ICollection<GameDto> Games { get; set; } = new HashSet<GameDto>();

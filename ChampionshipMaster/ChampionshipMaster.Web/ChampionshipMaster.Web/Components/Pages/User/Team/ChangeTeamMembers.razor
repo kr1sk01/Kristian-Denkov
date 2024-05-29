@@ -16,7 +16,13 @@
                         ValueProperty="Id"
                         Style="width: 100%; max-width: 400px;"
                         Name="DropDownFiltering"
-                        ValueChanged="@(args => UpdateData(args, 0))" />
+                        ValueChanged="@(args => UpdateData(args, 0))">
+            <Template Context="player1">
+                <ImageNameTemplate Image="@player1.Avatar"
+                                   Name="@player1.Name"
+                                   ImageType="ImageNameTemplate.ImageTypeOptions.Avatar" />
+            </Template>
+        </RadzenDropDown>
     </RadzenStack>
 
     <RadzenStack Orientation="Orientation.Vertical" Visible=@(teamMaxPlayers > 1)>
@@ -32,7 +38,13 @@
                         ValueProperty="Id"
                         Style="width: 100%; max-width: 400px;"
                         Name="DropDownFiltering2"
-                        ValueChanged="@(args => UpdateData(args, 1))" />
+                        ValueChanged="@(args => UpdateData(args, 1))">
+            <Template Context="player2">
+                <ImageNameTemplate Image="@player2.Avatar"
+                                   Name="@player2.Name"
+                                   ImageType="ImageNameTemplate.ImageTypeOptions.Avatar" />
+            </Template>
+        </RadzenDropDown>
     </RadzenStack>
 
     <RadzenStack Orientation="Orientation.Vertical" Visible=@(teamMaxPlayers > 2)>
@@ -48,7 +60,13 @@
                         ValueProperty="Id"
                         Style="width: 100%; max-width: 400px;"
                         Name="DropDownFiltering3"
-                        ValueChanged="@(args => UpdateData(args, 2))" />
+                        ValueChanged="@(args => UpdateData(args, 2))">
+            <Template Context="player3">
+                <ImageNameTemplate Image="@player3.Avatar"
+                                   Name="@player3.Name"
+                                   ImageType="ImageNameTemplate.ImageTypeOptions.Avatar" />
+            </Template>
+        </RadzenDropDown>
     </RadzenStack>
 
     <RadzenStack Orientation="Orientation.Vertical" Visible=@(teamMaxPlayers > 3)>
@@ -64,7 +82,13 @@
                         ValueProperty="Id"
                         Style="width: 100%; max-width: 400px;"
                         Name="DropDownFiltering4"
-                        ValueChanged="@(args => UpdateData(args, 3))" />
+                        ValueChanged="@(args => UpdateData(args, 3))">
+            <Template Context="player4">
+                <ImageNameTemplate Image="@player4.Avatar"
+                                   Name="@player4.Name"
+                                   ImageType="ImageNameTemplate.ImageTypeOptions.Avatar" />
+            </Template>
+        </RadzenDropDown>
     </RadzenStack>
     
 </RadzenStack>

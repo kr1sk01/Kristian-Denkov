@@ -24,7 +24,13 @@
         <RadzenButton Style="margin-right:5px;" Disabled=@disabledEdit Click="@(()=> OpenEditTeam(selectedTeam.FirstOrDefault()!.Id.ToString()))" Icon="edit" Text="Edit" />
     </HeaderTemplate>
     <Columns>
-        <RadzenDataGridColumn TItem="TeamDto" Property="Name" Title="Name" />
+        <RadzenDataGridColumn TItem="TeamDto" Property="Name" Title="Team">
+            <Template Context="team">
+                <ImageNameTemplate Image="@team.Logo"
+                                   Name="@team.Name"
+                                   ImageType="ImageNameTemplate.ImageTypeOptions.Team" />
+            </Template>
+        </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="TeamDto" Property="CreatedOn" Title="Created On" />
         <RadzenDataGridColumn TItem="TeamDto" Property="CreatedByUsername" Title="Created By" />
         <RadzenDataGridColumn TItem="TeamDto" Property="TeamTypeName" Title="Team Type" />

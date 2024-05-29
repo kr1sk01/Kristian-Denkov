@@ -46,7 +46,10 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="ChampionshipDto" Property="WinnerName" Title="Championship Winner">
             <Template Context="championship">
-                @championship.WinnerName
+                <ImageNameTemplate 
+                    Image="@championship.WinnerLogo"
+                    Name="@championship.WinnerName"
+                    ImageType="ImageNameTemplate.ImageTypeOptions.Team"/>
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="ChampionshipDto" Property="ChampionshipStatusName" Title="Status">

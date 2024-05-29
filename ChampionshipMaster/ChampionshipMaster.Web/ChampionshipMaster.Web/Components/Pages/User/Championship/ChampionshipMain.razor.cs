@@ -15,6 +15,8 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Championship
         [Inject]
         IConfiguration configuration { get; set; } = default!;
         [Inject]
+        IImageService imageService { get; set; } = default!;
+        [Inject]
         NavigationManager NavigationManager { get; set; } = default!;
         [Inject] DialogService DialogService { get; set; } = default!;
         [Inject] ContextMenuService ContextMenuService { get; set; } = default!;
