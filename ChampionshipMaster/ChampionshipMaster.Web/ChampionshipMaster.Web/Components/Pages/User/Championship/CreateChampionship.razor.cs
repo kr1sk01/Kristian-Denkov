@@ -114,7 +114,7 @@ public partial class CreateChampionship : ComponentBase
         if (request.IsSuccessStatusCode)
         {
             notifier.SendSuccessNotification("Championship created successfully!");
-            NavigationManager.NavigateTo("/championshipMain");
+            NavigationManager.NavigateTo("/championshipsMain");
         }
         else
         {

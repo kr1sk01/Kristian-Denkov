@@ -94,8 +94,8 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                     ChampionshipType = await _context.ChampionshipTypes.FirstAsync(x => x.Name == championship.ChampionshipTypeName),
                     ChampionshipStatus = await _context.ChampionshipStatuses.FirstAsync(x => x.Name == championship.ChampionshipStatusName),
                     GameType = await _context.GameTypes.FirstAsync(x => x.Name == championship.GameTypeName),
-                    LotDate = championship.LotDate,
-                    Date = championship.Date,
+                    LotDate = championship.LotDate.Value.ToUniversalTime(),
+                    Date = championship.Date.Value.ToUniversalTime(),
                     ModifiedBy = userId,
                     ModifiedOn = DateTime.UtcNow
                 };

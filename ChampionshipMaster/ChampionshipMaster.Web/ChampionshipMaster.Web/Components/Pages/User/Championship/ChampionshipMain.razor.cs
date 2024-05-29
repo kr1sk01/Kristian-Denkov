@@ -108,7 +108,15 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Championship
         {
             NavigationManager.NavigateTo($"/championshipDetails/{id}");
         }
-
+        public async Task OpenJoinDialog(string championshipId, string championshipName) 
+        {
+            await DialogService.OpenAsync<JoinChampionship>($"",
+                       new Dictionary<string, object>() { 
+                           { "championshipId", championshipId }, 
+                           { "championshipName",  championshipName} 
+                       },
+                       new DialogOptions() { Width = "45%", Height = "60%", Draggable = true, CloseDialogOnEsc = true });
+        }
         public async Task OpenChampionshipCreatePage()
         {
             await DialogService.OpenAsync<CreateChampionship>($"",

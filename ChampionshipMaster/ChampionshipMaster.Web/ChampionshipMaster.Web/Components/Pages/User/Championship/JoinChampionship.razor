@@ -1,0 +1,56 @@
+﻿@inherits ComponentBase
+
+@rendermode InteractiveServer
+
+
+<center><h1 style="color:white;">Join @championshipName</h1></center>
+
+<div class="form-container">
+    <RadzenTemplateForm TItem="ChampionshipTeamsDto" Data="ChampionshipTeamsToAdd" Submit="@OnSubmit" InvalidSubmit="@OnInvalidSubmit">
+
+        <div class="form-row">
+            <div class="form-group half-width">
+                <RadzenLabel Style="color:white;" Text="Team To Add" Class="form-label" />
+                <RadzenDropDown TValue="int?"
+                                TextProperty="Name"
+                                ValueProperty="Id"
+                                Data="selectableTeamsToShow"
+                                ClearSearchAfterSelection="true"
+                                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                FilterOperator="StringFilterOperator.StartsWith"
+                                AllowFiltering="true"
+                                @bind-Value=@ChampionshipTeamsToAdd.TeamId
+                                Style="width: 100%;"
+                                Disabled=@zeroTeamAvaiableToAdd
+                                Name="Team2">
+                    <Template Context="team2">
+                        <ImageNameTemplate Image="@team2.Logo"
+                                           Name="@team2.Name"
+                                           ImageType="ImageNameTemplate.ImageTypeOptions.Team" />
+                    </Template>
+                </RadzenDropDown>
+                <RadzenRequiredValidator Component="Team2" Text="Team 2 is required" />
+            </div>
+        </div>
+
+        @if (zeroTeamAvaiableToAdd)
+        {
+            <div class="form-row">
+                <div class="form-group half-width">
+                    <center><RadzenButton Visible=@(zeroTeamAvaiableToAdd) Click="@ForwardToCreateTeam" Text="Create New Team" /></center>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="form-row">
+            <div class="form-group half-width">
+                    <center><RadzenButton ButtonType="ButtonType.Submit" Text="Join Championship" /></center>
+                </div>
+            </div>
+        }
+    </RadzenTemplateForm>
+</div>
+<br />
+<RadzenNotification />
+

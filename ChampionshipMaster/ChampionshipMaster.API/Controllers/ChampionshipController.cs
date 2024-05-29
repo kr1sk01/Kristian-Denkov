@@ -57,7 +57,7 @@ public class ChampionshipController : ControllerBase
 
     [Authorize]
     [HttpPost("join")]
-    public async Task<IActionResult> PostChampionship(ChampionshipTeamsDto championshipTeams)
+    public async Task<IActionResult> JoinChampionship(ChampionshipTeamsDto championshipTeams)
     {
         var authHeader = HttpContext.Request.Headers.Authorization;
         var result = await _championshipService.JoinChampionship(championshipTeams, authHeader);
