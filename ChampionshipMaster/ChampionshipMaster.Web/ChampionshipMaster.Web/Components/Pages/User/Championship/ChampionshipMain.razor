@@ -29,17 +29,27 @@
         <RadzenButton Disabled=@disabledJoin Style="margin-right: 0.5rem;" Icon="groups" Text="Join Championship" ButtonStyle="ButtonStyle.Success" Click=@(() => OpenJoinDialog(selectedChampionship.FirstOrDefault().Id.ToString(), selectedChampionship.FirstOrDefault().Name)) />
     </HeaderTemplate>
     <Columns>
-        <RadzenDataGridColumn TItem="ChampionshipDto" Property="Name" Title="Name">
+        <RadzenDataGridColumn TextAlign="TextAlign.Left" TItem="ChampionshipDto" Property="Name" Title="Name">
             <Template Context="championship">
                 @championship.Name
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="ChampionshipDto" Property="GameTypeName" Title="Game Type Name">
+        <RadzenDataGridColumn Width="75px" TItem="ChampionshipDto" Property="ChampionshipStatusName" Title="Status">
+            <Template Context="championship">
+                <StatusBadge Status="@championship.ChampionshipStatusName" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TextAlign="TextAlign.Center" Width="100px" TItem="ChampionshipDto" Property="ChampionshipTypeName" Title="Championship Type">
+            <Template Context="championship">
+                @championship.ChampionshipTypeName
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TextAlign="TextAlign.Center" Width="100px" TItem="ChampionshipDto" Property="GameTypeName" Title="Game Type Name">
             <Template Context="championship">
                 @championship.GameTypeName
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="ChampionshipDto" Property="Date" Title="Date">
+        <RadzenDataGridColumn TextAlign="TextAlign.Center" Width="100px" TItem="ChampionshipDto" Property="Date" Title="Date">
             <Template Context="championship">
                 @championship.Date
             </Template>
@@ -52,21 +62,7 @@
                     ImageType="ImageNameTemplate.ImageTypeOptions.Team"/>
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="ChampionshipDto" Property="ChampionshipStatusName" Title="Status">
-            <Template Context="championship">
-                <StatusBadge Status="@championship.ChampionshipStatusName" />
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="ChampionshipDto" Property="ChampionshipTypeName" Title="Championship Type">
-            <Template Context="championship">
-                @championship.ChampionshipTypeName
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn Filterable=false Sortable=false TItem="ChampionshipDto" Title="Details">
-            <Template Context="championship">
-                <RadzenButton ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" Icon="info" class="m-1" Click="() => OpenChampionship(championship.Id.ToString())" />
-            </Template>
-        </RadzenDataGridColumn>
+
     </Columns>
 </RadzenDataGrid>
 
