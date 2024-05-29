@@ -16,33 +16,33 @@
     background-color: lightblue;
     color: blue;
     border: 1px solid #5f9ea0; /* Darker shade of lightblue */
-    box-shadow: 0 2px 4px rgba(95, 158, 160, 0.5); /* Darker shade of lightblue */
+    /* box-shadow: 0 2px 4px rgba(95, 158, 160, 0.5);  Darker shade of lightblue */
 }
 
 .status-in-progress {
     background-color: lightyellow;
     color: orange;
     border: 1px solid #d4af37; /* Darker shade of lightyellow */
-    box-shadow: 0 2px 4px rgba(212, 175, 55, 0.5); /* Darker shade of lightyellow */
+    /* box-shadow: 0 2px 4px rgba(212, 175, 55, 0.5);  Darker shade of lightyellow */
 }
 
 .status-live {
     background-color: lightgreen;
     color: green;
     border: 1px solid #228b22; /* Darker shade of lightgreen */
-    box-shadow: 0 2px 4px rgba(34, 139, 34, 0.5); /* Darker shade of lightgreen */
+    /* box-shadow: 0 2px 4px rgba(34, 139, 34, 0.5);  Darker shade of lightgreen */
 }
 
 .status-finished {
     background-color: lightgray;
     color: gray;
     border: 1px solid #808080; /* Darker shade of lightgray */
-    box-shadow: 0 2px 4px rgba(128, 128, 128, 0.5); /* Darker shade of lightgray */
+    /* box-shadow: 0 2px 4px rgba(128, 128, 128, 0.5);  Darker shade of lightgray */
 }
 
 .status-cancelled {
     background-color: lightcoral;
     color: red;
     border: 1px solid #b22222; /* Darker shade of lightcoral */
-    box-shadow: 0 2px 4px rgba(178, 34, 34, 0.5); /* Darker shade of lightcoral */
+    /* box-shadow: 0 2px 4px rgba(178, 34, 34, 0.5);  Darker shade of lightcoral */
 }
