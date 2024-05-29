@@ -51,12 +51,13 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TextAlign="TextAlign.Center" Width="75px" TItem="ChampionshipDto" Property="LotDate" Title="Lot Date">
             <Template Context="championship">
-                @championship.LotDate
+                @(championship.LotDate == null ? "" : championship.LotDate.Value.ToLocalTime().ToString("| dd-MM-yyyy | HH:MM tt |"))
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TextAlign="TextAlign.Center" Width="75px" TItem="ChampionshipDto" Property="Date" Title="Date">
             <Template Context="championship">
-                @championship.Date
+                @(championship.Date == null ? "" : championship.Date.Value.ToLocalTime().ToString("| dd-MM-yyyy | HH:MM tt |"))
+    
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="ChampionshipDto" Property="WinnerName" Title="Championship Winner">
