@@ -9,7 +9,8 @@ namespace ChampionshipMaster.API.Data
         {
             TypeAdapterConfig<Championship, ChampionshipDto>.NewConfig()
                 .Map(dest => dest.Teams, src => src.ChampionshipTeams.Select(sc => sc.Team).Adapt<List<TeamDto>>())
-                .Map(dest => dest.WinnerLogo, src => src.Winner == null ? null : src.Winner.Logo);
+                .Map(dest => dest.WinnerLogo, src => src.Winner == null ? null : src.Winner.Logo)
+                .Map(dest => dest.GameType, src => src.GameType.Adapt<GameTypeDto>());
 
             TypeAdapterConfig<Team, TeamDto>.NewConfig()
                 .Map(dest => dest.Players, src => src.TeamPlayers.Select(sc => sc.Player).Adapt<List<PlayerDto>>())

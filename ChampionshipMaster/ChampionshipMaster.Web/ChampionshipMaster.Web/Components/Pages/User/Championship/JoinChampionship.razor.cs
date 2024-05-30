@@ -1,4 +1,5 @@
 ﻿using ChampionshipMaster.DATA.Models;
+using Mapster;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.Extensions.Logging;
 using System.IdentityModel.Tokens.Jwt;
@@ -26,6 +27,7 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Championship
         [Parameter] public string? championshipName { get; set; }
 
         bool isLogged = false;
+        bool isAdmin = false;
 
         public List<TeamDto>? allTeams;
         public List<TeamDto>? selectableTeams;
@@ -36,6 +38,7 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Championship
         public bool zeroTeamAvaiableToAdd = false;
 
         string? playerId;
+        string? playerRole;
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -52,15 +55,22 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Championship
 
                 var token = new JwtSecurityTokenHandler().ReadJwtToken(await tokenService.GetToken());
                 playerId = token.Claims.FirstOrDefault(x => x.Type == "nameid")?.Value ?? "";
+                playerRole = token.Claims.FirstOrDefault(x => x.Type == "role")?.Value ?? "";
+
+                if (playerRole.ToLower() == "admin")
+                {
+                    isAdmin = true;
+                }
 
                 using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
                 client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", await tokenService.GetToken());
 
-                allTeams = await client.GetFromJsonAsync<List<TeamDto>>("api/Teams");
+                allTeams = await client.GetFromJsonAsync<List<TeamDto>>("api/Teams/active");
 
                 if (allTeams == null)
                 {
                     notifier.SendWarningNotification("Couldn't retreive teams!");
+                    NavigationManager.NavigateTo("/championshipsmain");
                     return;
                 }
 
@@ -73,11 +83,12 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Championship
                     return;
                 }
 
+                selectableTeams = isAdmin ? allTeams : allTeams.Where(x => x.CreatedBy == playerId).ToList();
+                if (currentChampionship.GameType != null)
+                {
+                    selectableTeams = selectableTeams.Where(x => x.TeamTypeName == currentChampionship.GameType.TeamTypeName).ToList();
+                }
                 
-
-
-                selectableTeams = allTeams.Where(x => x.CreatedBy == playerId).ToList();
-
 
                 if (selectableTeams == null)
                 {
@@ -100,6 +111,12 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Championship
 
             }
         }
+
+        public async Task DropDownSelect(object args)
+        {
+            
+        }
+
         public async Task OnSubmit()
         {
             if (ChampionshipTeamsToAdd != null && championshipId != null)

@@ -2,6 +2,10 @@
 {
     public class GameTypeDto
     {
+        public override string? ToString()
+        {
+            return Name;
+        }
 
         public int Id { get; set; }
 
