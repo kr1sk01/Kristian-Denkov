@@ -42,16 +42,19 @@ public partial class CreateTeam : ComponentBase
         {
             using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
             var test = await client.GetFromJsonAsync<List<TeamType>>("api/TeamTypes");
-            teamTypes = test;
-            if(isRedirectedFromChampionship == true)
+            if(test != null)
             {
-                var championship = await client.GetFromJsonAsync<ChampionshipDto>($"api/Championship/{championshipId}");
-                await teamTypeDropDown.SelectItem(championship!.GameType!.TeamTypeName, false);
-                model.TeamTypeName = championship!.GameType!.TeamTypeName;
-                teamTypeDropDown.Disabled = true;
-                ;
-            }
-            StateHasChanged();
+                teamTypes = test;
+                if (isRedirectedFromChampionship == true)
+                {
+                    var championship = await client.GetFromJsonAsync<ChampionshipDto>($"api/Championship/{championshipId}");
+                    await teamTypeDropDown.SelectItem(championship!.GameType!.TeamTypeName, false);
+                    model.TeamTypeName = championship!.GameType!.TeamTypeName;
+                    teamTypeDropDown.Disabled = true;
+                    ;
+                }
+                StateHasChanged();
+            }           
         }
     }
 
