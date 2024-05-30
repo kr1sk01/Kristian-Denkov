@@ -5,6 +5,7 @@ using ChampionshipMaster.Web.Components.Pages.User.Account;
 using ChampionshipMaster.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+using Microsoft.AspNetCore.Mvc;
 using Radzen;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text.Json;
@@ -19,6 +20,10 @@ public partial class CreateTeam : ComponentBase
     [Inject] INotifier notifier { get; set; } = default!;
     [Inject] ProtectedLocalStorage _localStorage { get; set; } = default!;
     [Inject] NavigationManager NavigationManager { get; set; } = default!;
+
+
+    [Parameter] public bool? isRedirectedFromChampionship { get; set; }
+    [Parameter] public int? championshipId { get; set; }
 
     Variant variant = Variant.Outlined;
 
@@ -36,6 +41,11 @@ public partial class CreateTeam : ComponentBase
             using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
             var test = await client.GetFromJsonAsync<List<TeamType>>("api/TeamTypes");
             teamTypes = test;
+            if(isRedirectedFromChampionship == true)
+            {
+                var championship = await client.GetFromJsonAsync<ChampionshipDto>($"api/Championship/{championshipId}");
+                ;
+            }
             StateHasChanged();
         }
     }

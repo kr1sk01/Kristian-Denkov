@@ -140,9 +140,9 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Championship
         {
 
         }
-        void ForwardToCreateTeam()
+        void ForwardToCreateTeam(bool isRedirectedFromChampionship, string championshipId)
         {
-            NavigationManager.NavigateTo("/createteam");
+            NavigationManager.NavigateTo($"/createteam/{isRedirectedFromChampionship}/{championshipId}");
         }
     }
 }

@@ -38,7 +38,7 @@
         {
             <div class="form-row">
                 <div class="form-group half-width">
-                    <center><RadzenButton Visible=@(zeroTeamAvaiableToAdd) Click="@ForwardToCreateTeam" Text="Create New Team" /></center>
+                    <center><RadzenButton Visible=@(zeroTeamAvaiableToAdd) Click="@(()=>ForwardToCreateTeam(true,championshipId!))" Text="Create New Team" /></center>
                 </div>
             </div>
         }
