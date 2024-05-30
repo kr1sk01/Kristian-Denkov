@@ -83,11 +83,87 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Championship
                 return;
             if (args.Data == null)
                 return;
-            if(args.Data != null)
+            if(args.Data != null && args.Data.ChampionshipStatusName == "Open")
             {
                 selectedChampionship = new List<ChampionshipDto>() { args.Data };
+                if (isAdmin)
+                {                   
+                    ContextMenuService.Open(args,
+                                       new List<ContextMenuItem> {
+                        new ContextMenuItem(){ Text = "Details", Value = 1, Icon = "info" },
+                        new ContextMenuItem(){ Text = "Edit", Value = 1, Icon = "edit" },
+                        new ContextMenuItem(){ Text = "Join", Value = 1, Icon = "groups" },
+                                                                       },
+                                       async (e) =>
+                                       {
+                                           if (e.Text == "Details")
+                                           {
+                                               OpenChampionship(args.Data.Id.ToString());
+                                               ContextMenuService.Close();
+                                           }
+                                           if (e.Text == "Edit")
+                                           {
+                                               OpenChampionship(args.Data.Id.ToString());
+                                               ContextMenuService.Close();
+                                           }
+                                           if (e.Text == "Join")
+                                           {
+                                               await OpenJoinDialog(args.Data.Id.ToString(), args.Data.Name.ToString());
+                                               ContextMenuService.Close();
+                                           }
+                                       });
+                }
+                else
+                {
+                    ContextMenuService.Open(args,
+                   new List<ContextMenuItem> {
+                        new ContextMenuItem(){ Text = "Details", Value = 1, Icon = "info" },
+                        new ContextMenuItem(){ Text = "Join", Value = 1, Icon = "groups" },
+                                                   },
+                   async (e) =>
+                   {
+                       if (e.Text == "Details")
+                       {
+                           OpenChampionship(args.Data.Id.ToString());
+                           ContextMenuService.Close();
+                       }
+                       if (e.Text == "Join")
+                       {
+                           await OpenJoinDialog(args.Data.Id.ToString(), args.Data.Name.ToString());
+                           ContextMenuService.Close();
+                       }
+                   });
+                }
 
-                ContextMenuService.Open(args,
+
+            }
+            else
+            {
+                selectedChampionship = new List<ChampionshipDto>() { args.Data };
+                if (isAdmin)
+                {
+                    ContextMenuService.Open(args,
+                                       new List<ContextMenuItem> {
+                        new ContextMenuItem(){ Text = "Details", Value = 1, Icon = "info" },
+                        new ContextMenuItem(){ Text = "Edit", Value = 1, Icon = "edit" },
+                                                                       },
+                                       async (e) =>
+                                       {
+                                           if (e.Text == "Details")
+                                           {
+                                               OpenChampionship(args.Data.Id.ToString());
+                                               ContextMenuService.Close();
+                                           }
+                                           if (e.Text == "Edit")
+                                           {
+                                               OpenChampionship(args.Data.Id.ToString());
+                                               ContextMenuService.Close();
+                                           }
+                                       });
+                }
+                else
+                {
+                    ContextMenuService.Open(args,
                    new List<ContextMenuItem> {
                         new ContextMenuItem(){ Text = "Details", Value = 1, Icon = "info" },
                                                    },
@@ -98,8 +174,8 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Championship
                            OpenChampionship(args.Data.Id.ToString());
                            ContextMenuService.Close();
                        }
-                   }
-                );
+                   });
+                }
             }
 
 
