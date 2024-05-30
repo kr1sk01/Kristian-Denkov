@@ -31,7 +31,7 @@ public partial class CreateTeam : ComponentBase
 
     TeamDto model = new TeamDto();
 
-    RadzenDropDown<string> teamTypeDropDown;
+    RadzenDropDown<string>? teamTypeDropDown;
     ChampionshipTeamsDto? ChampionshipTeamsToAdd;
     //private GameType gameType = new GameType();
     private List<TeamType> teamTypes = new List<TeamType>(); // Assuming you have a list of TeamTypes to choose from
@@ -48,6 +48,8 @@ public partial class CreateTeam : ComponentBase
                 if (isRedirectedFromChampionship == true)
                 {
                     var championship = await client.GetFromJsonAsync<ChampionshipDto>($"api/Championship/{championshipId}");
+                    if (teamTypeDropDown == null)
+                        return;
                     await teamTypeDropDown.SelectItem(championship!.GameType!.TeamTypeName, false);
                     model.TeamTypeName = championship!.GameType!.TeamTypeName;
                     teamTypeDropDown.Disabled = true;
@@ -61,6 +63,7 @@ public partial class CreateTeam : ComponentBase
     private async Task OnInvalidSubmit(FormInvalidSubmitEventArgs args)
     {
         //TeamDto team = new TeamDto { };
+        notifier.SendErrorNotification("Something went wrong!");
     }
     private async Task OnSubmit(TeamDto model)
     {
