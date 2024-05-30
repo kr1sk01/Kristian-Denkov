@@ -45,13 +45,14 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             return dtos;
         }
 
-        public async Task<Championship?> GetChampionship(int id)
+        public async Task<ChampionshipDto?> GetChampionship(int id)
         {
             var championshipClass = await _context.Championships
             .Include(x => x.ChampionshipStatus)
             .Include(x => x.ChampionshipType)
             .Include(x => x.Winner)
             .Include(x => x.GameType)
+                .ThenInclude(x => x.TeamType)
             .Include(x => x.Games)
                 .ThenInclude(g => g.GameStatus)
             .Include(x => x.Games)
@@ -62,9 +63,13 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                 .ThenInclude(g => g.Winner)
             .Include(x => x.ChampionshipTeams)
                 .ThenInclude(x => x.Team)
+                    .ThenInclude(x => x.TeamPlayers)
+                        .ThenInclude(x => x.Player)
             .FirstOrDefaultAsync(a => a.Id == id);
 
-            return championshipClass;
+            var dto = championshipClass.Adapt<ChampionshipDto>();
+
+            return dto;
         }
 
         public async Task<ActionResult> PostChampionship(ChampionshipDto championship, StringValues authHeader)
@@ -93,7 +98,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                     Name = championship.Name,
                     ChampionshipType = await _context.ChampionshipTypes.FirstAsync(x => x.Name == championship.ChampionshipTypeName),
                     ChampionshipStatus = await _context.ChampionshipStatuses.FirstAsync(x => x.Name == championship.ChampionshipStatusName),
-                    GameType = await _context.GameTypes.FirstAsync(x => x.Name == championship.GameTypeName),
+                    GameType = await _context.GameTypes.FirstAsync(x => x.Id == championship.GameType!.Id),
                     LotDate = championship.LotDate.Value.ToUniversalTime(),
                     Date = championship.Date.Value.ToUniversalTime(),
                     ModifiedBy = userId,

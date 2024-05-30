@@ -103,6 +103,8 @@ namespace ChampionshipMaster.API.Services.ControllerServices
         {
             var teams = await _context.Teams
                 .Include(x => x.TeamType)
+                .Include(x => x.TeamPlayers)
+                    .ThenInclude(x => x.Player)
                 .Where(x => x.Active == true)
                 .ToListAsync();
 

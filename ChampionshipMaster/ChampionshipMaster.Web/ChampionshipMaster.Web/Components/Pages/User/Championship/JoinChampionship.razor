@@ -22,7 +22,8 @@
                                 @bind-Value=@ChampionshipTeamsToAdd.TeamId
                                 Style="width: 100%;"
                                 Disabled=@zeroTeamAvaiableToAdd
-                                Name="Team2">
+                                Name="Team2"
+                                SelectedItemChanged="@(args => DropDownSelect(args))">
                     <Template Context="team2">
                         <ImageNameTemplate Image="@team2.Logo"
                                            Name="@team2.Name"
