@@ -11,7 +11,8 @@
         <div class="form-row">
             <div class="form-group half-width">
                 <RadzenLabel Style="color:white;" Text="Team To Add" Class="form-label" />
-                <RadzenDropDown TValue="int?"
+                <RadzenDropDown @ref=@teamDropDown
+                                TValue="int?"
                                 TextProperty="Name"
                                 ValueProperty="Id"
                                 Data="selectableTeamsToShow"
@@ -30,7 +31,7 @@
                                            ImageType="ImageNameTemplate.ImageTypeOptions.Team" />
                     </Template>
                 </RadzenDropDown>
-                <RadzenRequiredValidator Component="Team2" Text="Team 2 is required" />
+                <RadzenRequiredValidator Component="Team2" Text="Team is required" />
             </div>
         </div>
 

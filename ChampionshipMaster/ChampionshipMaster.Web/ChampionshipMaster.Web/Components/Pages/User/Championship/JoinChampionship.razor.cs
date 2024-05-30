@@ -34,6 +34,7 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Championship
         public List<TeamDto> selectableTeamsToShow = new();
         public ChampionshipDto? currentChampionship;
         public ChampionshipTeamsDto ChampionshipTeamsToAdd = new();
+        RadzenDropDown<int?> teamDropDown = default!;
 
         public bool zeroTeamAvaiableToAdd = false;
 
@@ -114,7 +115,28 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Championship
 
         public async Task DropDownSelect(object args)
         {
-            
+            if (args == null) 
+            {
+                return;
+            }
+
+            var selectedTeam = args.Adapt<TeamDto>();
+
+            var repeatingPlayerWithTeam = (from player in selectedTeam.Players
+                                             from team in currentChampionship!.Teams
+                                             where team.Players.Any(p => p.Id == player.Id)
+                                             select new { Player = player, Team = team }).ToList().FirstOrDefault();
+
+            if (repeatingPlayerWithTeam != null)
+            {
+                var playerName = repeatingPlayerWithTeam.Player.Name;
+                var teamName = repeatingPlayerWithTeam.Team.Name;
+                notifier.SendWarningNotification("The team you selected contains a player who's already registered in this Championship." +
+                    $"\n Player [{playerName}] in Team [{teamName}]", 8);
+
+                await teamDropDown.SelectItem(null, raiseChange:false);
+                ChampionshipTeamsToAdd.TeamId = null;
+            }
         }
 
         public async Task OnSubmit()
