@@ -135,7 +135,6 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Championship
                     $"\n Player [{playerName}] in Team [{teamName}]", 8);
 
                 await teamDropDown.SelectItem(null, raiseChange:false);
-                ChampionshipTeamsToAdd.TeamId = null;
             }
         }
 
