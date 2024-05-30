@@ -65,7 +65,7 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Championship
         }
         void Update(DataGridRowMouseEventArgs<ChampionshipDto> args)
         {
-            if (args != null && args.Data.ChampionshipStatusName == "Coming")
+            if (args != null && args.Data.ChampionshipStatusName == "Open")
                 disabledJoin = false;
             else
                 disabledJoin = true;

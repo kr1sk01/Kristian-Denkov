@@ -8,7 +8,7 @@
         private string Icon => Status switch
         {
             "Coming" => "schedule",
-            "In Progress" => "pending",
+            "Open" => "door_open",
             "Live" => "live_tv",
             "Finished" => "check_circle",
             "Cancelled" => "cancel",
@@ -18,7 +18,7 @@
         private string StatusClass => Status switch
         {
             "Coming" => "status-coming",
-            "In Progress" => "status-in-progress",
+            "Open" => "status-open",
             "Live" => "status-live",
             "Finished" => "status-finished",
             "Cancelled" => "status-cancelled",
