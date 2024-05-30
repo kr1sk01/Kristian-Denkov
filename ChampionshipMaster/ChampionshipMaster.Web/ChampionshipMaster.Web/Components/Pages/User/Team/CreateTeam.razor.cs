@@ -31,6 +31,8 @@ public partial class CreateTeam : ComponentBase
 
     TeamDto model = new TeamDto();
 
+    RadzenDropDown<string> teamTypeDropDown;
+    ChampionshipTeamsDto? ChampionshipTeamsToAdd;
     //private GameType gameType = new GameType();
     private List<TeamType> teamTypes = new List<TeamType>(); // Assuming you have a list of TeamTypes to choose from
 
@@ -44,6 +46,9 @@ public partial class CreateTeam : ComponentBase
             if(isRedirectedFromChampionship == true)
             {
                 var championship = await client.GetFromJsonAsync<ChampionshipDto>($"api/Championship/{championshipId}");
+                await teamTypeDropDown.SelectItem(championship!.GameType!.TeamTypeName, false);
+                model.TeamTypeName = championship!.GameType!.TeamTypeName;
+                teamTypeDropDown.Disabled = true;
                 ;
             }
             StateHasChanged();
@@ -67,7 +72,18 @@ public partial class CreateTeam : ComponentBase
         client.DefaultRequestHeaders.Add("Authorization", $"Bearer {await tokenService.GetToken()}");
 
         var response = await client.PostAsJsonAsync("/api/Teams", model);
+        var body = await response.Content.ReadAsStringAsync();
+        Dictionary<string, object> object2 = JsonSerializer.Deserialize<Dictionary<string, object>>(body);
+        if (isRedirectedFromChampionship==true) 
+        {
+            ChampionshipTeamsToAdd = new ChampionshipTeamsDto
+            {
+                TeamId = int.Parse(object2["id"].ToString()),
+                ChampionshipId = championshipId
+            };
+            await client.PostAsJsonAsync("api/Championship/join", ChampionshipTeamsToAdd);
 
+        }
         var content = await response.Content.ReadAsStringAsync();
 
         if (response.IsSuccessStatusCode)

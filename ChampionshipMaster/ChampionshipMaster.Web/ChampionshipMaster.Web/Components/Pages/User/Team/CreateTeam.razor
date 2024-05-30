@@ -22,13 +22,13 @@
                 </RadzenFormField>
                 <RadzenFormField Text="Team Type" Variant="@variant">
                     <ChildContent>
-                        <RadzenDropDown Name="TeamType" @bind-Value=@model.TeamTypeName Data=@teamTypes.Select(x => x.Name).ToList() Style="width: 100%;" />
+                        <RadzenDropDown @ref=@teamTypeDropDown Name="TeamType" @bind-Value=@model.TeamTypeName Data=@teamTypes.Select(x => x.Name).ToList() Style="width: 100%;" />
                     </ChildContent>
                     <Helper>
                         <RadzenRequiredValidator Component="TeamType" Text="Team Type is required!" />
                     </Helper>
                 </RadzenFormField>
-                <RadzenButton ButtonType="ButtonType.Submit" Text="Create Team"></RadzenButton>
+                <RadzenButton ButtonType="ButtonType.Submit" Text=@(isRedirectedFromChampionship == true ? "Create Team To Join" : "Create Team")></RadzenButton>
             </RadzenStack>
         </RadzenTemplateForm>
     </div>
