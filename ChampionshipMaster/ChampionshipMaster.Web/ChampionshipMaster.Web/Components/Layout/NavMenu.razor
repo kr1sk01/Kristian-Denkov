@@ -3,27 +3,28 @@
 @inject IHttpClientFactory httpClient
 @inject IConfiguration configuration
 @inject ProtectedLocalStorage _localStorage
+@inject LayoutStateService LayoutStateService
 
 @rendermode InteractiveServer
 
 
 <div style="top:0px;left:0px;margin-bottom: 0px;position:sticky;z-index:1;box-shadow: 0 0 10px 0 rgba(0,0,0,0.5);">
-    <RadzenMenu Click="OnParentClicked">
-        <RadzenMenuItem Text="Home" Icon="home" Path="home" Visible=@isLogged></RadzenMenuItem>
-        <RadzenMenuItem Text="Championships" Icon="emoji_events" Path="championshipsmain" Visible=@isLogged></RadzenMenuItem>
-        <RadzenMenuItem Text="Teams" Path="manageteams" Icon="groups" Visible=@isLogged></RadzenMenuItem>
-        <RadzenMenuItem Text="Games" Path="managegames" Icon="sports_soccer" Visible=@isLogged></RadzenMenuItem>       
-        <RadzenMenuItem Icon="help_outline" Visible=@isLogged Text="Info" Path="info"></RadzenMenuItem>
+    <RadzenMenu Visible=@isLogged Click="OnParentClicked">
+        <RadzenMenuItem Text="Home" Icon="home" Path="home" ></RadzenMenuItem>
+        <RadzenMenuItem Text="Championships" Icon="emoji_events" Path="championshipsmain" ></RadzenMenuItem>
+        <RadzenMenuItem Text="Teams" Path="manageteams" Icon="groups" ></RadzenMenuItem>
+        <RadzenMenuItem Text="Games" Path="managegames" Icon="sports_soccer" ></RadzenMenuItem>       
+        <RadzenMenuItem Icon="help_outline"  Text="Info" Path="info"></RadzenMenuItem>
         <RadzenMenuItem Icon="admin_panel_settings" Text="Admin Panel" Visible=@isAdmin Path="admin"></RadzenMenuItem>
-        <RadzenProfileMenu Visible=@isLogged>
+        <RadzenProfileMenu >
             <Template>
-                <RadzenImage Path="@imagePath" AlternateText="Profile picture" Visible=@isLogged Style="margin-right: 10px; width: 32px;" />
+                <RadzenImage Path="@imagePath" AlternateText="Profile picture"  Style="margin-right: 10px; width: 32px;" />
                 <span class="rz-navigation-item-text" style="flex:none;">@username</span>
             </Template>
             <ChildContent>
-                <RadzenMenuItem Icon="account_circle" Visible=@isLogged Text="Manage profile" Path="profile"></RadzenMenuItem>
-                <RadzenMenuItem Icon="lock" Visible=@isLogged Text="Change password" Path="changePassword"></RadzenMenuItem>
-                <RadzenMenuItem Icon="exit_to_app" Visible=@isLogged Text="Log Out" Click="()=> LogOut(username)"></RadzenMenuItem>
+                <RadzenMenuItem Icon="account_circle"  Text="Manage profile" Path="profile"></RadzenMenuItem>
+                <RadzenMenuItem Icon="lock"  Text="Change password" Path="changePassword"></RadzenMenuItem>
+                <RadzenMenuItem Icon="exit_to_app"  Text="Log Out" Click="()=> LogOut(username)"></RadzenMenuItem>
             </ChildContent>
         </RadzenProfileMenu>
     </RadzenMenu>
@@ -41,11 +42,25 @@
 
     string base64EncodedImageData = string.Empty;
 
+    protected override void OnInitialized()
+    {
+        LayoutStateService.OnLayoutRefresh += RefreshLayout;
+    }
+
+    private void RefreshLayout()
+    {
+        isLogged=true;
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        LayoutStateService.OnLayoutRefresh -= RefreshLayout;
+    }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
-        {
-
+        {                     
             var tokenString = await tokenService.GetToken();
             if (tokenString != null)
             {
@@ -77,13 +92,11 @@
 
                     StateHasChanged();
                 }
-
             }
         }
     }
     void OnParentClicked()
     {
-
     }
     private async Task LogOut(string username)
     {

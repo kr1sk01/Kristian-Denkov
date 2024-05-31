@@ -20,7 +20,8 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Account
         NavigationManager NavigationManager { get; set; } = default!;
         [Inject]
         ProtectedLocalStorage _localStorage { get; set; } = default!;
-
+        [Inject]
+        LayoutStateService LayoutStateService { get; set; } = default!;
         Variant variant = Variant.Outlined;
 
         private LoginViewModel model = new LoginViewModel();
@@ -51,11 +52,14 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Account
             await _localStorage.SetAsync("jwtToken", jwtToken);
             await _localStorage.SetAsync("playerAvatar", image);
             isLogged = true;
-            StateHasChanged();
             notifier.SendSuccessNotification("Logged in successfully!");
-            NavigationManager.NavigateTo("/", forceLoad: true);
+            RefreshLayout();
+            NavigationManager.NavigateTo("/");
         }
-
+        private void RefreshLayout()
+        {
+            LayoutStateService.RefreshLayout();
+        }
         void OnInvalidSubmit(FormInvalidSubmitEventArgs args)
         {
             showError = false;
