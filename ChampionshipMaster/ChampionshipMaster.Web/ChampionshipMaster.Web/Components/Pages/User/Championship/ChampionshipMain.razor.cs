@@ -83,11 +83,12 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Championship
                 return;
             if (args.Data == null)
                 return;
-            if (args.Data != null && args.Data.ChampionshipStatusName == "Open")
+
+            if(args.Data != null && args.Data.ChampionshipStatusName == "Open")
             {
                 selectedChampionship = new List<ChampionshipDto>() { args.Data };
                 if (isAdmin)
-                {
+                {                   
                     ContextMenuService.Open(args,
                                        new List<ContextMenuItem> {
                         new ContextMenuItem(){ Text = "Details", Value = 1, Icon = "info" },
