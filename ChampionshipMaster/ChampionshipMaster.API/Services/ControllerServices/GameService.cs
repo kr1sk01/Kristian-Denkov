@@ -201,8 +201,8 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                 var token = new JwtSecurityToken(tokenString);
 
                 var userId = token.Claims.First(x => x.Type == "nameid").Value;
-                var blueTeam = await _context.Teams.Include(x => x.TeamPlayers).ThenInclude(x => x.Player).FirstAsync(x => x.Name == game.BlueTeamName);
-                var redTeam = await _context.Teams.Include(x => x.TeamPlayers).ThenInclude(x => x.Player).FirstAsync(x => x.Name == game.RedTeamName);
+                var blueTeam = await _context.Teams.Include(x => x.TeamPlayers).ThenInclude(x => x.Player).FirstAsync(x => x.Name == game.BlueTeam!.Name);
+                var redTeam = await _context.Teams.Include(x => x.TeamPlayers).ThenInclude(x => x.Player).FirstAsync(x => x.Name == game.RedTeam!.Name);
 
                 if (blueTeam.TeamPlayers.Any(x => redTeam.TeamPlayers.Any(y => y.PlayerId == x.PlayerId)))
                 {

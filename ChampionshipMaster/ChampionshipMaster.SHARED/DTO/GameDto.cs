@@ -11,9 +11,9 @@
 
         public string? GameStatusName { get; set; }
 
-        public string? BlueTeamName { get; set; }
+        public TeamDto? BlueTeam { get; set; }
 
-        public string? RedTeamName { get; set; }
+        public TeamDto? RedTeam { get; set; }
 
         public int? BluePoints { get; set; }
 

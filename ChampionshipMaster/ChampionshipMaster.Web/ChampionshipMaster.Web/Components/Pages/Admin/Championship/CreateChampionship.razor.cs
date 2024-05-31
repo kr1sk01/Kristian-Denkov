@@ -36,7 +36,7 @@ public partial class CreateChampionship : ComponentBase
     public GameTypeDto? selectedGameType;
     public ChampionshipTypeDto? selectedChampionshipType;
     public ChampionshipStatusDto? selectedChampionshipStatusDto;
-    public int GameTypeId;
+    public string? GameTypeName;
 
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -110,7 +110,7 @@ public partial class CreateChampionship : ComponentBase
         using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
         client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 
-        championshipToAdd!.GameType = gameTypes!.FirstOrDefault(x => x.Id == GameTypeId);
+        championshipToAdd!.GameType = gameTypes!.FirstOrDefault(x => x.Name == GameTypeName);
         var request = await client.PostAsJsonAsync("api/Championship", championshipToAdd);
 
         if (request.IsSuccessStatusCode)
