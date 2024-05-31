@@ -111,7 +111,7 @@ namespace ChampionshipMaster.API.Controllers
 
         [Authorize]
         [HttpPut]
-        public async Task<IActionResult> EditPlayer([FromQuery] string teamId, [FromBody] TeamDto team)
+        public async Task<IActionResult> EditTeam([FromQuery] string teamId, [FromBody] TeamDto team)
         {
             var authHeader = HttpContext.Request.Headers.Authorization;
             var result = await _teamService.EditTeam(teamId, team, authHeader);

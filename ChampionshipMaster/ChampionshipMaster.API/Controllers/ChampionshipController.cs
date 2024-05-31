@@ -1,4 +1,5 @@
 ﻿using ChampionshipMaster.API.Interfaces;
+using ChampionshipMaster.SHARED.DTO;
 using Microsoft.AspNetCore.Authorization;
 
 namespace ChampionshipMaster.API.Controllers;
@@ -65,10 +66,12 @@ public class ChampionshipController : ControllerBase
     }
 
     // PUT: api/Championship/5
-    [HttpPut("{id}")]
-    public async Task<IActionResult> PutChampionship(int id, Championship championship)
+    [Authorize]
+    [HttpPut]
+    public async Task<IActionResult> PutChampionship([FromQuery] string championshipId, [FromBody] ChampionshipDto championship)
     {
-        var result = await _championshipService.EditChampionship(id, championship);
+        var authHeader = HttpContext.Request.Headers.Authorization;
+        var result = await _championshipService.EditChampionship(championshipId, championship, authHeader);
         return result;
     }
 
@@ -77,6 +80,15 @@ public class ChampionshipController : ControllerBase
     public async Task<IActionResult> DeleteChampionship(int id)
     {
         var result = await _championshipService.DeleteChampionship(id);
+        return result;
+    }
+
+    [Authorize]
+    [HttpPost("drawLot/{id}")]
+    public async Task<IActionResult> DrawLot(int id)
+    {
+        var authHeader = HttpContext.Request.Headers.Authorization;
+        var result = await _championshipService.DrawLot(id, authHeader);
         return result;
     }
 }

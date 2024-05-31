@@ -123,33 +123,33 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             return await _context.Championships.AnyAsync(x => x.Name!.ToLower() == name!.ToLower());
         }
 
-        public async Task<IActionResult> EditChampionship(int id, Championship championship)
-        {
-            if (id != championship.Id)
-            {
-                return BadRequest();
-            }
+        //public async Task<IActionResult> EditChampionship(int id, Championship championship)
+        //{
+        //    if (id != championship.Id)
+        //    {
+        //        return BadRequest();
+        //    }
 
-            _context.Entry(championship).State = EntityState.Modified;
+        //    _context.Entry(championship).State = EntityState.Modified;
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!await ChampionshipExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+        //    try
+        //    {
+        //        await _context.SaveChangesAsync();
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        if (!await ChampionshipExists(id))
+        //        {
+        //            return NotFound();
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
 
-            return NoContent();
-        }
+        //    return NoContent();
+        //}
 
         public async Task<bool> ChampionshipExists(int id)
         {
@@ -216,6 +216,82 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                 await Console.Out.WriteLineAsync(ex.Message);
                 return BadRequest("Something went wrong!");
             }
+        }
+
+        public async Task<IActionResult> EditChampionship(string championshipId, ChampionshipDto championship, StringValues authHeader)
+        {
+            try
+            {
+                var tokenString = authHeader.ToString().Split(' ')[1];
+                var token = new JwtSecurityToken(tokenString);
+
+                var userId = token.Claims.First(x => x.Type == "nameid").Value;
+                var userRole = token.Claims.First(x => x.Type == "role").Value;
+                var championshipToEdit = await _context.Championships.FirstOrDefaultAsync(x => x.Id == int.Parse(championshipId));
+
+                if (championshipToEdit == null)
+                {
+                    return NotFound("This championship doesn't exist!");
+                }
+
+                if (userRole != "admin")
+                {
+                    return Forbid("You do not have permission for this operation!");
+                }
+
+                if (championship.Name != championshipToEdit.Name && championship.Name != null)
+                {
+                    if (await _context.Championships.AnyAsync(x => x.Name == championship.Name))
+                    {
+                        return BadRequest("There is already a championship with that name!");
+                    }
+
+                    championshipToEdit.Name = championship.Name;
+                }
+
+                if (championship.Logo != null && championship.Logo.Length != 0)
+                {
+                    championshipToEdit.Logo = championship.Logo;
+                }
+
+                if (championship.ChampionshipStatusName != null && championship.ChampionshipStatusName != championshipToEdit.ChampionshipStatus?.Name)
+                {
+                    championshipToEdit.ChampionshipStatus = await _context.ChampionshipStatuses.FirstAsync(x => x.Name == championship.ChampionshipStatusName);
+                }
+
+                if (championship.LotDate != null)
+                {
+                    championshipToEdit.LotDate = championship.LotDate;
+                }
+
+                if (championship.Date != null)
+                {
+                    championshipToEdit.Date = championship.Date;
+                }
+
+                if (championship.WinnerName != null && championship.WinnerName != championshipToEdit.Winner?.Name)
+                {
+                    championshipToEdit.Winner = await _context.Teams.FirstAsync(x => x.Name == championship.WinnerName);
+                }
+
+                championshipToEdit.ModifiedBy = userId;
+                championshipToEdit.ModifiedOn = DateTime.UtcNow;
+
+                _context.Entry(championshipToEdit).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+
+                return Ok("Championship edited successfully!");
+            }
+            catch (Exception ex)
+            {
+                await Console.Out.WriteLineAsync(ex.Message);
+                return BadRequest("Something went wrong!");
+            }
+        }
+
+        public Task<IActionResult> DrawLot(int championshipId, StringValues authHeader)
+        {
+            throw new NotImplementedException();
         }
     }
 }
