@@ -1,4 +1,5 @@
 ﻿using ChampionshipMaster.DATA.Models;
+using ChampionshipMaster.Web.Components.Pages.User.Championship;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using System.Data;
 using System.IdentityModel.Tokens.Jwt;
@@ -23,6 +24,10 @@ namespace ChampionshipMaster.Web.Components.Pages.Admin.Championship
 
         [Parameter] public string? championshipId { get; set; }
 
+        RadzenDataGrid<TeamDto> datagrid = default!;
+
+        public ChampionshipDto? currentChampionship;
+
         IList<TeamDto>? selectedTeam;
         private List<TeamDto>? teams;
         private List<TeamDto>? teamToShow;
@@ -31,6 +36,7 @@ namespace ChampionshipMaster.Web.Components.Pages.Admin.Championship
         bool isAdmin = false;
 
         private bool disabledDelete = true;
+
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
@@ -55,6 +61,7 @@ namespace ChampionshipMaster.Web.Components.Pages.Admin.Championship
             }
 
             var test2 = test.Teams.ToList();
+            currentChampionship = test;
 
             teams = test2!;
 
@@ -71,11 +78,8 @@ namespace ChampionshipMaster.Web.Components.Pages.Admin.Championship
             }
 
             var jsonString = JsonSerializer.Serialize(teams!.Select(x => x.CreatedBy).ToList());
-
             var content = new StringContent(jsonString, System.Text.Encoding.UTF8, "application/json");
-
             var request = await client.PostAsync("api/Player/getPlayersById", content);
-
             var body = await request.Content.ReadAsStringAsync();
 
             if (request.IsSuccessStatusCode)
@@ -94,7 +98,6 @@ namespace ChampionshipMaster.Web.Components.Pages.Admin.Championship
                 }
             }
             StateHasChanged();
-
         }
         void Update(DataGridRowMouseEventArgs<TeamDto> args)
         {
@@ -105,14 +108,42 @@ namespace ChampionshipMaster.Web.Components.Pages.Admin.Championship
 
             StateHasChanged();
         }
-        async Task Delete(string championshipId,string id) 
+        async Task Delete(string championshipId,string teamId) 
         {
             using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {await tokenService.GetToken()}");
 
-            await client.DeleteAsync($"api/ChampionshipTeams/delete/{championshipId}/{id}");
+            var result = await client.DeleteAsync($"api/ChampionshipTeams/delete/{championshipId}/{teamId}");
+            if (result.IsSuccessStatusCode)
+            {
+                
+                if (teams != null)
+                    teams.RemoveAll(x => x.Id == int.Parse(teamId));
+
+                RefreshData();
+            }
+            else
+            {
+                notifier.SendErrorNotification("Something went wrong!");
+            }
 
             StateHasChanged();
+        }
+        public async Task OpenJoinDialog(string championshipId, string championshipName) 
+        {
+            var dialogService = await DialogService.OpenAsync<JoinChampionship>($"",
+                       new Dictionary<string, object>() {
+                           { "championshipId", championshipId },
+                           { "championshipName",  championshipName},
+                           { "dontredirect", true },
+                           { "OnDialogClosed", EventCallback.Factory.Create(this, RefreshData) }
+                       },
+                       new DialogOptions() { Width = "45%", Height = "60%", Draggable = true, CloseDialogOnEsc = true });
+        }
+        private async Task RefreshData()
+        {
+            await GetTeamsData();
+            await datagrid.Reload();
         }
     }
 }

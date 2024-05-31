@@ -8,18 +8,26 @@
 
 
 <RadzenDataGrid AllowFiltering="true"
+                @ref=@datagrid
                 FilterPopupRenderMode="PopupRenderMode.OnDemand"
                 FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                 AllowPaging="true"
                 PageSize="7"
                 TItem="TeamDto"
-                AllowSorting="true" Data="@teams" ColumnWidth="200px"
+                AllowSorting="true" 
+                Data="@teams" 
+                ColumnWidth="200px"
                 SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedTeam
                 RowClick="@(args => Update(args))"
 >
 
     <HeaderTemplate>
-        <RadzenButton Style="margin-right:5px;" Icon="note_add" Text="Add" ButtonStyle="ButtonStyle.Primary" />
+        <RadzenButton 
+            Style="margin-right:5px;" 
+            Icon="note_add" 
+            Text="Add" 
+            ButtonStyle="ButtonStyle.Primary"
+                      Click=@(()=>OpenJoinDialog(currentChampionship.Id.ToString(), currentChampionship.Name.ToString())) />
         <RadzenButton 
             Style="margin-right:5px;" 
             Disabled=@disabledDelete 

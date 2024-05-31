@@ -11,7 +11,6 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Championship
     public partial class JoinChampionship : ComponentBase
     {
         [Inject] NavigationManager nManager { get; set; } = default!;
-        [Inject] Radzen.DialogService dialogService { get; set; } = default!;
         [Inject] IConfiguration configuration { get; set; } = default!;
         [Inject] ITokenService tokenService { get; set; } = default!;
         [Inject] IHttpClientFactory httpClient { get; set; } = default!;
@@ -25,6 +24,8 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Championship
 
         [Parameter] public string? championshipId { get; set; }
         [Parameter] public string? championshipName { get; set; }
+        [Parameter] public bool? dontredirect { get; set; } = false;
+        [Parameter] public EventCallback OnDialogClosed { get; set; }
 
         bool isLogged = false;
         bool isAdmin = false;
@@ -148,11 +149,16 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Championship
                 client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", await tokenService.GetToken());
 
                 var request = await client.PostAsJsonAsync("api/Championship/join", ChampionshipTeamsToAdd);
-                if (request.IsSuccessStatusCode)
+                if (request.IsSuccessStatusCode && dontredirect == false)
                 {
                     notifier.SendSuccessNotification("Team joined successfully!");
                     NavigationManager.NavigateTo("/championshipsmain");
 
+                }
+                if (dontredirect == true)
+                {
+                    await CloseDialog();
+                    notifier.SendSuccessNotification("Team added successfully!");
                 }
             }
 
@@ -164,6 +170,13 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Championship
         void ForwardToCreateTeam(bool isRedirectedFromChampionship, string championshipId)
         {
             NavigationManager.NavigateTo($"/createteam/{isRedirectedFromChampionship}/{championshipId}");
+        }
+        
+
+        private async Task CloseDialog()
+        {
+            await OnDialogClosed.InvokeAsync(null);
+            DialogService.Close();
         }
     }
 }

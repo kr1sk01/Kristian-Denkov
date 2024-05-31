@@ -35,6 +35,10 @@ namespace ChampionshipMaster.Web.Components.Shared
 
         string GetPlayerImagePath(PlayerDto player)
         {
+            if(player == null)
+            {
+                return "";
+            }
             if (player.Avatar == null || player.Avatar.Length == 0)
             {
                 return "images/defaultAvatar.png";

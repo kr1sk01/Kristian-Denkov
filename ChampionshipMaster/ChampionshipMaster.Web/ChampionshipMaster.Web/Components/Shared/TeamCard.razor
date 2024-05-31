@@ -11,11 +11,15 @@
         <div class="players-header">Players</div>
         @foreach (var player in Team.Players)
         {
-            string playerImagePath = GetPlayerImagePath(player);
+            if(player != null)
+            {
+                string playerImagePath = GetPlayerImagePath(player);
             <div class="player">
                 <img src="@playerImagePath" alt="Player Avatar" class="player-avatar" />
                 <div class="player-name">@player.Name</div>
             </div>
+            }
+            
         }
     </div>
 </div>
