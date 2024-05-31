@@ -1,0 +1,21 @@
+﻿@inherits ComponentBase
+
+@rendermode InteractiveServer
+
+<div class="team-card" style="@Style" @onclick="OnCardClick" >
+    <div class="left-side">
+        <img src="@teamImagePath" alt="Team Logo" class="team-logo" />
+        <div class="team-name">@Team.Name</div>
+    </div>
+    <div class="right-side">
+        <div class="players-header">Players</div>
+        @foreach (var player in Team.Players)
+        {
+            string playerImagePath = GetPlayerImagePath(player);
+            <div class="player">
+                <img src="@playerImagePath" alt="Player Avatar" class="player-avatar" />
+                <div class="player-name">@player.Name</div>
+            </div>
+        }
+    </div>
+</div>
