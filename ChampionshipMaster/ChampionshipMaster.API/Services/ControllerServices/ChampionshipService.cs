@@ -1,5 +1,6 @@
 ﻿using ChampionshipMaster.API.Interfaces;
 using ChampionshipMaster.DATA.Models;
+using System.Collections.Generic;
 
 namespace ChampionshipMaster.API.Services.ControllerServices
 {
@@ -289,9 +290,90 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             }
         }
 
-        public Task<IActionResult> DrawLot(int championshipId, StringValues authHeader)
+        public async Task<IActionResult> DrawLot(int championshipId, StringValues authHeader)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var tokenString = authHeader.ToString().Split(' ')[1];
+                var token = new JwtSecurityToken(tokenString);
+
+                var userId = token.Claims.First(x => x.Type == "nameid").Value;
+                var userRole = token.Claims.First(x => x.Type == "role").Value;
+                var championshipToEdit = await _context.Championships
+                    .Include(x => x.ChampionshipTeams)
+                        .ThenInclude(x => x.Team)
+                            .ThenInclude(x => x.TeamType)
+                        .FirstOrDefaultAsync(x => x.Id == championshipId);
+
+                if (userRole != "admin")
+                {
+                    return Forbid("You do not have permission for this operation!");
+                }
+
+                if (championshipToEdit == null)
+                {
+                    return NotFound("This championship doesn't exist!");
+                }
+
+                if (championshipToEdit.LotDate == null)
+                {
+                    return BadRequest("You cannot draw the lot because the Lot Date is not set!");
+                }
+
+                if (DateTime.UtcNow < championshipToEdit.LotDate.Value.ToUniversalTime())
+                {
+                    return BadRequest("You cannot draw the lot because the Lot Date hasn't arrived yet!");
+                }
+
+                if (championshipToEdit.ChampionshipTeams.Count < 2)
+                {
+                    return BadRequest("You cannot draw the lot when there are less than 2 teams registered!");
+                }
+
+                Random rng = new();
+                var teams = championshipToEdit.ChampionshipTeams.Select(x => x.Team).ToList();
+
+                if (teams.Contains(null))
+                {
+                    return BadRequest("Something went wrong!");
+                }
+
+                int n = teams.Count;
+                while (n > 1)
+                {
+                    n--;
+                    int k = rng.Next(n + 1);
+                    (teams[n], teams[k]) = (teams[k], teams[n]);
+                }
+
+                var gameType = await _context.GameTypes.Include(x => x.TeamType).FirstAsync(x => x.TeamType!.Name == teams.First()!.TeamType!.Name);
+                var gameStatus = await _context.GameStatuses.FirstAsync(x => x.Name == "Coming");
+
+                for (int i = 0; i < teams.Count;)
+                {
+                    if (i != teams.Count - 1)
+                    {
+                        var newGame = new Game() 
+                        {
+                            Name = $"{teams[i]!.Name} vs {teams[i+1]!.Name}",
+                            GameType = gameType,
+                            GameStatus = gameStatus,
+                            BlueTeam = teams[i++],
+                            RedTeam = teams[i++],
+                            Championship = championshipToEdit,
+                            CreatedBy = userId,
+                            CreatedOn = DateTime.UtcNow
+                        };
+                    }
+                }
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                await Console.Out.WriteLineAsync(ex.Message);
+                return BadRequest("Something went wrong!");
+            }
         }
     }
 }
