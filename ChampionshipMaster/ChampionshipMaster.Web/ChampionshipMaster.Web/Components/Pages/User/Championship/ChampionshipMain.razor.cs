@@ -108,6 +108,10 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Championship
         {
             NavigationManager.NavigateTo($"/championshipDetails/{id}");
         }
+        void OpenEditDialog(string championshipId) 
+        {
+            NavigationManager.NavigateTo($"/editchampionship/{championshipId}");
+        }
         public async Task OpenJoinDialog(string championshipId, string championshipName) 
         {
             await DialogService.OpenAsync<JoinChampionship>($"",
