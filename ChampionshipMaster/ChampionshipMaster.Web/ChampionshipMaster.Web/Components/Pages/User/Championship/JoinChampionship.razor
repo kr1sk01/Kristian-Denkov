@@ -4,9 +4,14 @@
 
 @rendermode InteractiveServer
 
-
-<center><h1 style="color:white;">Join @championshipName</h1></center>
-
+@if(dontredirect == false)
+{
+    <center><h1 style="color:white;">Join @championshipName</h1></center>
+}
+else
+{
+     <center><h1 style="color:white;">Add Team To @championshipName</h1></center>
+}
 <div class="form-container">
     <RadzenTemplateForm TItem="ChampionshipTeamsDto" Data="ChampionshipTeamsToAdd" Submit="@OnSubmit" InvalidSubmit="@OnInvalidSubmit">
 
