@@ -39,33 +39,33 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             return NoContent();
         }
 
-        public async Task<IActionResult> EditTeam(int id, Team team)
-        {
-            if (id != team.Id)
-            {
-                return BadRequest();
-            }
+        //public async Task<IActionResult> EditTeam(int id, Team team)
+        //{
+        //    if (id != team.Id)
+        //    {
+        //        return BadRequest();
+        //    }
 
-            _context.Entry(team).State = EntityState.Modified;
+        //    _context.Entry(team).State = EntityState.Modified;
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!await TeamExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+        //    try
+        //    {
+        //        await _context.SaveChangesAsync();
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        if (!await TeamExists(id))
+        //        {
+        //            return NotFound();
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
 
-            return NoContent();
-        }
+        //    return NoContent();
+        //}
 
         public async Task<ActionResult<List<GameDto>>> GameHistory(int id)
         {
