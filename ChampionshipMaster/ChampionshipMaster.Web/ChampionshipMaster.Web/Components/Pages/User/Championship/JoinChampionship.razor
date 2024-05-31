@@ -11,7 +11,8 @@
         <div class="form-row">
             <div class="form-group half-width">
                 <RadzenLabel Style="color:white;" Text="Team To Add" Class="form-label" />
-                <RadzenDropDown TValue="int?"
+                <RadzenDropDown @ref=@teamDropDown
+                                TValue="int?"
                                 TextProperty="Name"
                                 ValueProperty="Id"
                                 Data="selectableTeamsToShow"
@@ -22,14 +23,15 @@
                                 @bind-Value=@ChampionshipTeamsToAdd.TeamId
                                 Style="width: 100%;"
                                 Disabled=@zeroTeamAvaiableToAdd
-                                Name="Team2">
+                                Name="Team2"
+                                SelectedItemChanged="@(args => DropDownSelect(args))">
                     <Template Context="team2">
                         <ImageNameTemplate Image="@team2.Logo"
                                            Name="@team2.Name"
                                            ImageType="ImageNameTemplate.ImageTypeOptions.Team" />
                     </Template>
                 </RadzenDropDown>
-                <RadzenRequiredValidator Component="Team2" Text="Team 2 is required" />
+                <RadzenRequiredValidator Component="Team2" Text="Team is required" />
             </div>
         </div>
 
@@ -37,7 +39,7 @@
         {
             <div class="form-row">
                 <div class="form-group half-width">
-                    <center><RadzenButton Visible=@(zeroTeamAvaiableToAdd) Click="@ForwardToCreateTeam" Text="Create New Team" /></center>
+                    <center><RadzenButton Visible=@(zeroTeamAvaiableToAdd) Click="@(()=>ForwardToCreateTeam(true,championshipId!))" Text="Create New Team" /></center>
                 </div>
             </div>
         }

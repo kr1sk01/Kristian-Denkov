@@ -65,7 +65,7 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Championship
         }
         void Update(DataGridRowMouseEventArgs<ChampionshipDto> args)
         {
-            if (args != null && args.Data.ChampionshipStatusName == "Coming")
+            if (args != null && args.Data.ChampionshipStatusName == "Open")
                 disabledJoin = false;
             else
                 disabledJoin = true;
@@ -83,6 +83,7 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Championship
                 return;
             if (args.Data == null)
                 return;
+
             if(args.Data != null && args.Data.ChampionshipStatusName == "Open")
             {
                 selectedChampionship = new List<ChampionshipDto>() { args.Data };
@@ -180,6 +181,7 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Championship
 
 
         }
+
         void OpenChampionship(string id)
         {
             NavigationManager.NavigateTo($"/championshipDetails/{id}");

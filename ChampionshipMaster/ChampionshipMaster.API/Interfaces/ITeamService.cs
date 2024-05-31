@@ -11,7 +11,7 @@ namespace ChampionshipMaster.API.Interfaces
         Task<ActionResult<List<GameDto>>> GameHistory(int id);
         Task<ActionResult<TeamDto>> PostTeam(TeamDto team, StringValues authHeader);
         Task<ActionResult<TeamDto>> SetTeamMembers(string teamId, List<string> playerIds, StringValues authHeader);
-        Task<IActionResult> EditTeam(int id, Team team);
+        //Task<IActionResult> EditTeam(int id, Team team);
         Task<bool> TeamExists(int id);
         Task<bool> TeamNameExists(string? name);
         Task<IActionResult> DeleteTeam(int id);

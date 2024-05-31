@@ -24,14 +24,16 @@
                 RowClick="@(args => Update(args))"
                 CellContextMenu="@OnCellContextMenu">
     <HeaderTemplate>
-        <RadzenButton Disabled=@(!isAdmin) Visible=@isAdmin Style="right: 5.5rem; float: right; position: absolute; margin-right: 0.5rem;" Icon="note_add" Text="Create Championship" ButtonStyle="ButtonStyle.Secondary" Click="OpenChampionshipCreatePage" />
+        <RadzenButton Disabled=@(!isAdmin) Visible=@isAdmin Style="right: 5.5rem; float: right; position: absolute; margin-right: 0.5rem;" Icon="note_add" Text="Create" ButtonStyle="ButtonStyle.Secondary" Click="OpenChampionshipCreatePage" />
         <RadzenButton Disabled=@disabledEdit Visible=@isAdmin Style="right: 0.5rem; float: right; position: absolute;" Icon="edit" Text="Edit" ButtonStyle="ButtonStyle.Primary" />
-        <RadzenButton Disabled=@disabledJoin Style="margin-right: 0.5rem;" Icon="groups" Text="Join Championship" ButtonStyle="ButtonStyle.Success" Click=@(() => OpenJoinDialog(selectedChampionship.FirstOrDefault().Id.ToString(), selectedChampionship.FirstOrDefault().Name)) />
+        <RadzenButton Disabled=@disabledJoin Style="margin-right: 0.5rem;" Icon="groups" Text="Join" ButtonStyle="ButtonStyle.Success" Click=@(() => OpenJoinDialog(selectedChampionship.FirstOrDefault().Id.ToString(), selectedChampionship.FirstOrDefault().Name)) />
     </HeaderTemplate>
     <Columns>
-        <RadzenDataGridColumn TextAlign="TextAlign.Left" TItem="ChampionshipDto" Property="Name" Title="Name">
+        <RadzenDataGridColumn TextAlign="TextAlign.Left" TItem="ChampionshipDto" Property="Name" Title="Championship">
             <Template Context="championship">
-                @championship.Name
+                <ImageNameTemplate Image="@championship.Logo"
+                                   Name="@championship.Name"
+                                   ImageType="ImageNameTemplate.ImageTypeOptions.Championship" />
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Width="75px" TItem="ChampionshipDto" Property="ChampionshipStatusName" Title="Status">
@@ -44,17 +46,17 @@
                 @championship.ChampionshipTypeName
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TextAlign="TextAlign.Center" Width="75px" TItem="ChampionshipDto" Property="GameTypeName" Title="Game Type Name">
+        <RadzenDataGridColumn TextAlign="TextAlign.Center" Width="75px" TItem="ChampionshipDto" Property="GameType" Title="Game Type Name">
             <Template Context="championship">
-                @championship.GameTypeName
+                @championship.GameType
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TextAlign="TextAlign.Center" Width="75px" TItem="ChampionshipDto" Property="LotDate" Title="Lot Date">
+        <RadzenDataGridColumn TextAlign="TextAlign.Center" Width="100px" TItem="ChampionshipDto" Property="LotDate" Title="Lot Date">
             <Template Context="championship">
                 @(championship.LotDate == null ? "" : championship.LotDate.Value.ToLocalTime().ToString("| dd-MM-yyyy | HH:MM tt |"))
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TextAlign="TextAlign.Center" Width="75px" TItem="ChampionshipDto" Property="Date" Title="Date">
+        <RadzenDataGridColumn TextAlign="TextAlign.Center" Width="100px" TItem="ChampionshipDto" Property="Date" Title="Date">
             <Template Context="championship">
                 @(championship.Date == null ? "" : championship.Date.Value.ToLocalTime().ToString("| dd-MM-yyyy | HH:MM tt |"))
     

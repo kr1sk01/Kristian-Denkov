@@ -13,17 +13,17 @@
     }
 
 .status-coming {
+    background-color: lightyellow;
+    color: orange;
+    border: 1px solid #d4af37; /* Darker shade of lightyellow */
+    /* box-shadow: 0 2px 4px rgba(95, 158, 160, 0.5);  Darker shade of lightyellow */
+}
+
+.status-open {
     background-color: lightblue;
     color: blue;
     border: 1px solid #5f9ea0; /* Darker shade of lightblue */
     /* box-shadow: 0 2px 4px rgba(95, 158, 160, 0.5);  Darker shade of lightblue */
-}
-
-.status-in-progress {
-    background-color: lightyellow;
-    color: orange;
-    border: 1px solid #d4af37; /* Darker shade of lightyellow */
-    /* box-shadow: 0 2px 4px rgba(212, 175, 55, 0.5);  Darker shade of lightyellow */
 }
 
 .status-live {

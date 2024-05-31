@@ -8,7 +8,7 @@
         public byte[]? Logo { get; set; }
         public string? ChampionshipTypeName { get; set; }
         public string? ChampionshipStatusName { get; set; }
-        public string? GameTypeName { get; set; }
+        public GameTypeDto? GameType { get; set; }
         public string? WinnerName { get; set; }
         public byte[]? WinnerLogo { get; set; }
         public DateTime? LotDate { get; set; }
