@@ -5,13 +5,13 @@ using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.Extensions.Logging;
 using System.IdentityModel.Tokens.Jwt;
 
-namespace ChampionshipMaster.Web.Components.Pages.User.Championship;
+namespace ChampionshipMaster.Web.Components.Pages.Admin.Championship;
 
 public partial class CreateChampionship : ComponentBase
 {
 
     [Inject] NavigationManager nManager { get; set; } = default!;
-    [Inject] Radzen.DialogService dialogService { get; set; } = default!;
+    [Inject] DialogService dialogService { get; set; } = default!;
     [Inject] IConfiguration configuration { get; set; } = default!;
     [Inject] ITokenService tokenService { get; set; } = default!;
     [Inject] IHttpClientFactory httpClient { get; set; } = default!;
@@ -22,7 +22,7 @@ public partial class CreateChampionship : ComponentBase
     [Inject] DialogService DialogService { get; set; } = default!;
     [Inject] INotifier notifier { get; set; } = default!;
 
-   
+
 
     public bool isLogged = false;
     public bool isAdmin = false;
@@ -51,8 +51,8 @@ public partial class CreateChampionship : ComponentBase
                     NavigationManager.NavigateTo("/login");
                     return;
                 }
-                
-                if(!await tokenService.ValidateToken(true))
+
+                if (!await tokenService.ValidateToken(true))
                 {
                     notifier.SendErrorNotification("You don't have permission!");
                     NavigationManager.NavigateTo("/");
@@ -132,11 +132,11 @@ public partial class CreateChampionship : ComponentBase
 
     public void DateRender(DateRenderEventArgs args)
     {
-        if(championshipToAdd != null && championshipToAdd.LotDate != null)
-            args.Disabled = args.Disabled || (args.Date < championshipToAdd.LotDate);
+        if (championshipToAdd != null && championshipToAdd.LotDate != null)
+            args.Disabled = args.Disabled || args.Date < championshipToAdd.LotDate;
     }
     public void LotDateRender(DateRenderEventArgs args)
-    {        
-            args.Disabled = args.Disabled || (args.Date < DateTime.UtcNow);
+    {
+        args.Disabled = args.Disabled || args.Date < DateTime.UtcNow;
     }
 }

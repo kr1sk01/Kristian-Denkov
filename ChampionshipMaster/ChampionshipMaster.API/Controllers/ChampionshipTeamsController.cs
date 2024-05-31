@@ -48,11 +48,13 @@ namespace ChampionshipMaster.API.Controllers
             return result;
         }
 
-        // DELETE: api/ChampionshipTeams/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteChampionshipTeams(int id)
+        // DELETE: api/ChampionshipTeams/delete/1/5
+        [HttpDelete("delete/{championshipId}/{teamId}")]
+        public async Task<IActionResult> DeleteChampionshipTeams(string championshipId, string teamId)
         {
-            var result = await _championshipTeamsService.DeleteChampionshipTeams(id);
+            int championshipId_int = int.Parse(championshipId);
+            int teamId_int = int.Parse(teamId);
+            var result = await _championshipTeamsService.DeleteChampionshipTeams(championshipId_int, teamId_int);
             return result;
         }
     }

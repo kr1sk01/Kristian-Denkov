@@ -1,4 +1,5 @@
 ﻿using ChampionshipMaster.DATA.Models;
+using ChampionshipMaster.Web.Components.Pages.Admin.Championship;
 using ChampionshipMaster.Web.Components.Pages.User.Game;
 using System.IdentityModel.Tokens.Jwt;
 

@@ -7,6 +7,6 @@
         Task<ActionResult<ChampionshipTeams>> PostChampionshipTeams(ChampionshipTeams championshipTeams);
         Task<IActionResult> EditChampionshipTeams(int id, ChampionshipTeams championshipTeams);
         Task<bool> ChampionshipTeamsExists(int id);
-        Task<IActionResult> DeleteChampionshipTeams(int id);
+        Task<IActionResult> DeleteChampionshipTeams(int championshipId, int teamId);
     }
 }

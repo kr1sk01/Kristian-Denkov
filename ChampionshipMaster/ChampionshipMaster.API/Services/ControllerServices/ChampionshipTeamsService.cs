@@ -16,15 +16,16 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             return await _context.ChampionshipTeams.AnyAsync(t => t.Id == id);
         }
 
-        public async Task<IActionResult> DeleteChampionshipTeams(int id)
+        public async Task<IActionResult> DeleteChampionshipTeams(int championshipId, int teamId)
         {
-            var championshipTeams = await _context.ChampionshipTeams.FindAsync(id);
-            if (championshipTeams == null)
+            var championshipTeams = await _context.ChampionshipTeams.Where(x=>x.TeamId == teamId).ToListAsync();
+            var championshipTeamToDelete = championshipTeams.Where(x => x.ChampionshipId == championshipId).FirstOrDefault();
+            if (championshipTeams == null || championshipTeamToDelete == null)
             {
                 return NotFound();
             }
 
-            _context.ChampionshipTeams.Remove(championshipTeams);
+            _context.ChampionshipTeams.Remove(championshipTeamToDelete);
             await _context.SaveChangesAsync();
 
             return NoContent();

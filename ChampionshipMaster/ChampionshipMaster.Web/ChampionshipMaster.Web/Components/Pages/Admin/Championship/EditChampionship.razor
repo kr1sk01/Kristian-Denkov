@@ -1,0 +1,43 @@
+﻿@page "/editchampionship/{championshipId}"
+
+@inherits ComponentBase
+
+@rendermode InteractiveServer
+
+<center><h1 style="color:white;">EditChampionship</h1></center>
+
+
+<RadzenDataGrid AllowFiltering="true"
+                FilterPopupRenderMode="PopupRenderMode.OnDemand"
+                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                AllowPaging="true"
+                PageSize="7"
+                TItem="TeamDto"
+                AllowSorting="true" Data="@teams" ColumnWidth="200px"
+                SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedTeam
+                RowClick="@(args => Update(args))"
+>
+
+    <HeaderTemplate>
+        <RadzenButton Style="margin-right:5px;" Icon="note_add" Text="Add" ButtonStyle="ButtonStyle.Primary" />
+        <RadzenButton 
+            Style="margin-right:5px;" 
+            Disabled=@disabledDelete 
+            Icon="delete_forever" 
+            Text="Remove" 
+            ButtonStyle="ButtonStyle.Secondary"
+                      Click="@(()=>Delete(championshipId, selectedTeam.FirstOrDefault().Id.ToString()))" />
+    </HeaderTemplate>
+    <Columns>
+        <RadzenDataGridColumn TItem="TeamDto" Property="Name" Title="Team">
+            <Template Context="team">
+                <ImageNameTemplate Image="@team.Logo"
+                                   Name="@team.Name"
+                                   ImageType="ImageNameTemplate.ImageTypeOptions.Team" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="TeamDto" Property="CreatedOn" Title="Created On" />
+        <RadzenDataGridColumn TItem="TeamDto" Property="CreatedByUsername" Title="Created By" />
+        <RadzenDataGridColumn TItem="TeamDto" Property="TeamTypeName" Title="Team Type" />
+    </Columns>
+</RadzenDataGrid>
