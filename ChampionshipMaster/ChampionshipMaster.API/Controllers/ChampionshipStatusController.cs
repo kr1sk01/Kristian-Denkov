@@ -17,7 +17,7 @@ public class ChampionshipStatusController : ControllerBase
 
     // GET: api/ChampionshipStatus
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ChampionshipStatus>>> Get()
+    public async Task<ActionResult<IEnumerable<ChampionshipStatusDto>>> Get()
     {
         var result = await _championshipStatusService.GetAllChampionshipStatuses();
         return Ok(result);
