@@ -16,13 +16,13 @@
         </div>
         <div class="team-info">
             <div class="team-row">
-                <img src="images/defaultTeam.png" alt="Blue Team Logo" class="team-logo" />
-                <div class="team-name">@(Game.BlueTeamName ?? "N/A")</div>
+                <img src="@blueTeamLogoPath" alt="Blue Team Logo" class="team-logo" />
+                <div class="team-name">@(Game.BlueTeam?.Name ?? "TBD")</div>
                 <div class="team-points">@(Game.BluePoints ?? (Game.GameStatusName == "Live" ? 0 : null))</div>
             </div>
             <div class="team-row">
-                <img src="images/defaultTeam.png" alt="Red Team Logo" class="team-logo" />
-                <div class="team-name">@(Game.RedTeamName ?? "N/A")</div>
+                <img src="@redTeamLogoPath" alt="Red Team Logo" class="team-logo" />
+                <div class="team-name">@(Game.RedTeam?.Name ?? "TBD")</div>
                 <div class="team-points">@(Game.RedPoints ?? (Game.GameStatusName == "Live" ? 0 : null))</div>
             </div>
         </div>

@@ -106,8 +106,8 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Game
                 return;
             }
 
-            game.BlueTeamName = teamDropDowns[0].SelectedItem.Adapt<TeamDto>().Name;
-            game.RedTeamName = teamDropDowns[1].SelectedItem.Adapt<TeamDto>().Name;
+            game.BlueTeam = teamDropDowns[0].SelectedItem.Adapt<TeamDto>();
+            game.RedTeam = teamDropDowns[1].SelectedItem.Adapt<TeamDto>();
             game.GameTypeName = gameTypeDropDown.SelectedItem.Adapt<GameTypeDto>().Name;
 
             if (!await tokenService.ValidateToken())

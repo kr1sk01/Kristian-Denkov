@@ -25,6 +25,7 @@ namespace ChampionshipMaster.API.Services
             services.AddTransient<IPlayerService, PlayerService>();
             services.AddTransient<JwtService>();
             services.AddTransient<IEmailSender, EmailSender>();
+            services.AddTransient<ILotService, LotService>();
         }
     }
 }

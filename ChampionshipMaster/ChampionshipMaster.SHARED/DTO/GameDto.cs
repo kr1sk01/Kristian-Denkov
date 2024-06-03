@@ -11,15 +11,17 @@
 
         public string? GameStatusName { get; set; }
 
-        public string? BlueTeamName { get; set; }
+        public TeamDto? BlueTeam { get; set; }
 
-        public string? RedTeamName { get; set; }
+        public TeamDto? RedTeam { get; set; }
 
         public int? BluePoints { get; set; }
 
         public int? RedPoints { get; set; }
 
         public string? WinnerName { get; set; }
+
+        public TeamDto? Winner { get; set; }
 
         public string? ChampionshipName { get; set; }
 

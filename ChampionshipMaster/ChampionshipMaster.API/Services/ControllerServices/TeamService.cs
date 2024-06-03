@@ -84,6 +84,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                     .Include(x => x.RedTeam)
                     .Include(x => x.BlueTeam)
                     .Include(x => x.Championship)
+                    .Include(x => x.Winner)
                 .ToListAsync();
 
             var dto = games.Adapt<List<GameDto>>();

@@ -34,12 +34,12 @@
 .game-details {
     display: flex;
     flex: 3;
-    border-top: 1px solid #38474e;
+    /*border-top: 1px solid #38474e;*/
 }
 
 .left-column {
     flex: 1;
-    border-right: 1px solid #38474e; /* Slightly darker shade of the gray background */
+    /*border-right: 1px solid #38474e;*/ /* Slightly darker shade of the gray background */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -64,7 +64,7 @@
 .team-row {
     display: flex;
     align-items: center;
-    border-bottom: 1px solid #38474e; /* Slightly darker shade of the gray background */
+    /*border-bottom: 1px solid #38474e;*/ /* Slightly darker shade of the gray background */
     padding: 0.5rem;
     flex: 1;
 }

@@ -34,11 +34,11 @@
             <div class="form-group half-width">
                 <RadzenLabel Style="color:white;" Text="Game Type" Class="form-label" />
                 <RadzenDropDown Data="gameTypes"
-                                @bind-Value="GameTypeId"
+                                @bind-Value="GameTypeName"
                                 Name="GameType"
                                 TextProperty="Name"
-                                ValueProperty="Id"
-                                TValue="int"
+                                ValueProperty="Name"
+                                TValue="string"
                                 Style="width: 100%;" />
                 <RadzenRequiredValidator Component="GameType" Text="Game Type is required" />
             </div>

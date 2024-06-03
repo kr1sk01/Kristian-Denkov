@@ -20,9 +20,17 @@
                 CellContextMenu="@OnCellContextMenu">
 
     <HeaderTemplate>
-        <RadzenButton Style="margin-right:5px;" Icon="note_add" Text="Create Team" ButtonStyle="ButtonStyle.Secondary" Click=@OpenCreateTeam />
-        <RadzenButton Style="margin-right:5px;" Disabled=@disabledEdit Click="@(()=> OpenEditTeam(selectedTeam.FirstOrDefault()!.Id.ToString()))" Icon="edit" Text="Edit" />
-    </HeaderTemplate>
+@*             <HeaderTemplate>
+        <RadzenButton Disabled=@(!isAdmin) Visible=@isAdmin Style="right: 5.5rem; float: right; position: absolute; margin-right: 0.5rem;" Icon="note_add" Text="Create" ButtonStyle="ButtonStyle.Secondary" Click="OpenChampionshipCreatePage" />
+        <RadzenButton Disabled=@disabledEdit Visible=@isAdmin Style="right: 0.5rem; float: right; position: absolute;" Icon="edit" Text="Edit" ButtonStyle="ButtonStyle.Primary" Click=@(()=> OpenEditDialog(selectedChampionship.FirstOrDefault().Id.ToString())) />
+        <RadzenButton Disabled=@disabledJoin Style="margin-right: 0.5rem;" Icon="groups" Text="Join" ButtonStyle="ButtonStyle.Success" Click=@(() => OpenJoinDialog(selectedChampionship.FirstOrDefault().Id.ToString(), selectedChampionship.FirstOrDefault().Name)) />
+    </HeaderTemplate> *@
+        
+
+        <RadzenButton Style="right: 5.5rem; float: right; position: absolute" Icon="note_add" Text="Create" ButtonStyle="ButtonStyle.Secondary" Click=@OpenCreateTeam />
+        <RadzenButton Style="right: 1rem; float: right; position: absolute;" Disabled=@disabledEdit Click="@(()=> OpenEditTeam(selectedTeam.FirstOrDefault()!.Id.ToString()))" Icon="edit" Text="Edit" />
+        <RadzenButton Style="margin-right: 0.5rem;" Icon="groups" Text="History" ButtonStyle="ButtonStyle.Success" />
+        </HeaderTemplate>
     <Columns>
         <RadzenDataGridColumn TItem="TeamDto" Property="Name" Title="Team">
             <Template Context="team">
@@ -36,35 +44,5 @@
         <RadzenDataGridColumn TItem="TeamDto" Property="TeamTypeName" Title="Team Type" />
     </Columns>
 </RadzenDataGrid>
-
-<RadzenDataList class="custom-datalist"
-                AllowVirtualization=@true
-                Style="height:550px;overflow:auto;"
-                WrapItems=@false AllowPaging=@false
-                Data="@teams" TItem="TeamDto">
-    <Template Context="team">
-        <TeamCard Team="team"></TeamCard>
-    </Template>
-</RadzenDataList>
-
-<style>
-    .custom-datalist {
-        --rz-datalist-background-color: var(--rz-base-background-color);
-        --rz-datalist-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.01);
-        --rz-datalist-padding: none;
-        --rz-datalist-border: var(--rz-border-base-700);
-        --rz-datalist-border-radius: var(--rz-border-radius);
-        --rz-datalist-item-shadow: none; /* Remove the shadow */
-        --rz-datalist-item-border: none;
-        --rz-datalist-item-vertical-margin: 0.5rem;
-        --rz-datalist-item-horizontal-margin: 0.5rem;
-        --rz-datalist-item-padding: 1rem;
-        --rz-datalist-item-background-color: var(--rz-base-background-color);
-    }
-
-        .custom-datalist .rz-datalist-data > li {
-            border-radius: 0; /* Remove border-radius */
-        }
-</style>
 
 

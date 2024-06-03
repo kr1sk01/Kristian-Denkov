@@ -41,10 +41,16 @@ namespace ChampionshipMaster.Web.Components.Pages.Admin.Championship
         {
             if (firstRender)
             {
-                var token = new JwtSecurityTokenHandler().ReadJwtToken(await tokenService.GetToken());
-                playerId = token.Claims.FirstOrDefault(x => x.Type == "nameid")?.Value ?? "";
-                role = token.Claims.FirstOrDefault(x => x.Type == "role")?.Value ?? "";
-                isAdmin = role == "admin";
+                if (await tokenService.ValidateToken(true))
+                {
+                    isAdmin = true;
+                }
+                else
+                {
+                    notifier.SendErrorNotification("Access denied!");
+                    notifier.SendWarningNotification("If you believe there is an error, please contact administrator!", 10);
+                    NavigationManager.NavigateTo("/");
+                }
                 await GetTeamsData();
                 selectedTeam = null;
                 StateHasChanged();

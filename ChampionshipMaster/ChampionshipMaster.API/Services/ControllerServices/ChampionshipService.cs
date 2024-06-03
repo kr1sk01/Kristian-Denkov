@@ -1,15 +1,19 @@
 ﻿using ChampionshipMaster.API.Interfaces;
 using ChampionshipMaster.DATA.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
+using System.Collections.Generic;
 
 namespace ChampionshipMaster.API.Services.ControllerServices
 {
     public class ChampionshipService : ControllerBase, IChampionshipService
     {
         private readonly ApplicationDbContext _context;
+        private readonly ILotService _lotService;
 
-        public ChampionshipService(ApplicationDbContext context)
+        public ChampionshipService(ApplicationDbContext context, ILotService lotService)
         {
             _context = context;
+            _lotService = lotService;
         }
 
         public async Task<List<ChampionshipDto>> GetAllChampionships()
@@ -192,7 +196,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
 
                 var existingChampionshipTeams = await _context.ChampionshipTeams.Where(x => x.ChampionshipId == championshipTeam.ChampionshipId).ToListAsync();
 
-                if (existingChampionshipTeams.Any(x => x.TeamId == teamToAdd.Id)) 
+                if (existingChampionshipTeams.Any(x => x.TeamId == teamToAdd.Id))
                 {
                     return BadRequest("This team is already registered for this championship");
                 }
@@ -289,9 +293,128 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             }
         }
 
-        public Task<IActionResult> DrawLot(int championshipId, StringValues authHeader)
+        public async Task<IActionResult> DrawLot(int championshipId, StringValues authHeader)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var tokenString = authHeader.ToString().Split(' ')[1];
+                var token = new JwtSecurityToken(tokenString);
+
+                var userId = token.Claims.First(x => x.Type == "nameid").Value;
+                var userRole = token.Claims.First(x => x.Type == "role").Value;
+                var championshipToEdit = await _context.Championships
+                    .Include(x => x.ChampionshipTeams)
+                        .ThenInclude(x => x.Team)
+                            .ThenInclude(x => x.TeamType)
+                        .FirstOrDefaultAsync(x => x.Id == championshipId);
+
+                if (userRole != "admin")
+                {
+                    return Forbid("You do not have permission for this operation!");
+                }
+
+                if (championshipToEdit == null)
+                {
+                    return NotFound("This championship doesn't exist!");
+                }
+
+                if (championshipToEdit.LotDate == null)
+                {
+                    return BadRequest("You cannot draw the lot because the Lot Date is not set!");
+                }
+
+                if (DateTime.UtcNow < championshipToEdit.LotDate.Value.ToUniversalTime())
+                {
+                    return BadRequest("You cannot draw the lot because the Lot Date hasn't arrived yet!");
+                }
+
+                if (championshipToEdit.ChampionshipTeams.Count < 2)
+                {
+                    return BadRequest("You cannot draw the lot when there are less than 2 teams registered!");
+                }
+
+                List<Team> teams = [.. championshipToEdit.ChampionshipTeams.Select(x => x.Team)];
+                var gameType = await _context.GameTypes.Include(x => x.TeamType).FirstAsync(x => x.TeamType!.Name == teams.First()!.TeamType!.Name);
+                var gameStatus = await _context.GameStatuses.FirstAsync(x => x.Name == "Coming");
+
+                int teamsCount = teams.Count;
+                int extraGames = _lotService.IsPowerOfTwo(teamsCount) ? 0 : teamsCount - _lotService.LargestPowerOfTwoLessThan(teamsCount);
+
+                _lotService.ShuffleTeams(teams);
+
+                int championshipRounds = _lotService.Rounds(teamsCount);
+                int games = teamsCount - 1;
+
+                for (int gameIndex = 1; gameIndex <= games; gameIndex++)
+                {
+                    int round = _lotService.GetRound(teamsCount, gameIndex);
+
+                    if (round == 1)
+                    {
+                        await _context.Games.AddAsync(new Game()
+                        {
+                            Name = $"{teams[0].Name} vs {teams[1].Name}",
+                            GameType = gameType,
+                            GameStatus = gameStatus,
+                            BlueTeam = teams[0],
+                            RedTeam = teams[1],
+                            Championship = championshipToEdit,
+                            CreatedBy = userId,
+                            CreatedOn = DateTime.UtcNow
+                        });
+
+                        teams.RemoveAt(0);
+                        teams.RemoveAt(0);
+                        await _context.SaveChangesAsync();
+                    }
+                    else
+                    {
+                        if (teams.Count == 0)
+                        {
+                            for (int i = 0; i < games - gameIndex; i++)
+                            {
+                                await _context.Games.AddAsync(new Game()
+                                {
+                                    GameType = gameType,
+                                    GameStatus = gameStatus,
+                                    Championship = championshipToEdit,
+                                    CreatedBy = userId,
+                                    CreatedOn = DateTime.UtcNow
+                                });
+
+                                await _context.SaveChangesAsync();
+                            }
+
+                            break;
+                        }
+                        else
+                        {
+                            await _context.Games.AddAsync(new Game()
+                            {
+                                Name = teams.Count == 2 ? $"{teams[0].Name} vs {teams[1].Name}" : null,
+                                GameType = gameType,
+                                GameStatus = gameStatus,
+                                BlueTeam = teams.Count == 2 ? teams[1] : null,
+                                RedTeam = teams[0],
+                                Championship = championshipToEdit,
+                                CreatedBy = userId,
+                                CreatedOn = DateTime.UtcNow
+                            });
+
+                            gameIndex++;
+                            teams.Clear();
+                            await _context.SaveChangesAsync();
+                        }
+                    }
+                }
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                await Console.Out.WriteLineAsync(ex.Message);
+                return BadRequest("Something went wrong!");
+            }
         }
     }
 }

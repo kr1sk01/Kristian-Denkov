@@ -2,7 +2,10 @@
 {
     public class TeamDto
     {
-
+        public override string? ToString()
+        {
+            return Name;
+        }
         public int Id { get; set; }
 
         public string? Name { get; set; }

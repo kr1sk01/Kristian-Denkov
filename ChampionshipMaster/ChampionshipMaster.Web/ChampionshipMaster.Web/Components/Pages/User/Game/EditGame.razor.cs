@@ -96,8 +96,8 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Game
                     if (maxPoints != null)
                     {
                         maxTeamPoints = maxPoints.Value;
-                        teams[0] = game.BlueTeamName!;
-                        teams[1] = game.RedTeamName!;
+                        teams[0] = game.BlueTeam!.Name!;
+                        teams[1] = game.RedTeam!.Name!;
                     }
 
                     StateHasChanged();
