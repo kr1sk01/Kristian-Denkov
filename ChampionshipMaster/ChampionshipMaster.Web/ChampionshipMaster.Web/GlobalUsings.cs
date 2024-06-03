@@ -5,3 +5,4 @@ global using Radzen.Blazor;
 global using ChampionshipMaster.Web.Services;
 global using Radzen;
 global using ChampionshipMaster.Web.Components.Shared;
+global using System.IdentityModel.Tokens.Jwt;

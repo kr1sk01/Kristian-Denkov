@@ -20,17 +20,10 @@
                 CellContextMenu="@OnCellContextMenu">
 
     <HeaderTemplate>
-@*             <HeaderTemplate>
-        <RadzenButton Disabled=@(!isAdmin) Visible=@isAdmin Style="right: 5.5rem; float: right; position: absolute; margin-right: 0.5rem;" Icon="note_add" Text="Create" ButtonStyle="ButtonStyle.Secondary" Click="OpenChampionshipCreatePage" />
-        <RadzenButton Disabled=@disabledEdit Visible=@isAdmin Style="right: 0.5rem; float: right; position: absolute;" Icon="edit" Text="Edit" ButtonStyle="ButtonStyle.Primary" Click=@(()=> OpenEditDialog(selectedChampionship.FirstOrDefault().Id.ToString())) />
-        <RadzenButton Disabled=@disabledJoin Style="margin-right: 0.5rem;" Icon="groups" Text="Join" ButtonStyle="ButtonStyle.Success" Click=@(() => OpenJoinDialog(selectedChampionship.FirstOrDefault().Id.ToString(), selectedChampionship.FirstOrDefault().Name)) />
-    </HeaderTemplate> *@
-        
-
-        <RadzenButton Style="right: 5.5rem; float: right; position: absolute" Icon="note_add" Text="Create" ButtonStyle="ButtonStyle.Secondary" Click=@OpenCreateTeam />
+        <RadzenButton Style="right: 6.5rem; float: right; position: absolute" Icon="note_add" Text="Create" ButtonStyle="ButtonStyle.Secondary" Click=@OpenCreateTeam />
         <RadzenButton Style="right: 1rem; float: right; position: absolute;" Disabled=@disabledEdit Click="@(()=> OpenEditTeam(selectedTeam.FirstOrDefault()!.Id.ToString()))" Icon="edit" Text="Edit" />
-        <RadzenButton Style="margin-right: 0.5rem;" Icon="groups" Text="History" ButtonStyle="ButtonStyle.Success" />
-        </HeaderTemplate>
+        <RadzenButton Style="margin-right: 0.5rem;" Icon="history" Text="History" ButtonStyle="ButtonStyle.Success" Disabled=@disabledEdit Click=@(()=> NavigationManager.NavigateTo($"/history/{selectedTeam.FirstOrDefault()!.Id.ToString()}")) />
+    </HeaderTemplate>
     <Columns>
         <RadzenDataGridColumn TItem="TeamDto" Property="Name" Title="Team">
             <Template Context="team">

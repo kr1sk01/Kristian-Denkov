@@ -4,5 +4,46 @@
 
 @rendermode InteractiveServer
 
+<center><h1 style="color:white;">@(id)'s history</h1></center>
 
-<center><h1 style="color:white;">Manage Teams</h1></center>
+<div class="teamHistoryContainer">
+    <div class="chart">
+        <RadzenChart>
+            <RadzenPieSeries Data="@data" ValueProperty="Count" CategoryProperty="Category" Fills="@fills">
+            </RadzenPieSeries>
+        </RadzenChart>
+    </div>
+
+    <div class="data-list">
+        <RadzenDataList class="custom-datalist"
+                        AllowVirtualization=@true
+                        WrapItems=@false
+                        AllowPaging=@false
+                        Data="@games"
+                        TItem="GameDto">
+            <Template Context="game">
+                <GameCard Game="@game" Style="max-height:250px;"></GameCard>
+            </Template>
+        </RadzenDataList>
+    </div>
+</div>
+
+<style>
+    .teamHistoryContainer {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        background-color: #38474e;
+    }
+
+    .chart {
+        flex: 1;
+        margin-right: 20px; /* Space between chart and data list */
+    }
+
+    .data-list {
+        flex: 1;
+        max-height: 400px;
+        overflow-y: auto;
+    }
+</style>
