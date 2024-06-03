@@ -10,21 +10,21 @@
 
 <div style="top:0px;left:0px;margin-bottom: 0px;position:sticky;z-index:1;box-shadow: 0 0 10px 0 rgba(0,0,0,0.5);">
     <RadzenMenu Visible=@isLogged Click="OnParentClicked">
-        <RadzenMenuItem Text="Home" Icon="home" Path="home" ></RadzenMenuItem>
-        <RadzenMenuItem Text="Championships" Icon="emoji_events" Path="championshipsmain" ></RadzenMenuItem>
-        <RadzenMenuItem Text="Teams" Path="manageteams" Icon="groups" ></RadzenMenuItem>
-        <RadzenMenuItem Text="Games" Path="managegames" Icon="sports_soccer" ></RadzenMenuItem>       
-        <RadzenMenuItem Icon="help_outline"  Text="Info" Path="info"></RadzenMenuItem>
+        <RadzenMenuItem Text="Home" Icon="home" Path="home"></RadzenMenuItem>
+        <RadzenMenuItem Text="Championships" Icon="emoji_events" Path="championshipsmain"></RadzenMenuItem>
+        <RadzenMenuItem Text="Teams" Path="manageteams" Icon="groups"></RadzenMenuItem>
+        <RadzenMenuItem Text="Games" Path="managegames" Icon="sports_soccer"></RadzenMenuItem>
+        <RadzenMenuItem Icon="help_outline" Text="Info" Path="info"></RadzenMenuItem>
         <RadzenMenuItem Icon="admin_panel_settings" Text="Admin Panel" Visible=@isAdmin Path="admin"></RadzenMenuItem>
-        <RadzenProfileMenu >
+        <RadzenProfileMenu>
             <Template>
-                <RadzenImage Path="@imagePath" AlternateText="Profile picture"  Style="margin-right: 10px; width: 32px;" />
+                <RadzenImage Path="@imagePath" AlternateText="Profile picture" Style="margin-right: 10px; width: 32px;" />
                 <span class="rz-navigation-item-text" style="flex:none;">@username</span>
             </Template>
             <ChildContent>
-                <RadzenMenuItem Icon="account_circle"  Text="Manage profile" Path="profile"></RadzenMenuItem>
-                <RadzenMenuItem Icon="lock"  Text="Change password" Path="changePassword"></RadzenMenuItem>
-                <RadzenMenuItem Icon="exit_to_app"  Text="Log Out" Click="()=> LogOut(username)"></RadzenMenuItem>
+                <RadzenMenuItem Icon="account_circle" Text="Manage profile" Path="profile"></RadzenMenuItem>
+                <RadzenMenuItem Icon="lock" Text="Change password" Path="changePassword"></RadzenMenuItem>
+                <RadzenMenuItem Icon="exit_to_app" Text="Log Out" Click="()=> LogOut(username)"></RadzenMenuItem>
             </ChildContent>
         </RadzenProfileMenu>
     </RadzenMenu>
@@ -42,15 +42,38 @@
 
     string base64EncodedImageData = string.Empty;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         LayoutStateService.OnLayoutRefresh += RefreshLayout;
     }
 
-    private void RefreshLayout()
+    private async void RefreshLayout()
     {
-        isLogged=true;
-        StateHasChanged();
+        if (await tokenService.ValidateToken())
+        {
+            var tokenString = await tokenService.GetToken();
+            if (tokenString != null)
+            {
+                var token = new JwtSecurityTokenHandler().ReadJwtToken(tokenString);
+                isAdmin = tokenService.ValidateTokenAdmin(token);
+                username = token.Claims.FirstOrDefault(x => x.Type == "unique_name")?.Value ?? "";
+                isLogged = true;
+                try
+                {
+                    var imageResult = await _localStorage.GetAsync<string>("playerAvatar");
+                    if (imageResult.Success && !string.IsNullOrEmpty(imageResult.Value))
+                    {
+                        base64EncodedImageData = imageResult.Value!;
+                        imagePath = $"data:image/jpeg;base64,{base64EncodedImageData}";
+                    }
+                    else
+                    {
+                        imagePath = "images/defaultAvatar.png";
+                    }
+                }catch (Exception ex){}
+                StateHasChanged();
+            }
+        }
     }
 
     public void Dispose()
@@ -60,39 +83,8 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
-        {                     
-            var tokenString = await tokenService.GetToken();
-            if (tokenString != null)
-            {
-                var token = new JwtSecurityTokenHandler().ReadJwtToken(tokenString);
-
-                if (await tokenService.ValidateToken())
-                {
-                    isAdmin = tokenService.ValidateTokenAdmin(token);
-                    username = token.Claims.FirstOrDefault(x => x.Type == "unique_name")?.Value ?? "";
-                    isLogged = true;
-                    try
-                    {
-                        var imageResult = await _localStorage.GetAsync<string>("playerAvatar");
-                        if (imageResult.Success && !string.IsNullOrEmpty(imageResult.Value))
-                        {
-                            base64EncodedImageData = imageResult.Value!;
-                            imagePath = $"data:image/jpeg;base64,{base64EncodedImageData}";
-                        }
-                        else
-                        {
-                            imagePath = "images/defaultAvatar.png";
-                        }
-
-                    }
-                    catch (Exception ex)
-                    {
-
-                    }
-
-                    StateHasChanged();
-                }
-            }
+        {
+            RefreshLayout();
         }
     }
     void OnParentClicked()
