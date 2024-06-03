@@ -84,7 +84,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                         .FirstAsync(x => x.Id == gameToEdit.ChampionshipId);
 
                         var teamsCount = _context.ChampionshipTeams.Where(x => x.ChampionshipId == championshipToEdit.Id).ToList().Count;
-                        var championshipGames = championshipToEdit.Games.ToList();
+                        var championshipGames = championshipToEdit.Games.OrderBy(x => x.Id).ToList();
                         int currentGameIndex = championshipGames.FindIndex(x => x.Id == gameToEdit.Id);
                         int nextGameIndex = _lotService.GetNextGameIndex(teamsCount, currentGameIndex + 1, out string side) - 1;
                         if (nextGameIndex > 0)
