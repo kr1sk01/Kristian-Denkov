@@ -4,30 +4,35 @@
 
 @rendermode InteractiveServer
 
-<center><h1 style="color:white;">@(id)'s history</h1></center>
 
-<div class="teamHistoryContainer">
-    <div class="chart">
-        <RadzenChart>
-            <RadzenPieSeries Data="@data" ValueProperty="Count" CategoryProperty="Category" Fills="@fills">
-            </RadzenPieSeries>
-        </RadzenChart>
-    </div>
+<div id="main" style="background-color:#38474e;">
+    <center><h1 style="padding-top:1%;color:white;background-color:#38474e;">@(id)'s history</h1></center>
 
-    <div class="data-list">
-        <RadzenDataList class="custom-datalist"
-                        AllowVirtualization=@true
-                        WrapItems=@false
-                        AllowPaging=@false
-                        Data="@games"
-                        TItem="GameDto">
-            <Template Context="game">
-                <GameCard Game="@game" Style="max-height:250px;"></GameCard>
-            </Template>
-        </RadzenDataList>
+    <div class="teamHistoryContainer">
+        <div class="chart">
+            <br />
+            <center><h2>21 games total played</h2></center>
+            <RadzenChart>
+                <RadzenPieSeries Data="@data" ValueProperty="Count" CategoryProperty="Category" Fills="@fills">
+                </RadzenPieSeries>
+            </RadzenChart>
+        </div>
+
+        <div class="data-list">
+            <br />
+            <RadzenDataList class="custom-datalist"
+                            AllowVirtualization=@true
+                            WrapItems=@false
+                            AllowPaging=@false
+                            Data="@games"
+                            TItem="GameDto">
+                <Template Context="game">
+                    <GameCard Game="@game" Style="max-height:250px;"></GameCard>
+                </Template>
+            </RadzenDataList>
+        </div>
     </div>
 </div>
-
 <style>
     .teamHistoryContainer {
         display: flex;
@@ -37,6 +42,7 @@
     }
 
     .chart {
+        margin-top: 5 %;
         flex: 1;
         margin-right: 20px; /* Space between chart and data list */
     }
@@ -45,5 +51,6 @@
         flex: 1;
         max-height: 400px;
         overflow-y: auto;
+        margin: 5% 0 5% 0;
     }
 </style>

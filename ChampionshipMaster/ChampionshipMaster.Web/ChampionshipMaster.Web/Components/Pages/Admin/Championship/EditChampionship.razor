@@ -8,6 +8,7 @@
 {
     <center><h1 style="color:white;">Edit Championship</h1></center>
 }
+<center>
     <RadzenTabs TabPosition="TabPosition.Top" RenderMode="TabRenderMode.Client">
         <Tabs>
             <RadzenTabsItem Text="Teams">
@@ -53,18 +54,19 @@
             </RadzenTabsItem>
             <RadzenTabsItem Text="Details">
                 <ChangeName @ref=@changeChampionshipName
-                            StateChange=@CheckButtonState /><br/>
+                            StateChange=@CheckButtonState /><br /><br />
                 <ImageUpload @ref=@changeChampionshipLogo
                              SetImageFor="@ImageUpload.SetImageForOptions.Championship"
                              StateChange=@CheckButtonState /><br/>
                 <RadzenDropDown Change="@(args => OnChangeDropDown(args))" @bind-Value=@currentChampionshipStatus Data=@(championshipStatuses.Select(x => x.Name).ToList()) Name="DropDownBindValue" /><br/>
                 <div>
+                    <br />
                     <RadzenButton Click=@OnSaveChangesClick Text="Save Changes" ButtonStyle="ButtonStyle.Primary" Disabled="@isValueInitial" Class="SaveButtonEdit" />
                 </div>
             </RadzenTabsItem>
             <RadzenTabsItem Text="Lot"></RadzenTabsItem>
         </Tabs>
     </RadzenTabs>
-    
+</center>
 
 
