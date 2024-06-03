@@ -21,6 +21,8 @@
 
         public string? WinnerName { get; set; }
 
+        public TeamDto? Winner { get; set; }
+
         public string? ChampionshipName { get; set; }
 
         public string? CreatedBy { get; set; }
