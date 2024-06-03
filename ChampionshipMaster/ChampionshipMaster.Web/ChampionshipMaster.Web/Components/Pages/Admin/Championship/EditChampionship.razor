@@ -7,8 +7,8 @@
 @if (isAdmin)
 {
     <center><h1 style="color:white;">Edit Championship</h1></center>
-
-    <RadzenTabs TabPosition="TabPosition.Top" RenderMode="TabRenderMode.Server">
+}
+    <RadzenTabs TabPosition="TabPosition.Top" RenderMode="TabRenderMode.Client">
         <Tabs>
             <RadzenTabsItem Text="Teams">
                 <RadzenDataGrid AllowFiltering="true"
@@ -51,10 +51,20 @@
                     </Columns>
                 </RadzenDataGrid>
             </RadzenTabsItem>
-            <RadzenTabsItem Text="Details"></RadzenTabsItem>
+            <RadzenTabsItem Text="Details">
+                <ChangeName @ref=@changeChampionshipName
+                            StateChange=@CheckButtonState /><br/>
+                <ImageUpload @ref=@changeChampionshipLogo
+                             SetImageFor="@ImageUpload.SetImageForOptions.Championship"
+                             StateChange=@CheckButtonState /><br/>
+                <RadzenDropDown Change="@(args => OnChangeDropDown(args))" @bind-Value=@currentChampionshipStatus Data=@(championshipStatuses.Select(x => x.Name).ToList()) Name="DropDownBindValue" /><br/>
+                <div>
+                    <RadzenButton Click=@OnSaveChangesClick Text="Save Changes" ButtonStyle="ButtonStyle.Primary" Disabled="@isValueInitial" Class="SaveButtonEdit" />
+                </div>
+            </RadzenTabsItem>
             <RadzenTabsItem Text="Lot"></RadzenTabsItem>
         </Tabs>
     </RadzenTabs>
     
-}
+
 
