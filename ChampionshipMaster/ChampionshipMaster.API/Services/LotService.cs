@@ -71,17 +71,17 @@ namespace ChampionshipMaster.API.Services
         {
             if (IsPowerOfTwo(teamsCount))
             {
-                int iteration = 1;
+                int round = 1;
                 for (int i = teamsCount / 2; i < teamsCount; i += (teamsCount - i) / 2)
                 {
                     if (gameIndex <= i)
                     {
-                        return iteration;
+                        return round;
                     }
-                    iteration++;
+                    round++;
                 }
 
-                return 1;
+                return 0;
             }
             else
             {
@@ -89,18 +89,76 @@ namespace ChampionshipMaster.API.Services
 
                 if (gameIndex <= teamsCount - p) { return 1; }
 
-                int iteration = 2;
+                int round = 2;
                 for (int i = p / 2; i < p; i += (p - i) / 2)
                 {
-                    if (gameIndex <= p + i)
+                    if (gameIndex <= (teamsCount - p) + i)
                     {
-                        return iteration;
+                        return round;
                     }
-                    iteration++;
+                    round++;
                 }
 
-                return 1;
+                return 0;
             }
+        }
+
+        public int GamesInRound(int teamsCount, int round)
+        {
+            if (IsPowerOfTwo(teamsCount))
+            {
+                int currentRound = 1;
+                for (int i = teamsCount / 2; i < teamsCount; i += (teamsCount - i) / 2)
+                {
+                    if (currentRound == round) { return teamsCount - i; }
+                    currentRound++;
+                }
+
+                return 0;
+            }
+            else
+            {
+                int p = LargestPowerOfTwoLessThan(teamsCount);
+
+                if (round == 1) { return teamsCount - p; }
+
+                int currentRound = 2;
+                for (int i = p / 2; i < p; i += (p - i) / 2)
+                {
+                    if (currentRound == round) { return p - i; }
+                    currentRound++;
+                }
+
+                return 0;
+            }
+        }
+
+        public int GetNextGameIndex(int teamsCount, int gameIndex, out string side)
+        {
+            side = "";
+            int round = GetRound(teamsCount, gameIndex);
+
+            if (Rounds(teamsCount) <= round) { return 0; }
+
+            int games = 0;
+            for (int i = 1; i <= round + 1; i++)
+            {
+                int gamesInRound = GamesInRound(teamsCount, i);
+                games += gamesInRound;
+
+                if (gameIndex > gamesInRound)
+                {
+                    gameIndex -= gamesInRound;
+                    
+                }
+                else
+                {
+                    side = (gameIndex % 2) == 0 ? "red" : "blue";
+                    return games + (gameIndex / 2) + (gameIndex % 2);
+                }
+            }
+
+            return 0;
         }
     }
 }

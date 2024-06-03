@@ -11,12 +11,14 @@ namespace ChampionshipMaster.API.Services.ControllerServices
         private readonly ApplicationDbContext _context;
         private readonly UserManager<Player> _userManager;
         private readonly IEmailSender _emailSender;
+        private readonly ILotService _lotService;
 
-        public GameService(ApplicationDbContext context, IEmailSender emailSender, UserManager<Player> userManager)
+        public GameService(ApplicationDbContext context, IEmailSender emailSender, UserManager<Player> userManager, ILotService lotService)
         {
             _context = context;
             _userManager = userManager;
             _emailSender = emailSender;
+            _lotService = lotService;
         }
 
         public async Task<IActionResult> DeleteGame(int id)
@@ -63,14 +65,50 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                     gameToEdit.Name = game.Name;
                 }
 
-                if (game.GameStatusName != null)
-                {
-                    gameToEdit.GameStatus = await _context.GameStatuses.FirstAsync(x => x.Name == game.GameStatusName);
-                }
-
                 if (game.WinnerName != null)
                 {
                     gameToEdit.Winner = await _context.Teams.FirstAsync(x => x.Name == game.WinnerName);
+                }
+
+                if (game.GameStatusName != null)
+                {
+                    gameToEdit.GameStatus = await _context.GameStatuses.FirstAsync(x => x.Name == game.GameStatusName);
+
+                    if (gameToEdit.GameStatus.Name == "Finished" && gameToEdit.ChampionshipId != null)
+                    {
+                        var championshipToEdit = await _context.Championships
+                        .Include(x => x.Games)
+                            .ThenInclude(x => x.BlueTeam)
+                        .Include(x => x.Games)
+                            .ThenInclude(x => x.RedTeam)
+                        .FirstAsync(x => x.Id == gameToEdit.ChampionshipId);
+
+                        var teamsCount = _context.ChampionshipTeams.Where(x => x.ChampionshipId == championshipToEdit.Id).ToList().Count;
+                        var championshipGames = championshipToEdit.Games.ToList();
+                        int currentGameIndex = championshipGames.FindIndex(x => x.Id == gameToEdit.Id);
+                        int nextGameIndex = _lotService.GetNextGameIndex(teamsCount, currentGameIndex + 1, out string side) - 1;
+                        if (nextGameIndex > 0)
+                        {
+                            var nextGame = championshipGames[nextGameIndex];
+
+                            if (side == "blue")
+                            {
+                                nextGame.BlueTeam = gameToEdit.Winner;
+                            }
+                            if (side == "red")
+                            {
+                                nextGame.RedTeam = gameToEdit.Winner;
+                            }
+
+                            nextGame.Name = $"{nextGame.BlueTeam?.Name} vs {nextGame.RedTeam?.Name}";
+
+                            _context.Entry(nextGame).State = EntityState.Modified;
+                        }
+                        else
+                        {
+                            championshipToEdit.Winner = gameToEdit.Winner;
+                        }
+                    }
                 }
 
                 if (game.BluePoints != null)
