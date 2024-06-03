@@ -1,5 +1,7 @@
 ﻿using ChampionshipMaster.DATA.Models;
 using ChampionshipMaster.Web.Components.Pages.User.Championship;
+using ChampionshipMaster.Web.Components.Pages.User.Team;
+using ChampionshipMaster.Web.Services;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using System.Data;
 using System.IdentityModel.Tokens.Jwt;
@@ -20,6 +22,7 @@ namespace ChampionshipMaster.Web.Components.Pages.Admin.Championship
         [Inject] ContextMenuService ContextMenuService { get; set; } = default!;
         [Inject] DialogService DialogService { get; set; } = default!;
         [Inject] INotifier notifier { get; set; } = default!;
+        [Inject] IImageService imageService { get; set; } = default!;
 
 
         [Parameter] public string? championshipId { get; set; }
@@ -27,13 +30,20 @@ namespace ChampionshipMaster.Web.Components.Pages.Admin.Championship
         RadzenDataGrid<TeamDto> datagrid = default!;
 
         public ChampionshipDto? currentChampionship;
-
+        List<ChampionshipStatusDto> championshipStatuses = new();
+        string? currentChampionshipStatus;
+        string? initialChampionshipStatus;
         IList<TeamDto>? selectedTeam;
         private List<TeamDto>? teams;
         private List<TeamDto>? teamToShow;
         string playerId = "";
         private string role = "";
+        string requestUrl = "api/Championship";
         bool isAdmin = false;
+
+        bool isValueInitial = true;
+        ImageUpload changeChampionshipLogo;
+        ChangeName changeChampionshipName;
 
         private bool disabledDelete = true;
 
@@ -60,16 +70,30 @@ namespace ChampionshipMaster.Web.Components.Pages.Admin.Championship
         {
             using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {await tokenService.GetToken()}");
-            var test = await client.GetFromJsonAsync<ChampionshipDto>($"api/Championship/{championshipId}");
-            if(test == null)
+            var championshipResult = await client.GetFromJsonAsync<ChampionshipDto>($"api/Championship/{championshipId}");
+            if(championshipResult == null)
             {
+                NavigationManager.NavigateTo("/championshipsmain");
                 notifier.SendWarningNotification("Coudn't retreive information about this championship!");
             }
 
-            var test2 = test.Teams.ToList();
-            currentChampionship = test;
+            var statusesResult = await client.GetFromJsonAsync<List<ChampionshipStatusDto>>($"api/ChampionshipStatus");
+            if (statusesResult == null)
+            {
+                NavigationManager.NavigateTo("/championshipsmain");
+                notifier.SendWarningNotification("Coudn't retreive championship statuses!");
+            }
 
-            teams = test2!;
+            currentChampionship = championshipResult;
+            changeChampionshipName.SetInitialValue(currentChampionship!.Name!);
+            changeChampionshipLogo.UpdateDisplayedImagePath(Convert.ToBase64String(currentChampionship.Logo ?? new byte[0]));
+            requestUrl += $"?championshipId={championshipResult!.Id}";
+
+            teams = championshipResult!.Teams.ToList();
+            championshipStatuses = statusesResult!;
+
+            initialChampionshipStatus = currentChampionship.ChampionshipStatusName;
+            currentChampionshipStatus = initialChampionshipStatus;
 
             int i = 0;
             
@@ -150,6 +174,48 @@ namespace ChampionshipMaster.Web.Components.Pages.Admin.Championship
         {
             await GetTeamsData();
             await datagrid.Reload();
+        }
+
+        public async Task OnSaveChangesClick()
+        {
+            if (!await tokenService.ValidateToken())
+            {
+                notifier.SendInformationalNotification("You're not logged in or your session has expired");
+                NavigationManager.NavigateTo("/login");
+            }
+
+            var token = await tokenService.GetToken();
+            using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+            var request = await client.PutAsJsonAsync(requestUrl, currentChampionship);
+            var body = await request.Content.ReadAsStringAsync();
+
+            if (request.IsSuccessStatusCode)
+            {
+                notifier.SendSuccessNotification(body);
+                NavigationManager.NavigateTo("/manageteams");
+            }
+            else
+            {
+                notifier.SendErrorNotification(body);
+            }
+        }
+
+        public async Task CheckButtonState()
+        {
+            isValueInitial = changeChampionshipName.IsValueInitial 
+                            && changeChampionshipLogo.IsValueInitial
+                            && (initialChampionshipStatus == currentChampionshipStatus || currentChampionshipStatus == null);
+
+            currentChampionship!.Name = changeChampionshipName.IsValueInitial ? null : changeChampionshipName.CurrentValue;
+            currentChampionship!.Logo = changeChampionshipLogo.IsValueInitial ? null : Convert.FromBase64String(await imageService.ConvertToBase64String(changeChampionshipLogo.UploadedImage!));
+        }
+
+        public void OnChangeDropDown(object args)
+        {
+            currentChampionship!.ChampionshipStatusName = championshipStatuses.FirstOrDefault(x => x.Name == args.ToString())!.Name;
+            CheckButtonState();
         }
     }
 }
