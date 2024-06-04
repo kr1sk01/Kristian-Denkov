@@ -3,6 +3,7 @@ using MailKit.Net.Smtp;
 using Microsoft.Identity.Client;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using MimeKit;
+using System.Text;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ChampionshipMaster.API.Services
@@ -99,6 +100,26 @@ namespace ChampionshipMaster.API.Services
                 .Replace("[Red Points]", redPoints.ToString());
 
             await SendEmailAsync(userEmail, $"Game finished", body);
+        }
+
+        public async Task SendAddedToTeamEmail(string userEmail, string userName, string teamName, string createdBy, string teamType, List<string> players)
+        {
+            var templatePath = "Services/EmailTemplates/AddedToTeamTemplate.html";
+            var template = GetEmailTemplate(templatePath);
+
+            StringBuilder playersList = new StringBuilder();
+            foreach (string player in players)
+            {
+                playersList.AppendLine($"<li>{player}</li>");
+            }
+
+            string body = template.Replace("{{players}}", playersList.ToString())
+                .Replace("[User Name]", userName)
+                .Replace("[Team Name]", teamName)
+                .Replace("[CreatedBy Name]", createdBy)
+                .Replace("[Team Type]", teamType);
+
+            await SendEmailAsync(userEmail, "Added to Team", body);
         }
     }
 }

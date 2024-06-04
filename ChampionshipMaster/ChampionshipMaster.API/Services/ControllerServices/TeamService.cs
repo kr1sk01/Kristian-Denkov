@@ -12,11 +12,13 @@ namespace ChampionshipMaster.API.Services.ControllerServices
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<Player> _userManager;
+        private readonly IEmailSender _emailSender;
 
-        public TeamService(ApplicationDbContext context, UserManager<Player> userManager)
+        public TeamService(ApplicationDbContext context, UserManager<Player> userManager, IEmailSender emailSender)
         {
             _context = context;
             _userManager = userManager;
+            _emailSender = emailSender;
         }
 
         public async Task<IActionResult> DeleteTeam(int id)
@@ -356,8 +358,9 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                 var token = new JwtSecurityToken(tokenString);
 
                 var userId = token.Claims.First(x => x.Type == "nameid").Value;
+                var userName = token.Claims.First(x => x.Type == "unique_name").Value;
                 var userRole = token.Claims.First(x => x.Type == "role").Value;
-                var teamToEdit = await _context.Teams.FirstOrDefaultAsync(x => x.Id == int.Parse(teamId));
+                var teamToEdit = await _context.Teams.Include(x => x.TeamType).FirstOrDefaultAsync(x => x.Id == int.Parse(teamId));
 
                 if (teamToEdit == null)
                 {
@@ -406,6 +409,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                             continue;
 
                         var playerToAdd = await _userManager.FindByIdAsync(player.Id!);
+                        if (playerToAdd == null) { continue; }
 
                         teamPlayer = new TeamPlayers
                         {
@@ -415,6 +419,9 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                             CreatedOn = DateTime.UtcNow,
                         };
                         await _context.TeamPlayers.AddAsync(teamPlayer);
+
+                        var playersList = team.Players.Select(x => x.Name ?? "").ToList();
+                        await _emailSender.SendAddedToTeamEmail(playerToAdd.Email!, playerToAdd.UserName!, teamToEdit.Name!, userName, teamToEdit.TeamType?.Name!, playersList);
                     }
                 }
 
