@@ -86,6 +86,10 @@ namespace ChampionshipMaster.Web.Components.Pages.Admin.Championship
             }
 
             currentChampionship = championshipResult!;
+
+            currentChampionship.LotDate = currentChampionship.LotDate?.ToLocalTime();
+            currentChampionship.Date = currentChampionship.Date?.ToLocalTime();
+
             changeChampionshipName.SetInitialValue(currentChampionship!.Name!);
             changeChampionshipLogo.UpdateDisplayedImagePath(Convert.ToBase64String(currentChampionship.Logo ?? new byte[0]));
             requestUrl += $"?championshipId={championshipResult!.Id}";

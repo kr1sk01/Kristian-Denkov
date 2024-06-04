@@ -263,8 +263,8 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                     championshipToEdit.ChampionshipStatus = await _context.ChampionshipStatuses.FirstAsync(x => x.Name == championship.ChampionshipStatusName);
                 }
 
-                championshipToEdit.LotDate = championship.LotDate;
-                championshipToEdit.Date = championship.Date;
+                championshipToEdit.LotDate = championship.LotDate?.ToUniversalTime();
+                championshipToEdit.Date = championship.Date?.ToUniversalTime();
 
                 if (championship.WinnerName != null && championship.WinnerName != championshipToEdit.Winner?.Name)
                 {
