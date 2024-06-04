@@ -14,7 +14,7 @@
 {
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="10px" class="mt-2 mb-4">
         <RadzenButton Style="background-color:darkslategray"
-                      ButtonStyle="ButtonStyle.Success"
+                      ButtonStyle="Radzen.ButtonStyle.Success"
                       Icon="add_circle_outline"
                       Text="Add New Game Status"
                       Click="@InsertRow"
@@ -47,17 +47,17 @@
 
             <RadzenDataGridColumn Width="1%" TItem="GameType" Context="GameType" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Frozen="true" FrozenPosition="FrozenColumnPosition.Right">
                 <Template Context="GameType">
-                    <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@(args => EditRow(GameType))" @onclick:stopPropagation="true">
+                    <RadzenButton Icon="edit" ButtonStyle="Radzen.ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@(args => EditRow(GameType))" @onclick:stopPropagation="true">
                     </RadzenButton>
-                    <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@(args => DeleteRow(GameType))" @onclick:stopPropagation="true">
+                    <RadzenButton ButtonStyle="Radzen.ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@(args => DeleteRow(GameType))" @onclick:stopPropagation="true">
                     </RadzenButton>
                 </Template>
                 <EditTemplate Context="GameType">
-                    <RadzenButton Icon="check" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@((args) => SaveRow(GameType))">
+                    <RadzenButton Icon="check" ButtonStyle="Radzen.ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@((args) => SaveRow(GameType))">
                     </RadzenButton>
-                    <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@((args) => CancelEdit(GameType))">
+                    <RadzenButton Icon="close" ButtonStyle="Radzen.ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@((args) => CancelEdit(GameType))">
                     </RadzenButton>
-                    <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@(args => DeleteRow(GameType))">
+                    <RadzenButton ButtonStyle="Radzen.ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@(args => DeleteRow(GameType))">
                     </RadzenButton>
                 </EditTemplate>
             </RadzenDataGridColumn>

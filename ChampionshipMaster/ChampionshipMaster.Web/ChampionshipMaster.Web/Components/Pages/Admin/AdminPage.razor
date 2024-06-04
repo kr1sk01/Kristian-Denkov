@@ -7,11 +7,11 @@
 @if (isAdmin)
 {
     <center><h1 style="color:white;">Admin Panel</h1></center>
-    <RadzenButton Click="@(() => NavigationManager.NavigateTo("/GameStatusMain"))" Text="Manage Game Statuses" ButtonStyle="ButtonStyle.Secondary" />
-    <RadzenButton Click="@(() => NavigationManager.NavigateTo("/GameTypeMain"))" Text="Manage Game Types" ButtonStyle="ButtonStyle.Secondary" />
-    <RadzenButton Click="@(() => NavigationManager.NavigateTo("/TeamTypeMain"))" Text="Manage Team Types" ButtonStyle="ButtonStyle.Secondary" />
-    <RadzenButton Click="@(() => NavigationManager.NavigateTo("/ChampionshipTypesMain"))" Text="Manage Championship Types" ButtonStyle="ButtonStyle.Secondary" />
-    <RadzenButton Click="@(() => NavigationManager.NavigateTo("/ChampionshipStatusMain"))" Text="Manage Championship Statuses" ButtonStyle="ButtonStyle.Secondary" />
+    <RadzenButton Click="@(() => NavigationManager.NavigateTo("/GameStatusMain"))" Text="Manage Game Statuses" ButtonStyle="Radzen.ButtonStyle.Secondary" />
+    <RadzenButton Click="@(() => NavigationManager.NavigateTo("/GameTypeMain"))" Text="Manage Game Types" ButtonStyle="Radzen.ButtonStyle.Secondary" />
+    <RadzenButton Click="@(() => NavigationManager.NavigateTo("/TeamTypeMain"))" Text="Manage Team Types" ButtonStyle="Radzen.ButtonStyle.Secondary" />
+    <RadzenButton Click="@(() => NavigationManager.NavigateTo("/ChampionshipTypesMain"))" Text="Manage Championship Types" ButtonStyle="Radzen.ButtonStyle.Secondary" />
+    <RadzenButton Click="@(() => NavigationManager.NavigateTo("/ChampionshipStatusMain"))" Text="Manage Championship Statuses" ButtonStyle="Radzen.ButtonStyle.Secondary" />
 }
 
 @code {

@@ -24,7 +24,7 @@ public class Program
         builder.Services.AddTransient<INotifier, Notifier>();
         builder.Services.AddTransient<IImageService, ImageService>();
         builder.Services.AddScoped<LayoutStateService>();
-
+        builder.Services.AddBootstrapBlazor();
         builder.Services.AddHttpClient(builder.Configuration["ClientName"]!, client =>
         {
             client.BaseAddress = new Uri(builder.Configuration["ApiBaseAddress"]!);
