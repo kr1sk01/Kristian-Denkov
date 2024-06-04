@@ -4,10 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game finished</title>
+    <link rel="stylesheet" href="GameFinishedTemplate.css">
 </head>
 <body>
-    <h1>[Game Name] has finished</h1>
-    <h2>Final score:</h2>
-    <h2>[Blue Team] [Blue Points] - [Red Points] [Red Team]</h2>
+    <div class="container">
+        <div class="header">
+            <h1 class="appname">Championship Master</h1>
+        </div>
+        <h1>[Game Name] has finished</h1>
+        <h2>Final score:</h2>
+        <div class="score">
+            <span class="team blue-team">[Blue Team] [Blue Points]</span>
+            <span> - </span>
+            <span class="team red-team">[Red Points] [Red Team]</span>
+        </div>
+    </div>
 </body>
 </html>
