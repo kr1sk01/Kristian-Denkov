@@ -110,6 +110,12 @@ namespace ChampionshipMaster.API.Services
                 {
                     if (!await context.ChampionshipStatuses.AnyAsync(x => x.Id == item.Id))
                         await context.ChampionshipStatuses.AddAsync(item);
+                    else
+                    {
+                        var statusToChange = await context.ChampionshipStatuses.FirstAsync(x => x.Id == item.Id);
+                        statusToChange.Name = item.Name;
+                        context.Entry(statusToChange).State = EntityState.Modified;
+                    }
                 }
 
             await context.SaveChangesAsync();
