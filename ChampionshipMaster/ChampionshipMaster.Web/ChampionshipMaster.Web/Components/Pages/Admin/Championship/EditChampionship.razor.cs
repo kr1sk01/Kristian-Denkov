@@ -29,23 +29,24 @@ namespace ChampionshipMaster.Web.Components.Pages.Admin.Championship
 
         RadzenDataGrid<TeamDto> datagrid = default!;
 
-        public ChampionshipDto? currentChampionship;
+        public ChampionshipDto currentChampionship = new();
         List<ChampionshipStatusDto> championshipStatuses = new();
         string? currentChampionshipStatus;
         string? initialChampionshipStatus;
         IList<TeamDto>? selectedTeam;
         private List<TeamDto>? teams;
-        private List<TeamDto>? teamToShow;
-        string playerId = "";
-        private string role = "";
         string requestUrl = "api/Championship";
         bool isAdmin = false;
+
+        DateTime? initialLotDate;
+        DateTime? initialDate;
 
         bool isValueInitial = true;
         ImageUpload changeChampionshipLogo;
         ChangeName changeChampionshipName;
 
         private bool disabledDelete = true;
+        string? dateDisabledText = null;
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -84,7 +85,7 @@ namespace ChampionshipMaster.Web.Components.Pages.Admin.Championship
                 notifier.SendWarningNotification("Coudn't retreive championship statuses!");
             }
 
-            currentChampionship = championshipResult;
+            currentChampionship = championshipResult!;
             changeChampionshipName.SetInitialValue(currentChampionship!.Name!);
             changeChampionshipLogo.UpdateDisplayedImagePath(Convert.ToBase64String(currentChampionship.Logo ?? new byte[0]));
             requestUrl += $"?championshipId={championshipResult!.Id}";
@@ -94,6 +95,8 @@ namespace ChampionshipMaster.Web.Components.Pages.Admin.Championship
 
             initialChampionshipStatus = currentChampionship.ChampionshipStatusName;
             currentChampionshipStatus = initialChampionshipStatus;
+            initialLotDate = championshipResult.LotDate;
+            initialDate = championshipResult.Date;
 
             int i = 0;
             
@@ -150,7 +153,7 @@ namespace ChampionshipMaster.Web.Components.Pages.Admin.Championship
                 if (teams != null)
                     teams.RemoveAll(x => x.Id == int.Parse(teamId));
 
-                RefreshData();
+                await RefreshData();
             }
             else
             {
@@ -206,16 +209,23 @@ namespace ChampionshipMaster.Web.Components.Pages.Admin.Championship
         {
             isValueInitial = changeChampionshipName.IsValueInitial 
                             && changeChampionshipLogo.IsValueInitial
-                            && (initialChampionshipStatus == currentChampionshipStatus || currentChampionshipStatus == null);
+                            && (initialChampionshipStatus == currentChampionshipStatus || currentChampionshipStatus == null)
+                            && (currentChampionship.LotDate == initialLotDate && currentChampionship.Date == initialDate);
 
             currentChampionship!.Name = changeChampionshipName.IsValueInitial ? null : changeChampionshipName.CurrentValue;
             currentChampionship!.Logo = changeChampionshipLogo.IsValueInitial ? null : Convert.FromBase64String(await imageService.ConvertToBase64String(changeChampionshipLogo.UploadedImage!));
         }
 
-        public void OnChangeDropDown(object args)
+        public async Task OnChangeDropDown(object args)
         {
             currentChampionship!.ChampionshipStatusName = championshipStatuses.FirstOrDefault(x => x.Name == args.ToString())!.Name;
-            CheckButtonState();
+            await CheckButtonState();
+        }
+
+        public void DateRender(DateRenderEventArgs args)
+        {
+            if (currentChampionship != null && currentChampionship.LotDate != null)
+                args.Disabled = args.Disabled || args.Date < currentChampionship.LotDate;
         }
     }
 }

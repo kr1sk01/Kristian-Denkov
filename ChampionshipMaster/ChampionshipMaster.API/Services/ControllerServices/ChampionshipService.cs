@@ -101,12 +101,12 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                 {
                     Name = championship.Name,
                     ChampionshipType = await _context.ChampionshipTypes.FirstAsync(x => x.Name == championship.ChampionshipTypeName),
-                    ChampionshipStatus = await _context.ChampionshipStatuses.FirstAsync(x => x.Name == championship.ChampionshipStatusName),
+                    ChampionshipStatus = await _context.ChampionshipStatuses.FirstAsync(x => x.Name == "Open"),
                     GameType = await _context.GameTypes.FirstAsync(x => x.Id == championship.GameType!.Id),
-                    LotDate = championship.LotDate.Value.ToUniversalTime(),
-                    Date = championship.Date.Value.ToUniversalTime(),
-                    ModifiedBy = userId,
-                    ModifiedOn = DateTime.UtcNow
+                    LotDate = championship.LotDate?.ToUniversalTime(),
+                    Date = championship.Date?.ToUniversalTime(),
+                    CreatedBy = userId,
+                    CreatedOn = DateTime.UtcNow
                 };
 
                 await _context.Championships.AddAsync(newChampionship);
@@ -263,19 +263,13 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                     championshipToEdit.ChampionshipStatus = await _context.ChampionshipStatuses.FirstAsync(x => x.Name == championship.ChampionshipStatusName);
                 }
 
-                if (championship.LotDate != null)
-                {
-                    championshipToEdit.LotDate = championship.LotDate;
-                }
-
-                if (championship.Date != null)
-                {
-                    championshipToEdit.Date = championship.Date;
-                }
+                championshipToEdit.LotDate = championship.LotDate;
+                championshipToEdit.Date = championship.Date;
 
                 if (championship.WinnerName != null && championship.WinnerName != championshipToEdit.Winner?.Name)
                 {
                     championshipToEdit.Winner = await _context.Teams.FirstAsync(x => x.Name == championship.WinnerName);
+                    championshipToEdit.ChampionshipStatus = await _context.ChampionshipStatuses.FirstAsync(x => x.Name == "Finished");
                 }
 
                 championshipToEdit.ModifiedBy = userId;

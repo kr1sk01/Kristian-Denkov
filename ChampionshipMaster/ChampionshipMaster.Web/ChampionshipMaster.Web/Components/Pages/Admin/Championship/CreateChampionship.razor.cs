@@ -31,7 +31,7 @@ public partial class CreateChampionship : ComponentBase
     public List<ChampionshipTypeDto>? championshipTypes = new List<ChampionshipTypeDto>();
     public List<GameTypeDto>? gameTypes = new List<GameTypeDto>();
     //Champpaddd
-    public ChampionshipDto? championshipToAdd = new ChampionshipDto { ChampionshipStatusName = "Coming" };
+    public ChampionshipDto? championshipToAdd = new ();
     //Choosen data
     public GameTypeDto? selectedGameType;
     public ChampionshipTypeDto? selectedChampionshipType;

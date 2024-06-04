@@ -129,7 +129,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                         {
                             foreach (var teamPlayer in teamPlayers)
                             {
-                                await _emailSender.SendGameFinishedEmail(teamPlayer.Player!.Email!, gameToEdit.Name!, gameToEdit.BlueTeam!.Name!, gameToEdit.BluePoints ?? 0, gameToEdit.RedTeam!.Name!, gameToEdit.RedPoints ?? 0);
+                                await _emailSender.SendGameFinishedEmail(teamPlayer.Player!.Email!, gameToEdit.Name!, gameToEdit.BlueTeam!.Name!, gameToEdit.BluePoints ?? 0, gameToEdit.RedTeam!.Name!, gameToEdit.RedPoints ?? 0).ConfigureAwait(false);
                             }
                         }
                         

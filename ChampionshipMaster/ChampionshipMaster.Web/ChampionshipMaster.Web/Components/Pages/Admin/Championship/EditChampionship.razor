@@ -53,12 +53,48 @@
                 </RadzenDataGrid>
             </RadzenTabsItem>
             <RadzenTabsItem Text="Details">
+                <RadzenLabel Style="color:white;" Text="Name" Class="form-label" />
                 <ChangeName @ref=@changeChampionshipName
                             StateChange=@CheckButtonState /><br /><br />
+                <RadzenLabel Style="color:white;" Text="Logo" Class="form-label" />
                 <ImageUpload @ref=@changeChampionshipLogo
                              SetImageFor="@ImageUpload.SetImageForOptions.Championship"
                              StateChange=@CheckButtonState /><br/>
+                <RadzenLabel Style="color:white;" Text="Status" Class="form-label" />
                 <RadzenDropDown Change="@(args => OnChangeDropDown(args))" @bind-Value=@currentChampionshipStatus Data=@(championshipStatuses.Select(x => x.Name).ToList()) Name="DropDownBindValue" /><br/>
+                <div class="form-row">
+                    <div class="form-group half-width">
+                        <RadzenLabel Style="color:white;" Text="Lot Date" Class="form-label" />
+                        <RadzenDatePicker Kind="DateTimeKind.Local"
+                                          Name="LotDate"
+                                          ShowTime="true"
+                                          DateFormat="dd/MM/yyyy HH:mm"
+                                          @bind-Value="currentChampionship.LotDate"
+                                          Style="width: 100%;"
+                                          Disabled="@(currentChampionship.Games.Count > 0)"
+                                          @bind-Value:after="CheckButtonState" />
+                        @if (currentChampionship.Games.Count > 0)
+                        {
+                            <label style="color:red">*Lot Date cannot be changed since the Lot has already been drawn.</label>
+                        }
+                    </div>
+                    <div class="form-group half-width">
+                        <RadzenLabel Style="color:white;" Text="Date" Class="form-label" />
+                        <RadzenDatePicker Kind="DateTimeKind.Local"
+                                          Name="Date"
+                                          ShowTime="true"
+                                          DateFormat="dd/MM/yyyy HH:mm"
+                                          @bind-Value="currentChampionship.Date"
+                                          Style="width: 100%;"
+                                          DateRender="DateRender"
+                                          @bind-Value:after="CheckButtonState"
+                                          Disabled="@(currentChampionship.ChampionshipStatusName == "Finished")" />
+                        @if (currentChampionship.ChampionshipStatusName == "Finished")
+                        {
+                            <label style="color:red">*Date cannot be changed since the Championship has already ended.</label>
+                        }
+                    </div>
+                </div>   <br />
                 <div>
                     <br />
                     <RadzenButton Click=@OnSaveChangesClick Text="Save Changes" ButtonStyle="ButtonStyle.Primary" Disabled="@isValueInitial" Class="SaveButtonEdit" />
