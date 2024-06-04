@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+﻿using ChampionshipMaster.Web.Components.Pages.User.Championship;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.AspNetCore.SignalR.Client;
 using System.Net.Http;
 
@@ -36,6 +37,15 @@ namespace ChampionshipMaster.Web.Components.Pages
                 }
                 else { NavigationManager.NavigateTo("/login"); }
             }
+        }
+        void openChampionship()
+        {
+            NavigationManager.NavigateTo("/championshipsmain");
+        }
+        void openCreateTeam()
+        {
+            NavigationManager.NavigateTo("/createteam");
+
         }
     }
 }
