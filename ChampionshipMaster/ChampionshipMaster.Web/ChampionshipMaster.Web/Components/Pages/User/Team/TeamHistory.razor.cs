@@ -51,7 +51,6 @@
         public int loses { get; set; }
         public double winratio { get; set; }
         public int gamesPlayed { get; set; }
-
         public double winrationPercentage { get; set; }
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -72,6 +71,7 @@
                 if (team != null)
                     currentTeam = team;
                 var test = await client.GetFromJsonAsync<List<GameDto>>($"/api/Teams/Game_History/{id}");
+                
                 if (test != null)
                     games = test;
 
@@ -80,6 +80,7 @@
                     {
                         if (item.GameStatusName == "Finished" && item.Winner != null)
                         {
+                            
                             if (item.Winner.Id == int.Parse(id)) wins++;
                             if (item.BlueTeam!.Id == int.Parse(id) || item.RedTeam!.Id == int.Parse(id)) gamesPlayed++;
 
