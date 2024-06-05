@@ -1,15 +1,168 @@
 ﻿@page "/info"
 
-@rendermode InteractiveServer
-
-<center style="color:white;"><h1>Foosball Rules</h1></center>
-<center>
-    <div>
-        <RadzenImage Style="height:25%;" class="p-1 rz-color-on-warning rz-text-align-center" Path="Images/rules.png" AlternateText="rules" />
+<div class="rules-container">
+    <h1>Правила на Джаги</h1>
+    <div class="rule">
+        <div class="rule-number">1.</div>
+        <div class="rule-content">
+            <strong>Хвърляне на монета</strong>
+            <p>Мачът започва с хвърляне на монета и победителят може да избере ТОПЧЕ или СТРАНА.</p>
+        </div>
     </div>
-</center>
+    <div class="rule">
+        <div class="rule-number">2.</div>
+        <div class="rule-content">
+            <strong>Започване на играта</strong>
+            <p>Играта започва като топчето се слага по средата на 
+                ръчката с петте фигури. Трябва да попитате опонента 
+                дали е готов и преди да преместите топчето към друг ръчна, 
+                то трябва да е докоснато втори път с 5-цата. 
+                Започва се винаги с централния играч на средната линия.</p>
+        </div>
+    </div>
+    <div class="rule">
+        <div class="rule-number">3.</div>
+        <div class="rule-content">
+            <strong>Топка извън масата</strong>
+            <p>Когато топката излезе извън игралното поле от страната, 
+                която я отправила ударът, топката 
+                се дава на двойката или вратаря на опонента.</p>
+        </div>
+    </div>
+    <div class="rule">
+        <div class="rule-number">4.</div>
+        <div class="rule-content">
+            <strong>Тайм-аут</strong>
+            <p>Два тайм-аута от по 30 секунди са разрешени 
+                във всяка игра. Само състезателят, 
+                който притежава топчето и го владее 
+                може да поиска тайм-аут, докато топчето е в игра. 
+                Когато топчето е извън игра и двата отбора могат 
+                да поискат тайм-аут.</p>
+        </div>
+    </div>
+    <div class="rule">
+        <div class="rule-number">5.</div>
+        <div class="rule-content">
+            <strong>Подавания/ловес</strong>
+            <p>След всяко започване на играта, топчето трябва да 
+                докосне поне две фигури, преди да напусне ръчката, 
+                от която е стартирала или възстановена играта.</p>
+        </div>
+    </div>
+    <div class="rule">
+        <div class="rule-number">6.</div>
+        <div class="rule-content">
+            <strong>Смяна на страната на масата</strong>
+            <p>След всяка игра отборите могат да сменят страните на масата.</p>
+        </div>
+    </div>
+    <div class="rule">
+        <div class="rule-number">7.</div>
+        <div class="rule-content">
+            <strong>Въртене на ръчката</strong>
+            <p>НЕ Е РАЗРЕШЕНО! В случай на реализиране на гол пас/удар, 
+                изпълнен с въртене на ръчката с повече от един оборот, 
+                играта се възстановява с топка от страната на другия 
+                отбор.</p>
+        </div>
+    </div>
+    <div class="rule">
+        <div class="rule-number">8.</div>
+        <div class="rule-content">
+            <strong>Гол</strong>
+            <p>Гол може да се реализира от всяка ръчка и фигура. 
+                Топче, което влезе и излезе от вратата се счита за гол.
+                </p>
+        </div>
+    </div>
+    <div class="rule">
+        <div class="rule-number">9.</div>
+        <div class="rule-content">
+            <strong>ФЕЪР ПЛЕЙ /FAIR PLAY/</strong>
+            <p>НЕ удряйте и блъскайте ръчките в страничната стена силно.<br />
+                НЕ слагайте ръцете си на масата, докато топчето е в игра.<br />
+                НЕ слагайте пиене на масата, 
+                докато топчето е в игра.</p>
+        </div>
+    </div>
+    <div class="rule">
+        <div class="rule-number">10.</div>
+        <div class="rule-content">
+            <strong>ВРЕМЕВИ ОГРАНИЧЕНИЯ</strong>
+            <p>
+                За всяка ръчка има времеви ограничения - 
+                за 5-цата това са
+                10 секунди, а за всички останали
+                /ръчката на вратаря и 
+                2-ката се счита за една/ - 
+                по 15 секунди.
+                При превишаване на времевите ограничения, докато 
+                топчето е на 3-ката - то се връчва на 2-ката на
+                опонента. При всяко друго превишаване на времето -
+                топчето отива на 5-цата на опонента.
+            </p>
+        </div>
+    </div>
+    <div class="rule">
+        <div class="rule-number">11.</div>
+        <div class="rule-content">
+            <strong>CODE OF HONOR</strong>
+            <p>
+                Футболът на масата/джагите са удоволствие!<br />
+                Уважавайте опонента си!<br />
+                Стискайте си ръцете преди началото и след мача!<br />
+                ВИНАГИ започвайте или възстановявайте играта, когато сте 
+                убедени, че опонентът ви е готов!<br />
+                <strong>ГОТОВИ???</strong>
+            </p>
+        </div>
+    </div>
+</div>
+<style>
+    .rules-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        font-family: Arial, sans-serif;
+    }
 
+        .rules-container h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
 
-@code {
+    .rule {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 15px;
+    }
 
-}
+    .rule-number {
+        flex: 0 0 30px;
+        font-size: 24px;
+        font-weight: bold;
+        color: #007bff;
+    }
+
+    .rule-content {
+        flex: 1;
+    }
+
+        .rule-content strong {
+            display: block;
+            font-size: 18px;
+            margin-bottom: 5px;
+            color: #007bff;
+        }
+
+        .rule-content p {
+            margin: 0;
+            color: #555;
+        }
+
+</style>

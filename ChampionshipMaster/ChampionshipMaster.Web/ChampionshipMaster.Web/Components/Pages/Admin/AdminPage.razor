@@ -6,14 +6,38 @@
 
 @if (isAdmin)
 {
-    <center><h1 style="color:white;">Admin Panel</h1></center>
-    <RadzenButton Click="@(() => NavigationManager.NavigateTo("/GameStatusMain"))" Text="Manage Game Statuses" ButtonStyle="Radzen.ButtonStyle.Secondary" />
-    <RadzenButton Click="@(() => NavigationManager.NavigateTo("/GameTypeMain"))" Text="Manage Game Types" ButtonStyle="Radzen.ButtonStyle.Secondary" />
-    <RadzenButton Click="@(() => NavigationManager.NavigateTo("/TeamTypeMain"))" Text="Manage Team Types" ButtonStyle="Radzen.ButtonStyle.Secondary" />
-    <RadzenButton Click="@(() => NavigationManager.NavigateTo("/ChampionshipTypesMain"))" Text="Manage Championship Types" ButtonStyle="Radzen.ButtonStyle.Secondary" />
-    <RadzenButton Click="@(() => NavigationManager.NavigateTo("/ChampionshipStatusMain"))" Text="Manage Championship Statuses" ButtonStyle="Radzen.ButtonStyle.Secondary" />
-}
+    <div class="admin-panel">
+        <h1>Admin Panel</h1>
+        <div class="button-grid">
+            <RadzenButton Click="@(() => NavigationManager.NavigateTo("/GameStatusMain"))" Text="Manage Game Statuses" ButtonStyle="Radzen.ButtonStyle.Secondary" />
+            <RadzenButton Click="@(() => NavigationManager.NavigateTo("/GameTypeMain"))" Text="Manage Game Types" ButtonStyle="Radzen.ButtonStyle.Secondary" />
 
-@code {
-    
+            <RadzenButton Click="@(() => NavigationManager.NavigateTo("/TeamTypeMain"))" Text="Manage Team Types" ButtonStyle="Radzen.ButtonStyle.Secondary" />
+
+            <RadzenButton Click="@(() => NavigationManager.NavigateTo("/ChampionshipTypesMain"))" Text="Manage Championship Types" ButtonStyle="Radzen.ButtonStyle.Secondary" />
+            <RadzenButton Click="@(() => NavigationManager.NavigateTo("/ChampionshipStatusMain"))" Text="Manage Championship Statuses" ButtonStyle="Radzen.ButtonStyle.Secondary" />
+        </div>
+    </div>
 }
+<style>
+    .admin-panel {
+        text-align: center;
+        padding: 20px;
+        background-color: #2c3e50; /* Dark background */
+        color: white; /* White text */
+        border-radius: 10px;
+        margin: 0 auto;
+        max-width: 600px;
+    }
+
+        .admin-panel h1 {
+            margin-bottom: 20px;
+        }
+
+    .button-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+</style>
