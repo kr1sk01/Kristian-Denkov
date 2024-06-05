@@ -10,6 +10,10 @@
     }
 </style>
 
+<br />
+ <center><h1 style="color:white;">Manage Championship Statuses</h1></center>
+<br />
+
 @if (isAdmin)
 {
 
@@ -29,9 +33,7 @@
                     Filter="@Reset"
                     ColumnWidth="20200202px">
         <HeaderTemplate>
-            <RadzenButton ButtonStyle="Radzen.ButtonStyle.Success"
-                          Icon="note_add"
-                          Text="Add"
+            <RadzenButton Icon="note_add" Text="Create" ButtonStyle="Radzen.ButtonStyle.Secondary"
                           Click="@InsertRow"
                           Disabled="@(championshipStatusesToInsert.Count() > 0)" />
         </HeaderTemplate>

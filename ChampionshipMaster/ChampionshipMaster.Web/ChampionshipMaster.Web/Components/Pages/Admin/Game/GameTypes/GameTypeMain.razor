@@ -9,7 +9,9 @@
         width: unset;
     }
 </style>
-
+<br />
+<center><h1 style="color:white;">Manage Game Types</h1></center>
+<br />
 @if (isAdmin)
 {
     <RadzenDataGrid @ref="GameTypeGrid"
@@ -28,9 +30,7 @@
                     Filter="@Reset"
                     ColumnWidth="20200202px">
         <HeaderTemplate>
-            <RadzenButton ButtonStyle="Radzen.ButtonStyle.Success"
-                          Icon="note_add"
-                          Text="Add"
+            <RadzenButton Icon="note_add" Text="Create" ButtonStyle="Radzen.ButtonStyle.Secondary"
                           Click="@InsertRow"
                           Disabled="@(GameTypeesToInsert.Count() > 0)" />
         </HeaderTemplate>

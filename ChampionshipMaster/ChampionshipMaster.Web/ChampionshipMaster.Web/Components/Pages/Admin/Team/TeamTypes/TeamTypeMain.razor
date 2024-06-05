@@ -10,7 +10,9 @@
     }
 </style>
 
-
+<br />
+<center><h1 style="color:white;">Manage Team Types</h1></center>
+<br />
 <RadzenDataGrid @ref="TeamTypeGrid"
                 AllowAlternatingRows="false"
                 AllowFiltering="false"
@@ -27,9 +29,7 @@
                 Filter="@Reset"
                 ColumnWidth="20200202px">
     <HeaderTemplate>
-        <RadzenButton ButtonStyle="Radzen.ButtonStyle.Success"
-                      Icon="note_add"
-                      Text="Add"
+        <RadzenButton Icon="note_add" Text="Create" ButtonStyle="Radzen.ButtonStyle.Secondary"
                       Click="@InsertRow"
                       Disabled="@(TeamTypeesToInsert.Count() > 0)" />
     </HeaderTemplate>
