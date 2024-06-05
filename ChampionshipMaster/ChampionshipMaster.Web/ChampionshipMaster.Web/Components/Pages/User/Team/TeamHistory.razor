@@ -3,10 +3,11 @@
 @inherits ComponentBase
 
 @rendermode InteractiveServer
-
-
-<div id="main" style="background-color:#38474e;">
-    <center><h1 style="padding-top:1%;color:white;background-color:#38474e;">@(currentTeam.Name)'s history</h1></center>
+<br />
+<center><h1 style="color:white;">@(currentTeam.Name)'s history</h1></center>
+<br />
+<div class="mainHistory">
+    
 
     <div class="teamHistoryContainer">
         <div class="chart">
@@ -38,24 +39,3 @@
         </div>
     </div>
 </div>
-<style>
-    .teamHistoryContainer {
-        display: flex;
-        flex-direction: row;
-        align-items: flex-start;
-        background-color: #38474e;
-    }
-
-    .chart {
-        margin-top: 5 %;
-        flex: 1;
-        margin-right: 20px; /* Space between chart and data list */
-    }
-
-    .data-list {
-        flex: 1;
-        max-height: 550px;
-        overflow-y: auto;
-        margin: 5% 0 5% 0;
-    }
-</style>
