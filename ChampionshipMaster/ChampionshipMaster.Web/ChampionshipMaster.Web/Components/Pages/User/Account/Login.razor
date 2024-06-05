@@ -5,7 +5,7 @@
 @rendermode InteractiveServer
 
 <center>
-    <h3>Log In</h3>
+    <h1 style="color:white;">Log In</h1>
     <div style="justify-content:center;text-align:left;width:45%;">
         <RadzenTemplateForm TItem="LoginViewModel" Data=@model Submit=@OnSubmit InvalidSubmit=@OnInvalidSubmit>
             @if (showError)
@@ -45,7 +45,7 @@
                    
         </RadzenTemplateForm>
          <RadzenStack Orientation="Orientation.Horizontal" Gap="10px" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Normal" Wrap="FlexWrap.NoWrap">
-                <RadzenText Style="color:black;">New to Championship Master?</RadzenText>
+                <RadzenText Style="color:white;">New to Championship Master?</RadzenText>
                 <RadzenLink Path="/register" Text="Create account" />
           </RadzenStack>
     </div>
