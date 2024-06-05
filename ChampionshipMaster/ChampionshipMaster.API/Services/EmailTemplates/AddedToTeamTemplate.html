@@ -4,17 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Added to Team</title>
+    <link rel="stylesheet" href="AddedToTeamTemplate.html.css">
 </head>
 <body>
-    <h1>[User Name], you have been added to the Team - [Team Name]</h1>
-    <h2>Team Information:</h2>
-    <h3>Created by:</h3>
-    <p>[CreatedBy Name]</p>
-    <h3>Team Type:</h3>
-    <p>[Team Type]</p>
-    <h3>Players:</h3>
-    <ul>
-        {{players}}
-    </ul>
+    <div class="container">
+        <div class="header">
+            <h1 class="appname">Championship Master</h1>
+        </div>
+        <h1>[User Name], you have been added to the Team - [Team Name]</h1>
+        <h2>Team Information:</h2>
+        <h3>Created by:</h3>
+        <p>[CreatedBy Name]</p>
+        <h3>Team Type:</h3>
+        <p>[Team Type]</p>
+        <h3>Players:</h3>
+        <ul>
+            {{players}}
+        </ul>
+    </div>
 </body>
-</html>
+<style>
