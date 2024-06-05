@@ -10,14 +10,6 @@
     }
 </style>
 
-<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="10px" class="mt-2 mb-4">
-    <RadzenButton Style="background-color:darkslategray"
-                  ButtonStyle="Radzen.ButtonStyle.Success"
-                  Icon="add_circle_outline"
-                  Text="Add New Game Status"
-                  Click="@InsertRow"
-                  Disabled="@(TeamTypeesToInsert.Count() > 0)" />
-</RadzenStack>
 
 <RadzenDataGrid @ref="TeamTypeGrid"
                 AllowAlternatingRows="false"
@@ -34,8 +26,14 @@
                 Page="@Reset"
                 Filter="@Reset"
                 ColumnWidth="20200202px">
+    <HeaderTemplate>
+        <RadzenButton ButtonStyle="Radzen.ButtonStyle.Success"
+                      Icon="note_add"
+                      Text="Add"
+                      Click="@InsertRow"
+                      Disabled="@(TeamTypeesToInsert.Count() > 0)" />
+    </HeaderTemplate>
     <Columns>
-
         <RadzenDataGridColumn TItem="TeamType" Property="Name" Title="Name">
             <EditTemplate Context="TeamType">
                 <RadzenTextBox @bind-Value="TeamType.Name" Style="width:200px; display: block" Name="Name" />

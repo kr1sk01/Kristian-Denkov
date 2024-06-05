@@ -12,15 +12,6 @@
 
 @if (isAdmin)
 {
-    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="10px" class="mt-2 mb-4">
-        <RadzenButton Style="background-color:darkslategray"
-                      ButtonStyle="Radzen.ButtonStyle.Success"
-                      Icon="add_circle_outline"
-                      Text="Add New Game Status"
-                      Click="@InsertRow"
-                      Disabled="@(GameTypeesToInsert.Count() > 0)" />
-    </RadzenStack>
-
     <RadzenDataGrid @ref="GameTypeGrid"
                     AllowAlternatingRows="false"
                     AllowFiltering="false"
@@ -36,8 +27,14 @@
                     Page="@Reset"
                     Filter="@Reset"
                     ColumnWidth="20200202px">
+        <HeaderTemplate>
+            <RadzenButton ButtonStyle="Radzen.ButtonStyle.Success"
+                          Icon="note_add"
+                          Text="Add"
+                          Click="@InsertRow"
+                          Disabled="@(GameTypeesToInsert.Count() > 0)" />
+        </HeaderTemplate>
         <Columns>
-
             <RadzenDataGridColumn TItem="GameType" Property="Name" Title="Name">
                 <EditTemplate Context="GameType">
                     <RadzenTextBox @bind-Value="GameType.Name" Style="width:200px; display: block" Name="Name" />

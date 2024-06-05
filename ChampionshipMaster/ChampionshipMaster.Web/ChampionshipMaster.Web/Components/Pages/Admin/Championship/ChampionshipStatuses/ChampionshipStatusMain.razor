@@ -12,14 +12,6 @@
 
 @if (isAdmin)
 {
-    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="10px" class="mt-2 mb-4">
-        <RadzenButton Style="background-color:darkslategray"
-                      ButtonStyle="Radzen.ButtonStyle.Success"
-                      Icon="add_circle_outline"
-                      Text="Add New Championship Status"
-                      Click="@InsertRow"
-                      Disabled="@(championshipStatusesToInsert.Count() > 0)" />
-    </RadzenStack>
 
     <RadzenDataGrid @ref="championshipStatusGrid"
                     AllowAlternatingRows="false"
@@ -36,8 +28,14 @@
                     Page="@Reset"
                     Filter="@Reset"
                     ColumnWidth="20200202px">
+        <HeaderTemplate>
+            <RadzenButton ButtonStyle="Radzen.ButtonStyle.Success"
+                          Icon="note_add"
+                          Text="Add"
+                          Click="@InsertRow"
+                          Disabled="@(championshipStatusesToInsert.Count() > 0)" />
+        </HeaderTemplate>
         <Columns>
-
             <RadzenDataGridColumn TItem="ChampionshipStatus" Property="Name" Title="Name">
                 <EditTemplate Context="championshipStatus">
                     <RadzenTextBox @bind-Value="championshipStatus.Name" Style="width:200px; display: block" Name="Name" />
