@@ -47,5 +47,9 @@ namespace ChampionshipMaster.Web.Components.Pages
             NavigationManager.NavigateTo("/createteam");
 
         }
+        void openRulesPage()
+        {
+            NavigationManager.NavigateTo("/info");
+        }
     }
 }

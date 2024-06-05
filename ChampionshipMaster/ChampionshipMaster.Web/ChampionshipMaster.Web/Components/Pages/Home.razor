@@ -11,26 +11,47 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <div class="container mt-4">
-    <Carousel Width="1366px">
+    <Carousel>
         <CarouselItem>
-            <a onclick=@openCreateTeam><img src="https://via.placeholder.com/1280x720?text=Slide+1" class="d-block w-100" alt="Slide 1"></a>
-            <div class="carousel-caption d-none d-md-block">
-                <h5>Create you own team!</h5>
-                <p>You can create your own team & add players to it in the teams section!</p>
+            <div style="width:1280px;height:720px;overflow: hidden;">
+                <a onclick=@openCreateTeam><RadzenImage class="d-block w-100 cover" Path="Images/teamvsteam.png" AlternateText="FoosBallRules" /></a>
+                <div class="glassmorphism carousel-caption d-none d-md-block">
+                    <h4>Create you own team!</h4>
+                    <h5>You can create your own team & add players to it in the teams section!</h5>
+                </div>
             </div>
         </CarouselItem>
         <CarouselItem>
-            <a onclick=@openChampionship><img src="https://via.placeholder.com/1280x720?text=Slide+2" class="d-block w-100" alt="Slide 2"></a>
-            <div class="carousel-caption d-none d-md-block">
-                <h5>Championship participation!</h5>
-                <p>You can join your time in any championship just click!</p>
+            <div style="width:1280px;height:720px;overflow: hidden;">
+                <a onclick=@openChampionship><RadzenImage src="/images/tournament.jpg" class="d-block w-100 scaledown" alt="Slide 2" /></a>
+                <div class="glassmorphism carousel-caption d-none d-md-block">
+                    <h4>Championship participation!</h4>
+                    <h5>Join your first championship now!</h5>
+                </div>
             </div>
         </CarouselItem>
         <CarouselItem>
-            <img src="https://via.placeholder.com/1280x720?text=Slide+3" class="d-block w-100" alt="Slide 3">
-            <div class="carousel-caption d-none d-md-block">
-                <h5>Third slide label</h5>
-                <p>Some representative placeholder content for the third slide.</p>
+            <div style="width:1280px;height:720px;overflow: hidden;">
+                <a onclick=@openCreateTeam><RadzenImage src="/images/mk.jpg" class="d-block w-100 cover" alt="Slide 2" /></a>
+                <div class="glassmorphism carousel-caption d-none d-md-block">
+                    <h4>Mortal Kombat 1v1 Battles!</h4>
+                    <h5>You can start any time, create team!</h5>
+                </div>
+            </div>
+        </CarouselItem>
+        <CarouselItem>
+            <div style="width:1280px;height:720px;overflow: hidden;">
+                <a onclick=@openRulesPage>
+                    <video autoplay loop muted>
+                        <source src="/videos/foosball.mp4" type="video/mp4">
+                        <!-- Add additional <source> elements for other video formats if needed -->
+                        Your browser does not support the video tag.
+                    </video>
+                </a>
+                <div class="glassmorphism carousel-caption d-none d-md-block">
+                    <h4>See foosball rules!</h4>
+                    <h5>With a click of a button you can go to rules page!</h5>
+                </div>
             </div>
         </CarouselItem>
     </Carousel>
@@ -39,9 +60,30 @@
     body {
         background-color: #706c6c;
     }
-    img{
-        width:90%;
-        height:90%;
 
+    .cover {
+        object-fit: cover;
     }
+
+    .scaledown123 {
+
+        object-fit: scale-down;
+    }
+
+    video {
+        width: 100%;
+        height: 100%;
+        object-fit: fill; /* or 'cover', 'contain', 'none', depending on the desired effect */
+    }
+    .glassmorphism {
+        background: rgba(255, 255, 255, 0.2); /* Background color with transparency */
+        backdrop-filter: blur(10px); /* Apply blur effect */
+        border-radius: 10px; /* Rounded corners */
+        border: 1px solid rgba(255, 255, 255, 0.18); /* Border with transparency */
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37); /* Box shadow */
+        backdrop-filter: blur(4px); /* Additional blur */
+        padding-down: 30px;
+        color: black;
+    }
+
 </style>
