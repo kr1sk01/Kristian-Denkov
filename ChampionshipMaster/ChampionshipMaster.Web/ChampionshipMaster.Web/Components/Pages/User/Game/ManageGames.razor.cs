@@ -46,7 +46,7 @@ namespace ChampionshipMaster.Web.Components.Pages.User.Game
         {
             await DialogService.OpenAsync<EditGame>($"",
                   new Dictionary<string, object>() { { "id", id } },
-                  new DialogOptions() { Width = "75vw", Height = "95%", CloseDialogOnEsc = true });
+                  new DialogOptions() { Width = "75vw", Height = "70%", CloseDialogOnEsc = true });
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
