@@ -294,7 +294,6 @@ SaveButtonEdit {
     background-color: beige;
     border: 1px solid #ccc;
     border-radius: 1.5rem;
-    font-size: 0.9rem;
     color: #333;
     text-align:center;    
 }
