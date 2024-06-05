@@ -86,7 +86,7 @@ h1:focus {
 
 .mainProfile {
     background-color: #38474E;
-    border-radius: 2.5%;
+    border-radius: 10px;
     padding: 1%;
 }
 
@@ -296,4 +296,23 @@ SaveButtonEdit {
     border-radius: 1.5rem;
     color: #333;
     text-align:center;    
+}
+.admin-panel {
+    text-align: center;
+    padding: 20px;
+    background-color: #38474E; /* Dark background */
+    color: white; /* White text */
+    border-radius: 10px;
+    margin: 0 auto;
+    max-width: 600px;
+}
+
+    .admin-panel h1 {
+        margin-bottom: 20px;
+    }
+
+.button-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
 }

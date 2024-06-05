@@ -9,20 +9,20 @@
 
 <div class="mainProfile">
     <center>
-        <h1>@(username)'s profile</h1>
-        <h2>Email: @email</h2>
-        
+        <h1 style="color:white;">@(username)'s profile</h1>
+        <h2 style="color:white;">Email: @email</h2>
+        <br />
         <ChangeName @ref=@changeUsername
                     StateChange=@CheckButtonState />
-        
+        <br />
         <ImageUpload @ref=@playerAvatar
                      SetImageFor="@ImageUpload.SetImageForOptions.Avatar"
                      StateChange=@CheckButtonState />
-
+        <br />
         <RadzenButton Text="Save Changes" Disabled="@isValueInitial" Click="OnClick"></RadzenButton>
     </center>
 </div>
 
 @code {
-    
+
 }
