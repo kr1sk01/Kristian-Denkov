@@ -32,7 +32,7 @@
                                    ImageType="ImageNameTemplate.ImageTypeOptions.Team" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="TeamDto" Title="Created On" Width="100px">
+        <RadzenDataGridColumn TItem="TeamDto" Property="CreatedOn" Title="Created On" Width="100px">
             <Template Context="team">
                 @if (team.CreatedOn == null)
                 {

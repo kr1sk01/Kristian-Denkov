@@ -18,13 +18,15 @@ namespace ChampionshipMaster.API.Services.ControllerServices
         private readonly JwtService _jwtService;
         private readonly IEmailSender _emailSender;
         private readonly ApplicationDbContext _context;
+        private readonly IConfiguration _configuration;
 
-        public PlayerService(UserManager<Player> userManager, JwtService jwtService, IEmailSender emailSender, ApplicationDbContext context)
+        public PlayerService(UserManager<Player> userManager, JwtService jwtService, IEmailSender emailSender, ApplicationDbContext context, IConfiguration configuration)
         {
             _userManager = userManager;
             _jwtService = jwtService;
             _emailSender = emailSender;
             _context = context;
+            _configuration = configuration;
         }
         public async Task<List<PlayerDto>> GetAllActivePlayers()
         {
@@ -42,8 +44,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             var player = new Player { 
                 UserName = registerRequest.UserName, 
                 Email = registerRequest.Email,
-                CreatedBy = registerRequest.CreatedBy,
-                CreatedOn = registerRequest.CreatedOn,
+                CreatedOn = registerRequest.CreatedOn
             };
             var result = await _userManager.CreateAsync(player, registerRequest.Password!);
             await _userManager.AddToRoleAsync(player, "user");
@@ -51,33 +52,33 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             if (result.Succeeded)
             {
                 var user = await _userManager.FindByEmailAsync(registerRequest.Email!);
-                var team = new Team()
+                if (user == null)
                 {
-                    Name = user.UserName,
-                    Active = true,
-                    CreatedBy = user.UserName,
-                    CreatedOn = DateTime.UtcNow,
-                    TeamType = await _context.TeamTypes.FirstOrDefaultAsync(x => x.Name!.ToLower() == "solo"),
-                    Logo = user.Avatar
-                };
+                    return BadRequest(new[]
+                    {
+                        new { name = "Database error", description = "Something went wrong" }
+                    });
+                }
 
-                await _context.Teams.AddAsync(team);
+                user.CreatedBy = user.Id;
+                user.Active = true;
+                _context.Entry(user).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
 
-                var teamPlayers = new TeamPlayers()
-                {
-                    Player = user,
-                    Team = team,
-                    CreatedBy = user.UserName,
-                    CreatedOn = DateTime.UtcNow
-                };
-
-                user.TeamPlayers.Add(teamPlayers);
-                await _context.SaveChangesAsync();
-
-                var emailToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                var emailToken = await _userManager.GenerateEmailConfirmationTokenAsync(user!);
                 var userId = user.Id;
-                var confirmationLink = $"https://localhost:50397/api/Player/confirmEmail?userId=" +
+
+                string apiAdress;
+                if (_configuration["CustomEnvironment"] == "Development")
+                {
+                    apiAdress = "https://localhost:50397";
+                }
+                else
+                {
+                    apiAdress = "http://10.244.44.38:8091";
+                }
+
+                var confirmationLink = $"{apiAdress}/api/Player/confirmEmail?userId=" +
                     Uri.EscapeDataString($"{userId}") +
                     "&token=" +
                     Uri.EscapeDataString($"{emailToken}");

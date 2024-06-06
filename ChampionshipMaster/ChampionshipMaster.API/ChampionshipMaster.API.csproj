@@ -9,6 +9,28 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Services\EmailTemplates\AddedToTeamTemplate.html" />
+    <None Remove="Services\EmailTemplates\ConfirmationTemplate.html" />
+    <None Remove="Services\EmailTemplates\GameFinishedTemplate.html" />
+    <None Remove="Services\EmailTemplates\GameScheduledTemplate.html" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Services\EmailTemplates\AddedToTeamTemplate.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Services\EmailTemplates\ConfirmationTemplate.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Services\EmailTemplates\GameFinishedTemplate.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Services\EmailTemplates\GameScheduledTemplate.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     
     <PackageReference Include="MailKit" Version="4.5.0" />
     
@@ -29,6 +51,7 @@
     <PackageReference Include="Microsoft.Identity.Web.DownstreamApi" Version="2.15.2" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.2" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.2" />
+    <PackageReference Include="Serilog.AspNetCore" Version="8.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
 using System.Security.Claims;
 using System.Text;
 
@@ -52,6 +53,20 @@ public class Program
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
+
+        builder.Services.AddSerilog((services, lc) => lc
+    .ReadFrom.Configuration(builder.Configuration)
+    .ReadFrom.Services(services)
+    .Enrich.FromLogContext()
+    .WriteTo.File(
+       System.IO.Path.Combine("c:/", "logs", "Application", "diagnostics.txt"),
+       rollingInterval: RollingInterval.Day,
+       fileSizeLimitBytes: 10 * 1024 * 1024,
+       retainedFileCountLimit: 2,
+       rollOnFileSizeLimit: true,
+       shared: true,
+       flushToDiskInterval: TimeSpan.FromSeconds(1))
+    );
 
 
         builder.Services.AddControllers();
