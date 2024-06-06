@@ -2,9 +2,9 @@
 
 @rendermode InteractiveServer
 
-<div class="collapsible-panel">
-    <div class="collapsible-header" @onclick="ToggleCollapse">
-        <span>@Title</span>
+<div class="collapsible-panel" @onclick="HandleClick">
+    <div class="collapsible-header @(isBreathing ? "breathe" : "")">
+        <span class="collapsible-title">@Title</span>
         <span class="collapsible-icon">@(!isCollapsed ? "▲" : "▼")</span>
     </div>
     <div class="collapsible-content" style="@(isCollapsed ? "display: none;" : "")">
