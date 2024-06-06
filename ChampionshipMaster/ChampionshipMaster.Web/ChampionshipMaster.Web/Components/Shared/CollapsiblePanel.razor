@@ -1,3 +1,13 @@
 ﻿@inherits ComponentBase
 
 @rendermode InteractiveServer
+
+<div class="collapsible-panel">
+    <div class="collapsible-header" @onclick="ToggleCollapse">
+        <span>@Title</span>
+        <span class="collapsible-icon">@(!isCollapsed ? "▲" : "▼")</span>
+    </div>
+    <div class="collapsible-content" style="@(isCollapsed ? "display: none;" : "")">
+        @ChildContent
+    </div>
+</div>

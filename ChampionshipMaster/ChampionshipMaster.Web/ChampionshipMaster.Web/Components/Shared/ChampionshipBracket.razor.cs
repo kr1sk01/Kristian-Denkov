@@ -4,10 +4,10 @@
     {
         [Inject] IClientLotService lotService { get; set; } = default!;
 
-        [Parameter] public required ICollection<GameDto> Games { get; set; }
+        [Parameter] public required ICollection<GameDto> Games { get; set; } = [];
         [Parameter] public int TeamsCount { get; set; }
 
-        GameDto[][]? gamesGrid;
+        GameDto[][] gamesGrid = [];
         int rounds;
 
         protected override void OnInitialized()
@@ -27,6 +27,8 @@
                     gamesGrid[i - 1][j] = Games.Skip(gamesToSkip++).First();
                 }
             }
+
+
 
             base.OnInitialized();
         }

@@ -9,11 +9,13 @@ namespace ChampionshipMaster.API.Services.ControllerServices
     {
         private readonly ApplicationDbContext _context;
         private readonly ILotService _lotService;
+        private readonly IEmailSender _emailSender;
 
-        public ChampionshipService(ApplicationDbContext context, ILotService lotService)
+        public ChampionshipService(ApplicationDbContext context, ILotService lotService, IEmailSender emailSender)
         {
             _context = context;
             _lotService = lotService;
+            _emailSender = emailSender;
         }
 
         public async Task<List<ChampionshipDto>> GetAllChampionships()
@@ -335,6 +337,8 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                     return BadRequest("You cannot draw the lot when there are less than 2 teams registered!");
                 }
 
+                championshipToEdit.ChampionshipStatus = await _context.ChampionshipStatuses.FirstAsync(x => x.Name == "Coming");
+
                 List<Team> teams = [.. championshipToEdit.ChampionshipTeams.Select(x => x.Team)];
                 var gameType = await _context.GameTypes.Include(x => x.TeamType).FirstAsync(x => x.TeamType!.Name == teams.First()!.TeamType!.Name);
                 var gameStatus = await _context.GameStatuses.FirstAsync(x => x.Name == "Coming");
@@ -373,7 +377,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                     {
                         if (teams.Count == 0)
                         {
-                            for (int i = 0; i < games - gameIndex; i++)
+                            for (int i = 0; i <= games - gameIndex; i++)
                             {
                                 await _context.Games.AddAsync(new Game()
                                 {

@@ -2,11 +2,19 @@
 
 @rendermode InteractiveServer
 
-@for (int i = 1; i <= rounds; i++)
-{
-    <RadzenLabel Text="@($"Round {i}")" />
-    @foreach (var game in gamesGrid[i - 1].ToList())
+@{
+    var index = 1;
+
+    @foreach (var game in gamesGrid)
     {
-        <GameCard Game="game" Style="margin-top: 5px; margin-bottom: 5px;" />
+        <CollapsiblePanel Title="@($"Round {index}")">
+            <ChildContent>
+                @foreach (var item in game)
+                {
+                    <GameCard Game="item" Style="margin-top: 5px; margin-bottom: 5px;" />
+                }
+            </ChildContent>
+        </CollapsiblePanel>
+        index += 1;
     }
 }
