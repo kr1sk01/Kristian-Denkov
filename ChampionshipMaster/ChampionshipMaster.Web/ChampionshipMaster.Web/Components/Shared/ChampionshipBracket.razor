@@ -1,0 +1,12 @@
+﻿@inherits ComponentBase
+
+@rendermode InteractiveServer
+
+@for (int i = 1; i <= rounds; i++)
+{
+    <RadzenLabel Text="@($"Round {i}")" />
+    @foreach (var game in gamesGrid[i - 1].ToList())
+    {
+        <GameCard Game="game" Style="margin-top: 5px; margin-bottom: 5px;" />
+    }
+}

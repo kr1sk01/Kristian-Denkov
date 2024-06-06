@@ -297,6 +297,14 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                 var userId = token.Claims.First(x => x.Type == "nameid").Value;
                 var userRole = token.Claims.First(x => x.Type == "role").Value;
                 var championshipToEdit = await _context.Championships
+                    .Include(x => x.Games)
+                        .ThenInclude(x => x.Winner)
+                    .Include(x => x.Games)
+                        .ThenInclude(x => x.RedTeam)
+                    .Include(x => x.Games)
+                        .ThenInclude(x => x.BlueTeam)
+                    .Include(x => x.Games)
+                        .ThenInclude(x => x.GameStatus)
                     .Include(x => x.ChampionshipTeams)
                         .ThenInclude(x => x.Team)
                             .ThenInclude(x => x.TeamType)
@@ -319,7 +327,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
 
                 if (DateTime.UtcNow < championshipToEdit.LotDate.Value.ToUniversalTime())
                 {
-                    return BadRequest("You cannot draw the lot because the Lot Date hasn't arrived yet!");
+                    return BadRequest($"You cannot draw the lot yet. The upcoming Lot Date is {championshipToEdit.LotDate.Value.ToUniversalTime():dd/MM/yyyy HH:mm} GMT");
                 }
 
                 if (championshipToEdit.ChampionshipTeams.Count < 2)
@@ -402,7 +410,8 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                     }
                 }
 
-                return Ok();
+                var gamesListDto = championshipToEdit.Games.OrderBy(x => x.Id).Adapt<List<GameDto>>();
+                return Ok(gamesListDto);
             }
             catch (Exception ex)
             {

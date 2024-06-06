@@ -2,6 +2,7 @@
 using ChampionshipMaster.Web.Components.Pages.User.Championship;
 using ChampionshipMaster.Web.Components.Pages.User.Team;
 using ChampionshipMaster.Web.Services;
+using Mapster;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using System.Data;
 using System.IdentityModel.Tokens.Jwt;
@@ -23,6 +24,7 @@ namespace ChampionshipMaster.Web.Components.Pages.Admin.Championship
         [Inject] DialogService DialogService { get; set; } = default!;
         [Inject] INotifier notifier { get; set; } = default!;
         [Inject] IImageService imageService { get; set; } = default!;
+        [Inject] IClientLotService lotService { get; set; } = default!;
 
 
         [Parameter] public string? championshipId { get; set; }
@@ -230,6 +232,50 @@ namespace ChampionshipMaster.Web.Components.Pages.Admin.Championship
         {
             if (currentChampionship != null && currentChampionship.LotDate != null)
                 args.Disabled = args.Disabled || args.Date < currentChampionship.LotDate;
+        }
+
+        public async Task DrawLot()
+        {
+            if (!await tokenService.ValidateToken())
+            {
+                notifier.SendInformationalNotification("You're not logged in or your session has expired");
+                NavigationManager.NavigateTo("/login");
+            }
+
+            var token = await tokenService.GetToken();
+            using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+            var request = await client.PostAsync($"api/Championship/drawLot/{currentChampionship.Id}", null);
+            var body = await request.Content.ReadAsStringAsync();
+
+            if (request.IsSuccessStatusCode)
+            {
+                try
+                {
+                    var options = new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+                    var games = JsonSerializer.Deserialize<List<GameDto>>(body, options);
+
+                    if (games == null || games.Count == 0)
+                    {
+                        notifier.SendErrorNotification("Couldn't retrieve the Championship bracket. Please refresh!", 6);
+                    }
+                    else
+                    {
+                        currentChampionship.Games = games;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    await Console.Out.WriteLineAsync(ex.Message);
+                    notifier.SendErrorNotification("Couldn't retrieve the Championship bracket. Please refresh!", 6);
+                }
+                
+            }
+            else
+            {
+                notifier.SendErrorNotification(body.ToString() ?? "Something went wrong!", 6);
+            }
         }
     }
 }

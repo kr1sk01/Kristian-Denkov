@@ -100,9 +100,25 @@
                     <RadzenButton Click=@OnSaveChangesClick Text="Save Changes" ButtonStyle="Radzen.ButtonStyle.Primary" Disabled="@isValueInitial" Class="SaveButtonEdit" />
                 </div>
             </RadzenTabsItem>
-            <RadzenTabsItem Text="Lot"></RadzenTabsItem>
+            <RadzenTabsItem Text="Lot">
+                @if (currentChampionship.Games == null || currentChampionship.Games.Count == 0)
+                {
+                    <RadzenButton ButtonStyle="Radzen.ButtonStyle.Primary" Text="Draw Lot" Icon="shuffle" Click="DrawLot"/>
+                }
+                else
+                {
+                    <ChampionshipBracket Games="currentChampionship.Games" TeamsCount="currentChampionship.Teams.Count" />
+                }
+            </RadzenTabsItem>
         </Tabs>
     </RadzenTabs>
 </center>
+
+@* <style>
+    .rz-panel-menu{
+        font-size: unset;
+        font-weight: unset;
+    }
+</style> *@
 
 
