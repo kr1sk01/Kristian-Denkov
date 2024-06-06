@@ -1,5 +1,7 @@
 ﻿using ChampionshipMaster.API.Interfaces;
+using ChampionshipMaster.DATA.Models;
 using MailKit.Net.Smtp;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Identity.Client;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using MimeKit;
@@ -120,6 +122,25 @@ namespace ChampionshipMaster.API.Services
                 .Replace("[Team Type]", teamType);
 
             await SendEmailAsync(userEmail, "Added to Team", body);
+        }
+
+        public async Task SendChampionshipLotEmail(string userEmail, string championshipName, int championshipId, string userName, string userTeam, string opponentTeam, DateTime? date)
+        {
+            var templatePath = "Services/EmailTemplates/ChampionshipLotTemplate.html";
+            var template = GetEmailTemplate(templatePath);
+
+            string dateText = date == null ? $"{date?.ToUniversalTime().ToString("dd/MM/yyyy HH:mm")} GMT" : "TBD";
+            string clientAddress = _configuration["CustomEnvironment"] == "Development" ? "https://localhost:50399" : "http://10.244.44.38:8090";
+            string lotLink = $"{clientAddress}/championshipDetails/{championshipId}";
+
+            string body = template.Replace("[User Name]", userName)
+                .Replace("[Championship Name]", championshipName)
+                .Replace("[User Team]", userTeam)
+                .Replace("[Opponent Team]", opponentTeam)
+                .Replace("[Date]", dateText)
+                .Replace("[Lot Link]", lotLink);
+
+            await SendEmailAsync(userEmail, "Championship Lot Drawn", body);
         }
     }
 }

@@ -303,8 +303,12 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                         .ThenInclude(x => x.Winner)
                     .Include(x => x.Games)
                         .ThenInclude(x => x.RedTeam)
+                            .ThenInclude(x => x.TeamPlayers)
+                                .ThenInclude(x => x.Player)
                     .Include(x => x.Games)
                         .ThenInclude(x => x.BlueTeam)
+                            .ThenInclude(x => x.TeamPlayers)
+                                .ThenInclude(x => x.Player)
                     .Include(x => x.Games)
                         .ThenInclude(x => x.GameStatus)
                     .Include(x => x.ChampionshipTeams)
@@ -414,6 +418,8 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                     }
                 }
 
+                await SendLotNotifications(championshipToEdit).ConfigureAwait(false);
+
                 var gamesListDto = championshipToEdit.Games.OrderBy(x => x.Id).Adapt<List<GameDto>>();
                 return Ok(gamesListDto);
             }
@@ -422,6 +428,51 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                 await Console.Out.WriteLineAsync(ex.Message);
                 return BadRequest("Something went wrong!");
             }
+        }
+
+        public async Task SendLotNotifications(Championship championship)
+        {
+            var players = GetChampionshipPlayers(championship);
+
+            foreach (var player in players)
+            {
+                if (player == null)
+                    continue;
+
+                var gameBlue = championship.Games.FirstOrDefault(x => x.BlueTeam.TeamPlayers.Any(y => y.PlayerId == player.Id));
+                if (gameBlue != null)
+                {
+                    await _emailSender.SendChampionshipLotEmail(
+                        player.Email!, 
+                        championship.Name!, 
+                        championship.Id, 
+                        player.UserName!, 
+                        gameBlue.BlueTeam?.Name!, 
+                        gameBlue.RedTeam == null ? "TBD" : gameBlue.RedTeam.Name!,
+                        championship.Date);
+                }
+                else
+                {
+                    var gameRed = championship.Games.FirstOrDefault(x => x.RedTeam.TeamPlayers.Any(y => y.PlayerId == player.Id));
+                    if (gameRed != null)
+                    {
+                        await _emailSender.SendChampionshipLotEmail(
+                            player.Email!,
+                            championship.Name!,
+                            championship.Id,
+                            player.UserName!,
+                            gameRed.RedTeam?.Name!,
+                            gameRed.BlueTeam == null ? "TBD" : gameRed.BlueTeam.Name!,
+                            championship.Date);
+                    }
+                }
+            }
+        }
+
+        public List<Player?> GetChampionshipPlayers(Championship championship)
+        {
+            List<Player?> players = [.. championship.ChampionshipTeams.SelectMany(x => x.Team!.TeamPlayers).Select(x => x.Player)];
+            return players;
         }
     }
 }

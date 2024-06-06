@@ -10,9 +10,13 @@
 @if (championshipWithDetails != null)
 {
     <center><h1 style="color:white;">@championshipWithDetails.Name</h1></center>
+    if (championshipWithDetails.Games != null && championshipWithDetails.Games.Count > 0)
+    {
+        <ChampionshipBracket Games="championshipWithDetails.Games" TeamsCount="championshipWithDetails.Teams.Count" />
+    }
 }
 
-<RadzenDataList class="custom-datalist"
+@* <RadzenDataList class="custom-datalist"
                 AllowVirtualization=@true
                 Style="height:100%;overflow:auto;"
                 WrapItems=@false AllowPaging=@false
@@ -20,9 +24,9 @@
     <Template Context="game">
         <GameCard Game="@game" Style="max-height:250px;"></GameCard>
     </Template>
-</RadzenDataList>
+</RadzenDataList> *@
 
-<style>
+@* <style>
     .custom-datalist {
         --rz-datalist-background-color: var(--rz-base-background-color);
         --rz-datalist-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.01);
@@ -40,4 +44,4 @@
         .custom-datalist .rz-datalist-data > li {
             border-radius: 0; /* Remove border-radius */
         }
-</style>
+</style> *@
