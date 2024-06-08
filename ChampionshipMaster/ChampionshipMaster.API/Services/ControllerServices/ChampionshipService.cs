@@ -233,7 +233,10 @@ namespace ChampionshipMaster.API.Services.ControllerServices
 
                 var userId = token.Claims.First(x => x.Type == "nameid").Value;
                 var userRole = token.Claims.First(x => x.Type == "role").Value;
-                var championshipToEdit = await _context.Championships.FirstOrDefaultAsync(x => x.Id == int.Parse(championshipId));
+                var championshipToEdit = await _context.Championships
+                    .Include(x => x.ChampionshipStatus)
+                    .Include(x => x.Winner)
+                    .FirstOrDefaultAsync(x => x.Id == int.Parse(championshipId));
 
                 if (championshipToEdit == null)
                 {
@@ -299,6 +302,10 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                 var userId = token.Claims.First(x => x.Type == "nameid").Value;
                 var userRole = token.Claims.First(x => x.Type == "role").Value;
                 var championshipToEdit = await _context.Championships
+                    .Include(x => x.ChampionshipTeams)
+                        .ThenInclude(x => x.Team)
+                            .ThenInclude(x => x.TeamPlayers)
+                                .ThenInclude(x => x.Player)
                     .Include(x => x.Games)
                         .ThenInclude(x => x.Winner)
                     .Include(x => x.Games)
@@ -439,7 +446,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                 if (player == null)
                     continue;
 
-                var gameBlue = championship.Games.FirstOrDefault(x => x.BlueTeam.TeamPlayers.Any(y => y.PlayerId == player.Id));
+                var gameBlue = championship.Games.FirstOrDefault(x => x.BlueTeam != null && x.BlueTeam.TeamPlayers.Any(y => y.PlayerId == player.Id));
                 if (gameBlue != null)
                 {
                     await _emailSender.SendChampionshipLotEmail(
@@ -453,7 +460,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                 }
                 else
                 {
-                    var gameRed = championship.Games.FirstOrDefault(x => x.RedTeam.TeamPlayers.Any(y => y.PlayerId == player.Id));
+                    var gameRed = championship.Games.FirstOrDefault(x => x.RedTeam != null && x.RedTeam.TeamPlayers.Any(y => y.PlayerId == player.Id));
                     if (gameRed != null)
                     {
                         await _emailSender.SendChampionshipLotEmail(

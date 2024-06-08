@@ -129,7 +129,7 @@ namespace ChampionshipMaster.API.Services
             var templatePath = "Services/EmailTemplates/ChampionshipLotTemplate.html";
             var template = GetEmailTemplate(templatePath);
 
-            string dateText = date == null ? $"{date?.ToUniversalTime().ToString("dd/MM/yyyy HH:mm")} GMT" : "TBD";
+            string dateText = date != null ? $"{date?.ToUniversalTime().ToString("dd/MM/yyyy HH:mm")} GMT" : "TBD";
             string clientAddress = _configuration["CustomEnvironment"] == "Development" ? "https://localhost:50399" : "http://10.244.44.38:8090";
             string lotLink = $"{clientAddress}/championshipDetails/{championshipId}";
 

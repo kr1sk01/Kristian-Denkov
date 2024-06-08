@@ -15,7 +15,6 @@ namespace ChampionshipMaster.API.Interfaces
         Task<bool> ChampionshipExists(int id);
         Task<IActionResult> DeleteChampionship(int id);
         Task<IActionResult> JoinChampionship(ChampionshipTeamsDto championshipTeam, StringValues authHeader);
-        List<Player?> GetChampionshipPlayers(Championship championship);
         Task SendLotNotifications(Championship championship);
     }
 }
