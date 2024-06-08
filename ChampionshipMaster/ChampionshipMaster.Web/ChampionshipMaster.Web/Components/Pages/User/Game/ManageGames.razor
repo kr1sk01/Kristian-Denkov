@@ -23,7 +23,7 @@
                 CellContextMenu="@OnCellContextMenu">
 
     <HeaderTemplate>
-        <RadzenButton Style="margin-right:5px;"  Icon="note_add" Text="Create" ButtonStyle="Radzen.ButtonStyle.Secondary" Click=@OpenCreateGame />
+        <RadzenButton Style="margin-right:5px;" Icon="note_add" Text="Create" ButtonStyle="Radzen.ButtonStyle.Secondary" Click=@OpenCreateGame />
         <RadzenButton Style="margin-right:5px;" Disabled=@disabledEdit Click="@(()=> OpenEditGame(selectedTeam.FirstOrDefault()!.Id.ToString()))" Icon="edit" Text="Edit" />
     </HeaderTemplate>
     <Columns>

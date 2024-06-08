@@ -5,9 +5,30 @@
 @rendermode InteractiveServer
 
 <center><h1 style="color:white;">Create Team</h1></center>
+<div class="form-container">
+    <RadzenTemplateForm TItem="TeamDto" Data=@model Submit=@OnSubmit InvalidSubmit=@OnInvalidSubmit>
+        <div class="form-row">
+            <div class="form-group half-width" style="align-content:center;">
+                <RadzenLabel Style="color:white;" Text="Team Name" Class="form-label" />
+                <RadzenTextBox Name="Name" @bind-Value=@model.Name Style="width:100%"/>
+                <RadzenRequiredValidator Component="Name" Text="Name is required." />
+                <RadzenLengthValidator Component="Name" Min="3" Max="32" Text="Name can be between 3 and 32 characters" />
+            </div>
+        </div> <br />
+        <div class="form-row">
+            <div class="form-group half-width">
+                <RadzenDropDown @ref=@teamTypeDropDown Name="TeamType" @bind-Value=@model.TeamTypeName Data=@teamTypes.Select(x => x.Name).ToList() Style="width: 100%;" />
+                <RadzenRequiredValidator Component="TeamType" Text="Team Type is required!" />
+            </div>
+        </div>
+        <div class="form-actions">
+            <RadzenButton ButtonType="Radzen.ButtonType.Submit" Icon="add_circle" Text=@(isRedirectedFromChampionship == true ? "Create Team To Join" : "Create")></RadzenButton>
+        </div>
+    </RadzenTemplateForm>
+</div>
 
-<center>
-    
+@* <center>
+
     <div style="justify-content:center;text-align:left;width:90%;">
         <RadzenTemplateForm TItem="TeamDto" Data=@model Submit=@OnSubmit InvalidSubmit=@OnInvalidSubmit>
             <RadzenStack Gap="0.5rem" Class="rz-p-sm-12">
@@ -32,4 +53,4 @@
             </RadzenStack>
         </RadzenTemplateForm>
     </div>
-</center>
+</center> *@

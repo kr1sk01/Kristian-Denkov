@@ -86,17 +86,8 @@
             </div>
         </div>
         <div class="form-actions">
-            <RadzenButton ButtonType="Radzen.ButtonType.Submit" Icon="save" Text="Save" Style="margin-right: 10px;" Class="btn btn-primary" />
+            <RadzenButton ButtonType="Radzen.ButtonType.Submit" Icon="add_circle" Text="Create" Style="margin-right: 10px;" Class="btn btn-primary" />
             <RadzenButton ButtonType="Radzen.ButtonType.Reset" Icon="refresh" Text="Reset" Class="btn btn-secondary" Click="OnResetClicked" />
         </div>
     </RadzenTemplateForm>
-
-    <RadzenNotification />
-
-    @if (!isLogged)
-    {
-        <div class="alert alert-warning">
-            You are not logged in. Please log in to create a game.
-        </div>
-    }
 </div>

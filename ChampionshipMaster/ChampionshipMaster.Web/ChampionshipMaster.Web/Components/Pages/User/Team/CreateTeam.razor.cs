@@ -31,7 +31,7 @@ public partial class CreateTeam : ComponentBase
 
     TeamDto model = new TeamDto();
 
-    RadzenDropDown<string>? teamTypeDropDown;
+    RadzenDropDown<string?>? teamTypeDropDown;
     ChampionshipTeamsDto? ChampionshipTeamsToAdd;
     //private GameType gameType = new GameType();
     private List<TeamType> teamTypes = new List<TeamType>(); // Assuming you have a list of TeamTypes to choose from
@@ -53,17 +53,14 @@ public partial class CreateTeam : ComponentBase
                     await teamTypeDropDown.SelectItem(championship!.GameType!.TeamTypeName, false);
                     model.TeamTypeName = championship!.GameType!.TeamTypeName;
                     teamTypeDropDown.Disabled = true;
-                    ;
                 }
                 StateHasChanged();
             }           
         }
     }
 
-    private async Task OnInvalidSubmit(FormInvalidSubmitEventArgs args)
+    private void OnInvalidSubmit(FormInvalidSubmitEventArgs args)
     {
-        //TeamDto team = new TeamDto { };
-        notifier.SendErrorNotification("Something went wrong!");
     }
     private async Task OnSubmit(TeamDto model)
     {
