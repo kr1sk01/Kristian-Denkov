@@ -12,13 +12,15 @@ namespace ChampionshipMaster.API.Services.ControllerServices
         private readonly UserManager<Player> _userManager;
         private readonly IEmailSender _emailSender;
         private readonly ILotService _lotService;
+        private readonly IChampionshipService _championshipService;
 
-        public GameService(ApplicationDbContext context, IEmailSender emailSender, UserManager<Player> userManager, ILotService lotService)
+        public GameService(ApplicationDbContext context, IEmailSender emailSender, UserManager<Player> userManager, ILotService lotService, IChampionshipService championshipService)
         {
             _context = context;
             _userManager = userManager;
             _emailSender = emailSender;
             _lotService = lotService;
+            _championshipService = championshipService;
         }
 
         public async Task<IActionResult> DeleteGame(int id)
@@ -107,6 +109,15 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                         else
                         {
                             championshipToEdit.Winner = gameToEdit.Winner;
+                            championshipToEdit.ChampionshipStatus = await _context.ChampionshipStatuses.FirstAsync(x => x.Name == "Finished");
+
+                            List<Player?> players = await _championshipService.GetChampionshipPlayers(championshipToEdit.Id);
+                            foreach (var player in players)
+                            {
+                                if (player == null)
+                                    continue;
+                                await _emailSender.SendChampionshipFinishedEmail(player.Email!, player.UserName!, championshipToEdit.Name!, championshipToEdit.Winner!.Name!);
+                            }
                         }
                     }
                 }

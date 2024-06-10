@@ -142,5 +142,17 @@ namespace ChampionshipMaster.API.Services
 
             await SendEmailAsync(userEmail, "Championship Lot Drawn", body);
         }
+
+        public async Task SendChampionshipFinishedEmail(string userEmail, string userName, string championshipName, string winnerName)
+        {
+            var templatePath = "Services/EmailTemplates/ChampionshipFinishedTemplate.html";
+            var template = GetEmailTemplate(templatePath);
+
+            string body = template.Replace("[User Name]", userName)
+                .Replace("[Championship Name]", championshipName)
+                .Replace("[Winner Name]", winnerName);
+
+            await SendEmailAsync(userEmail, "Championship has finished", body);
+        }
     }
 }

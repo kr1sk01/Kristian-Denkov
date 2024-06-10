@@ -302,20 +302,12 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                 var userId = token.Claims.First(x => x.Type == "nameid").Value;
                 var userRole = token.Claims.First(x => x.Type == "role").Value;
                 var championshipToEdit = await _context.Championships
-                    .Include(x => x.ChampionshipTeams)
-                        .ThenInclude(x => x.Team)
-                            .ThenInclude(x => x.TeamPlayers)
-                                .ThenInclude(x => x.Player)
                     .Include(x => x.Games)
                         .ThenInclude(x => x.Winner)
                     .Include(x => x.Games)
                         .ThenInclude(x => x.RedTeam)
-                            .ThenInclude(x => x.TeamPlayers)
-                                .ThenInclude(x => x.Player)
                     .Include(x => x.Games)
                         .ThenInclude(x => x.BlueTeam)
-                            .ThenInclude(x => x.TeamPlayers)
-                                .ThenInclude(x => x.Player)
                     .Include(x => x.Games)
                         .ThenInclude(x => x.GameStatus)
                     .Include(x => x.ChampionshipTeams)
@@ -439,7 +431,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
 
         public async Task SendLotNotifications(Championship championship)
         {
-            var players = GetChampionshipPlayers(championship);
+            var players = await GetChampionshipPlayers(championship.Id);
 
             foreach (var player in players)
             {
@@ -476,8 +468,35 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             }
         }
 
-        public List<Player?> GetChampionshipPlayers(Championship championship)
+        public async Task<List<Player?>> GetChampionshipPlayers(int championshipId)
         {
+            var championship = await _context.Championships
+                    .Include(x => x.ChampionshipTeams)
+                        .ThenInclude(x => x.Team)
+                            .ThenInclude(x => x.TeamPlayers)
+                                .ThenInclude(x => x.Player)
+                    .Include(x => x.Games)
+                        .ThenInclude(x => x.Winner)
+                    .Include(x => x.Games)
+                        .ThenInclude(x => x.RedTeam)
+                            .ThenInclude(x => x.TeamPlayers)
+                                .ThenInclude(x => x.Player)
+                    .Include(x => x.Games)
+                        .ThenInclude(x => x.BlueTeam)
+                            .ThenInclude(x => x.TeamPlayers)
+                                .ThenInclude(x => x.Player)
+                    .Include(x => x.Games)
+                        .ThenInclude(x => x.GameStatus)
+                    .Include(x => x.ChampionshipTeams)
+                        .ThenInclude(x => x.Team)
+                            .ThenInclude(x => x.TeamType)
+                        .FirstOrDefaultAsync(x => x.Id == championshipId);
+
+            if (championship == null)
+            {
+                return [];
+            }
+
             List<Player?> players = [.. championship.ChampionshipTeams.SelectMany(x => x.Team!.TeamPlayers).Select(x => x.Player)];
             return players;
         }
