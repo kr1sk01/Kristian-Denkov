@@ -417,7 +417,10 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                     }
                 }
 
-                await SendLotNotifications(championshipToEdit).ConfigureAwait(false);
+                var task = Task.Run(async () =>
+                {
+                    await SendLotNotifications(championshipToEdit);
+                });
 
                 var gamesListDto = championshipToEdit.Games.OrderBy(x => x.Id).Adapt<List<GameDto>>();
                 return Ok(gamesListDto);

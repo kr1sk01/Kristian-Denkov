@@ -421,7 +421,11 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                         await _context.TeamPlayers.AddAsync(teamPlayer);
 
                         var playersList = team.Players.Select(x => x.Name ?? "").ToList();
-                        await _emailSender.SendAddedToTeamEmail(playerToAdd.Email!, playerToAdd.UserName!, teamToEdit.Name!, userName, teamToEdit.TeamType?.Name!, playersList);
+
+                        var task = Task.Run(async () =>
+                        {
+                            await _emailSender.SendAddedToTeamEmail(playerToAdd.Email!, playerToAdd.UserName!, teamToEdit.Name!, userName, teamToEdit.TeamType?.Name!, playersList);
+                        });
                     }
                 }
 

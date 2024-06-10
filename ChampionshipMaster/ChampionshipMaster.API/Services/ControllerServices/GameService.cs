@@ -110,14 +110,21 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                         {
                             championshipToEdit.Winner = gameToEdit.Winner;
                             championshipToEdit.ChampionshipStatus = await _context.ChampionshipStatuses.FirstAsync(x => x.Name == "Finished");
+                            _context.Entry(championshipToEdit).State = EntityState.Modified;
+                            await _context.SaveChangesAsync();
 
                             List<Player?> players = await _championshipService.GetChampionshipPlayers(championshipToEdit.Id);
-                            foreach (var player in players)
+                            var task = Task.Run(async () =>
                             {
-                                if (player == null)
-                                    continue;
-                                await _emailSender.SendChampionshipFinishedEmail(player.Email!, player.UserName!, championshipToEdit.Name!, championshipToEdit.Winner!.Name!);
-                            }
+                                foreach (var player in players)
+                                {
+                                    if (player == null)
+                                        continue;
+
+                                    // Sending email asynchronously
+                                    await _emailSender.SendChampionshipFinishedEmail(player.Email!, player.UserName!, championshipToEdit.Name!, championshipToEdit.Winner!.Name!);
+                                }
+                            });
                         }
                     }
                 }
@@ -138,12 +145,15 @@ namespace ChampionshipMaster.API.Services.ControllerServices
 
                         if (teamPlayers != null)
                         {
-                            foreach (var teamPlayer in teamPlayers)
+                            var task = Task.Run(async () =>
                             {
-                                await _emailSender.SendGameFinishedEmail(teamPlayer.Player!.Email!, gameToEdit.Name!, gameToEdit.BlueTeam!.Name!, gameToEdit.BluePoints ?? 0, gameToEdit.RedTeam!.Name!, gameToEdit.RedPoints ?? 0).ConfigureAwait(false);
-                            }
+                                foreach (var teamPlayer in teamPlayers)
+                                {
+                                    await _emailSender.SendGameFinishedEmail(teamPlayer.Player!.Email!, gameToEdit.Name!, gameToEdit.BlueTeam!.Name!, gameToEdit.BluePoints ?? 0, gameToEdit.RedTeam!.Name!, gameToEdit.RedPoints ?? 0);
+                                }
+                            });
                         }
-                        
+
                     }
                 }
 
@@ -272,24 +282,29 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                 await _context.Games.AddAsync(newGame);
                 await _context.SaveChangesAsync();
 
-                foreach (var teamPlayer in newGame.BlueTeam.TeamPlayers.ToList())
+                var task1 = Task.Run(async () =>
                 {
-                    var userName = teamPlayer.Player!.UserName;
-                    var email = teamPlayer.Player!.Email;
-                    var userTeam = newGame.BlueTeam.Name;
-                    var opponentTeam = newGame.RedTeam.Name;
-                    await _emailSender.SendGameScheduledEmail(email!, userName!, game.Name!, userTeam!, opponentTeam!, game.Date ?? DateTime.MaxValue);
-                }
+                    foreach (var teamPlayer in newGame.BlueTeam.TeamPlayers.ToList())
+                    {
+                        var userName = teamPlayer.Player!.UserName;
+                        var email = teamPlayer.Player!.Email;
+                        var userTeam = newGame.BlueTeam.Name;
+                        var opponentTeam = newGame.RedTeam.Name;
+                        await _emailSender.SendGameScheduledEmail(email!, userName!, game.Name!, userTeam!, opponentTeam!, game.Date ?? DateTime.MaxValue);
+                    }
+                });
 
-                foreach (var teamPlayer in newGame.RedTeam.TeamPlayers.ToList())
+                var task2 = Task.Run(async () =>
                 {
-                    var userName = teamPlayer.Player!.UserName;
-                    var email = teamPlayer.Player!.Email;
-                    var userTeam = newGame.RedTeam.Name;
-                    var opponentTeam = newGame.BlueTeam.Name;
-                    await _emailSender.SendGameScheduledEmail(email!, userName!, game.Name!, userTeam!, opponentTeam!, game.Date ?? DateTime.MaxValue);
-                }
-
+                    foreach (var teamPlayer in newGame.RedTeam.TeamPlayers.ToList())
+                    {
+                        var userName = teamPlayer.Player!.UserName;
+                        var email = teamPlayer.Player!.Email;
+                        var userTeam = newGame.RedTeam.Name;
+                        var opponentTeam = newGame.BlueTeam.Name;
+                        await _emailSender.SendGameScheduledEmail(email!, userName!, game.Name!, userTeam!, opponentTeam!, game.Date ?? DateTime.MaxValue);
+                    }
+                });
 
                 return CreatedAtAction(nameof(PostGame), new { id = newGame.Id });
             }

@@ -30,7 +30,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
         }
         public async Task<List<PlayerDto>> GetAllActivePlayers()
         {
-            var activePlayers = await _userManager.Users.Where(x=>x.Active == true).ToArrayAsync();
+            var activePlayers = await _userManager.Users.Where(x => x.Active == true).ToArrayAsync();
             var players = activePlayers.Adapt<List<PlayerDto>>();
             return players;
         }
@@ -41,8 +41,9 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                 return BadRequest(ModelState);
             }
 
-            var player = new Player { 
-                UserName = registerRequest.UserName, 
+            var player = new Player
+            {
+                UserName = registerRequest.UserName,
                 Email = registerRequest.Email,
                 CreatedOn = registerRequest.CreatedOn
             };
@@ -82,7 +83,11 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                     Uri.EscapeDataString($"{userId}") +
                     "&token=" +
                     Uri.EscapeDataString($"{emailToken}");
-                await _emailSender.SendAccountConfirmationEmail(user.Email!, user.UserName!, confirmationLink);
+
+                var task = Task.Run(async () =>
+                {
+                    await _emailSender.SendAccountConfirmationEmail(user.Email!, user.UserName!, confirmationLink);
+                });
 
                 var jwtToken = _jwtService.GenerateToken(user);
                 return Ok(new { message = "Registration successful", jwtToken = jwtToken.Result });
@@ -98,10 +103,10 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             {
                 return BadRequest(ModelState);
             }
-            
+
             // Find the user by username
             var user = await _userManager.FindByEmailAsync(loginRequest.Email!);
-            
+
             if (user == null)
             {
                 return BadRequest("Invalid username or password");
@@ -109,7 +114,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
 
             // Validate the password
             var validPassword = await _userManager.CheckPasswordAsync(user, loginRequest.Password!);
-            
+
             if (!validPassword)
             {
                 return BadRequest("Invalid username or password");
@@ -138,10 +143,10 @@ namespace ChampionshipMaster.API.Services.ControllerServices
 
             var userToLogOut = await _context.Users.FirstOrDefaultAsync(x => x.UserName == username);
 
-            if (userToLogOut == null) 
-            { 
-                return BadRequest("User not found!"); 
-            
+            if (userToLogOut == null)
+            {
+                return BadRequest("User not found!");
+
             }
             userToLogOut.Online = false;
 
@@ -168,7 +173,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                 var token = new JwtSecurityToken(tokenString);
 
                 var userName = token.Claims.First(c => c.Type == "unique_name").Value;
-                
+
                 var user = await _userManager.FindByNameAsync(userName) ?? throw new Exception($"Unable to find user - {userName}");
 
                 if (await _userManager.CheckPasswordAsync(user, changePassword.Password!))
@@ -224,7 +229,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
 
         public async Task<IActionResult> ChangeAvatar(string newAvatar, StringValues authHeader)
         {
-            if(string.IsNullOrEmpty(newAvatar))
+            if (string.IsNullOrEmpty(newAvatar))
             {
                 return BadRequest("Image not received");
             }
