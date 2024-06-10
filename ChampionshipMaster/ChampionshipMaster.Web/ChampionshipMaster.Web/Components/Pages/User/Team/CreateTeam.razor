@@ -17,6 +17,7 @@
         </div> <br />
         <div class="form-row">
             <div class="form-group half-width">
+                <RadzenLabel Style="color:white;" Text="Team Type" Class="form-label" />
                 <RadzenDropDown @ref=@teamTypeDropDown Name="TeamType" @bind-Value=@model.TeamTypeName Data=@teamTypes.Select(x => x.Name).ToList() Style="width: 100%;" />
                 <RadzenRequiredValidator Component="TeamType" Text="Team Type is required!" />
             </div>
@@ -26,31 +27,3 @@
         </div>
     </RadzenTemplateForm>
 </div>
-
-@* <center>
-
-    <div style="justify-content:center;text-align:left;width:90%;">
-        <RadzenTemplateForm TItem="TeamDto" Data=@model Submit=@OnSubmit InvalidSubmit=@OnInvalidSubmit>
-            <RadzenStack Gap="0.5rem" Class="rz-p-sm-12">
-                <RadzenFormField Text="Name" Variant="@variant">
-                    <ChildContent>
-                        <RadzenTextBox Name="Name" @bind-Value=@model.Name />
-                    </ChildContent>
-                    <Helper>
-                        <RadzenRequiredValidator Component="Name" Text="Name is required." />
-                        <RadzenLengthValidator Component="Name" Min="3" Max="32" Text="Name can be between 3 and 32 characters" />
-                    </Helper>
-                </RadzenFormField>
-                <RadzenFormField Text="Team Type" Variant="@variant">
-                    <ChildContent>
-                        <RadzenDropDown @ref=@teamTypeDropDown Name="TeamType" @bind-Value=@model.TeamTypeName Data=@teamTypes.Select(x => x.Name).ToList() Style="width: 100%;" />
-                    </ChildContent>
-                    <Helper>
-                        <RadzenRequiredValidator Component="TeamType" Text="Team Type is required!" />
-                    </Helper>
-                </RadzenFormField>
-                <RadzenButton ButtonType="Radzen.ButtonType.Submit" Text=@(isRedirectedFromChampionship == true ? "Create Team To Join" : "Create Team")></RadzenButton>
-            </RadzenStack>
-        </RadzenTemplateForm>
-    </div>
-</center> *@
