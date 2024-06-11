@@ -13,16 +13,16 @@
 <div class="container mt-4">
     <Carousel>
         <CarouselItem>
-            <div style="width:1280px;height:720px;overflow: hidden;">
+            <div class="carouselItem">
                 <a onclick=@openCreateTeam><RadzenImage class="d-block w-100 cover" Path="Images/teamvsteam.png" AlternateText="FoosBallRules" /></a>
                 <div class="glassmorphism carousel-caption d-none d-md-block">
-                    <h4>Create you own team!</h4>
+                    <h4>Create your own team!</h4>
                     <h5>Team creation is one click away from you!</h5>
                 </div>
             </div>
         </CarouselItem>
         <CarouselItem>
-            <div style="width:1280px;height:720px;overflow: hidden;">
+            <div class="carouselItem">
                 <a onclick=@openChampionship><RadzenImage src="/images/tournament.jpg" class="d-block w-100 scaledown" alt="Slide 2" /></a>
                 <div class="glassmorphism carousel-caption d-none d-md-block">
                     <h4>Take your first adventure!</h4>
@@ -31,7 +31,7 @@
             </div>
         </CarouselItem>
         <CarouselItem>
-            <div style="width:1280px;height:720px;overflow: hidden;">
+            <div class="carouselItem">
                 <a onclick=@openCreateTeam><RadzenImage src="/images/mk.jpg" class="d-block w-100 cover" alt="Slide 2" /></a>
                 <div class="glassmorphism carousel-caption d-none d-md-block">
                     <h4>Mortal Kombat 1v1 Battles!</h4>
@@ -40,11 +40,10 @@
             </div>
         </CarouselItem>
         <CarouselItem>
-            <div style="width:1280px;height:720px;overflow: hidden;">
+            <div class="carouselItem">
                 <a onclick=@openRulesPage>
                     <video autoplay loop muted>
                         <source src="/videos/foosball.mp4" type="video/mp4">
-                        <!-- Add additional <source> elements for other video formats if needed -->
                         Your browser does not support the video tag.
                     </video>
                 </a>
@@ -60,14 +59,12 @@
     body {
         background-color: #706c6c;
     }
-
-    .cover {
-        object-fit: cover;
-    }
-
-    .scaledown123 {
-
-        object-fit: scale-down;
+    .carouselItem
+    {
+        width:1280px;
+        height:720px;
+        overflow: hidden;
+        object-fit: fill;
     }
 
     video {
@@ -77,12 +74,11 @@
     }
     .glassmorphism {
         background: rgba(255, 255, 255, 0.2); /* Background color with transparency */
-        backdrop-filter: blur(10px); /* Apply blur effect */
+        backdrop-filter: blur(15px); /* Apply blur effect */
         border-radius: 10px; /* Rounded corners */
-        border: 1px solid rgba(255, 255, 255, 0.18); /* Border with transparency */
-        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37); /* Box shadow */
+        border: 1px solid rgba(255, 255, 255, 0.22); /* Border with transparency */
+        box-shadow: 0 8px 32px 0 rgba(255, 255, 255, 0.25); /* Box shadow */
         backdrop-filter: blur(4px); /* Additional blur */
-        padding-down: 30px;
         color: black;
     }
 

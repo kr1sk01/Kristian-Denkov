@@ -9,13 +9,35 @@
     <div class="admin-panel">
         <h1>Admin Panel</h1>
         <div class="button-grid">
-            <RadzenButton Click="@(() => NavigationManager.NavigateTo("/GameStatusMain"))" Text="Manage Game Statuses" ButtonStyle="Radzen.ButtonStyle.Secondary" />
-            <RadzenButton Click="@(() => NavigationManager.NavigateTo("/GameTypeMain"))" Text="Manage Game Types" ButtonStyle="Radzen.ButtonStyle.Secondary" />
-
-            <RadzenButton Click="@(() => NavigationManager.NavigateTo("/TeamTypeMain"))" Text="Manage Team Types" ButtonStyle="Radzen.ButtonStyle.Secondary" />
-
-            <RadzenButton Click="@(() => NavigationManager.NavigateTo("/ChampionshipTypesMain"))" Text="Manage Championship Types" ButtonStyle="Radzen.ButtonStyle.Secondary" />
-            <RadzenButton Click="@(() => NavigationManager.NavigateTo("/ChampionshipStatusMain"))" Text="Manage Championship Statuses" ButtonStyle="Radzen.ButtonStyle.Secondary" />
+            <RadzenButton Click="@(() => NavigationManager.NavigateTo("/GameStatusMain"))" Text="Manage Game Statuses" ButtonStyle="Radzen.ButtonStyle.Secondary" class="glass-button" />
+            <RadzenButton Click="@(() => NavigationManager.NavigateTo("/GameTypeMain"))" Text="Manage Game Types" ButtonStyle="Radzen.ButtonStyle.Secondary" class="glass-button" />
+            <RadzenButton Click="@(() => NavigationManager.NavigateTo("/TeamTypeMain"))" Text="Manage Team Types" ButtonStyle="Radzen.ButtonStyle.Secondary" class="glass-button" />
+            <RadzenButton Click="@(() => NavigationManager.NavigateTo("/ChampionshipTypesMain"))" Text="Manage Championship Types" ButtonStyle="Radzen.ButtonStyle.Secondary" class="glass-button" />
+            <RadzenButton Click="@(() => NavigationManager.NavigateTo("/ChampionshipStatusMain"))" Text="Manage Championship Statuses" ButtonStyle="Radzen.ButtonStyle.Secondary" class="glass-button" />
         </div>
     </div>
 }
+
+<style>
+
+
+    .glass-button {
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        color: white;
+        padding: 10px 20px;
+        font-size: 1.2em;
+        border-radius: 10px;
+        transition: transform 0.3s, background 0.3s;
+    }
+
+        .glass-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .glass-button:focus {
+            outline: none;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+</style>
