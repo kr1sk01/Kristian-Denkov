@@ -11,13 +11,25 @@ namespace ChampionshipMaster.Web.Components.Pages
         [Inject] ITokenService tokenService { get; set; } = default!;
         [Inject] IHttpClientFactory httpClient { get; set; } = default!;
         [Inject] ProtectedLocalStorage _localStorage { get; set; } = default!;
-
+        [Inject] IConfiguration configuration { get; set; } = default!;
         private string username = "";
 
         private HubConnection? _hubConnection;
 
         private readonly List<string> _messages = new();
 
+        TeamDto bestTeam = new TeamDto { Id = 1 };
+        protected override async void OnInitialized()
+        {
+            using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+
+            var team = await client.GetFromJsonAsync<TeamDto>($"api/Teams/bestTeam");
+
+            if (team != null)
+                bestTeam = team;
+
+            StateHasChanged();
+        }
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
@@ -36,6 +48,8 @@ namespace ChampionshipMaster.Web.Components.Pages
                     StateHasChanged();
                 }
                 else { NavigationManager.NavigateTo("/login"); }
+
+                
             }
         }
         void openChampionship()

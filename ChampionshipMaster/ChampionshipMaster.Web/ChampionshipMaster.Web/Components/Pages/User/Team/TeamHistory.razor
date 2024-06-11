@@ -3,39 +3,80 @@
 @inherits ComponentBase
 
 @rendermode InteractiveServer
-<br />
-<center><h1 style="color:white;">@(currentTeam.Name)'s history</h1></center>
-<br />
-<div class="mainHistory">
-    
+@if (!fromHomePage)
+{ 
+    <br />
+    <center><h1 style="color:white;">@(currentTeam.Name)'s history</h1></center>
+    <br />
+    <div class="mainHistory">
 
-    <div class="teamHistoryContainer">
-        <div class="chart">
-            <br />
-            <center><h2 style="color:white;padding-right:3rem;">Total Games: @gamesPlayed </h2></center>
-            <center><h2 style="color:white;padding-right:3rem;">Winratio: <b><span style="color: @(@winrationPercentage >= 50 ? "green" : "red")">@winrationPercentage</span></b> %</h2></center>
-            @if (gamesPlayed > 0)
-            {
-                <RadzenChart>
-                    <RadzenPieSeries Data="@data" ValueProperty="Count" CategoryProperty="Category" Fills="@fills">
-                    </RadzenPieSeries>
-                </RadzenChart>
-            }
 
-        </div>
+        <div class="teamHistoryContainer">
+            <div class="chart">
+                <br />
+                <center><h2 style="color:white;padding-right:3rem;">Total Games: @gamesPlayed </h2></center>
+                <center><h2 style="color:white;padding-right:3rem;">Winratio: <b><span style="color: @(@winrationPercentage >= 50 ? "green" : "red")">@Convert.ToInt32(winrationPercentage)</span></b> %</h2></center>
+                @if (gamesPlayed > 0)
+                {
+                    <RadzenChart>
+                        <RadzenPieSeries Data="@data" ValueProperty="Count" CategoryProperty="Category" Fills="@fills">
+                        </RadzenPieSeries>
+                    </RadzenChart>
+                }
 
-        <div class="data-list">
-            <br />
-            <RadzenDataList class="custom-datalist"
-                            AllowVirtualization=@true
-                            WrapItems=@false
-                            AllowPaging=@false
-                            Data="@games"
-                            TItem="GameDto">
-                <Template Context="game">
-                    <GameCard Game="@game" Style="max-height:250px;"></GameCard>
-                </Template>
-            </RadzenDataList>
+            </div>
+
+            <div class="data-list">
+                <br />
+                <RadzenDataList class="custom-datalist"
+                                AllowVirtualization=@true
+                                WrapItems=@false
+                                AllowPaging=@false
+                                Data="@games"
+                                TItem="GameDto">
+                    <Template Context="game">
+                        <GameCard Game="@game" Style="max-height:250px;"></GameCard>
+                    </Template>
+                </RadzenDataList>
+            </div>
         </div>
     </div>
-</div>
+ } 
+ else
+{
+
+    <div class="mainHistory">
+        <center><h1 style="color:white;">Champion: @(currentTeam.Name)</h1></center>
+
+        <div class="teamHistoryContainer">
+            <div class="chart">
+                <br />
+                <center><h2 style="color:white;padding-right:3rem;">Total Games: @gamesPlayed </h2></center>
+                <center><h2 style="color:white;padding-right:3rem;">Winratio: <b><span style="color: @(@winrationPercentage >= 50 ? "green" : "red")">@Convert.ToInt32(winrationPercentage)</span></b> %</h2></center>
+                @if (gamesPlayed > 0)
+                {
+                    <RadzenChart>
+                        <RadzenPieSeries Data="@data" ValueProperty="Count" CategoryProperty="Category" Fills="@fills">
+                        </RadzenPieSeries>
+                    </RadzenChart>
+                }
+
+            </div>
+
+            <div class="data-list">
+                <br />
+                <RadzenDataList class="custom-datalist"
+                                AllowVirtualization=@true
+                                WrapItems=@false
+                                AllowPaging=@false
+                                Data="@games"
+                                TItem="GameDto">
+                    <Template Context="game">
+                        <GameCard Game="@game" Style="max-height:250px;"></GameCard>
+                    </Template>
+                </RadzenDataList>
+            </div>
+        </div>
+    </div>
+} 
+

@@ -2,6 +2,7 @@
 using ChampionshipMaster.DATA.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Primitives;
+using Org.BouncyCastle.Utilities;
 using System.IdentityModel.Tokens.Jwt;
 using System.Numerics;
 using static System.Net.Mime.MediaTypeNames;
@@ -74,6 +75,8 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             var team = await _context.Teams
                 .FirstOrDefaultAsync(x => x.Id == id);
 
+          
+
             if (team == null)
             {
                 return NotFound();
@@ -90,6 +93,70 @@ namespace ChampionshipMaster.API.Services.ControllerServices
                 .ToListAsync();
 
             var dto = games.Adapt<List<GameDto>>();
+            return Ok(dto);
+        }
+        public async Task<ActionResult<TeamDto>> BestTeam()
+        {
+
+            Team bestTeam = new Team();
+
+            var teams = await _context.Teams.ToListAsync();
+
+            if (teams == null)
+            {
+                return NotFound();
+            }
+
+            int wins = 0;
+            int loses = 0;
+            int gamesPlayed = 0;
+            double winrationPercentage = 0;
+            double current_winratio = 0;
+            foreach (var team in teams)
+            {
+                var games = await _context.Games
+                .Where(x => x.BlueTeamId == team.Id || x.RedTeamId == team.Id)
+                    .Include(x => x.GameType)
+                    .Include(x => x.GameStatus)
+                    .Include(x => x.RedTeam)
+                    .Include(x => x.BlueTeam)
+                    .Include(x => x.Championship)
+                    .Include(x => x.Winner)
+                .ToListAsync();
+
+                var dto1 = games.Adapt<List<GameDto>>();
+
+                foreach (var item in dto1)
+                {
+                    if (item.GameStatusName == "Finished" && item.Winner != null)
+                    {
+
+                        if (item.Winner.Id == team.Id) wins++;
+                        if (item.BlueTeam!.Id == team.Id || item.RedTeam!.Id == team.Id) gamesPlayed++;
+
+                        loses = gamesPlayed - wins;
+                    }
+                    if (gamesPlayed > 0)
+                    {
+                        current_winratio = (double)(((double)wins / (double)gamesPlayed) * 100);                                           
+                    }
+                }
+                if (current_winratio >= winrationPercentage)
+                {
+                    bestTeam = team;
+                    winrationPercentage = current_winratio;
+                    current_winratio = 0;
+                    wins = 0;
+                    loses = 0;
+                    gamesPlayed = 0;
+                   
+                    current_winratio = 0;
+                }
+            }
+
+            var dto = bestTeam.Adapt<TeamDto>();
+            //var dto2 = games.Adapt<List<GameDto>>();
+
             return Ok(dto);
         }
 

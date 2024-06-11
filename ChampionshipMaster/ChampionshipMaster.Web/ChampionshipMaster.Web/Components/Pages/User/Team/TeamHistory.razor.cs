@@ -1,21 +1,17 @@
-﻿namespace ChampionshipMaster.Web.Components.Pages.User.Team
+﻿using Blazorise;
+
+namespace ChampionshipMaster.Web.Components.Pages.User.Team
 {
     public partial class TeamHistory : ComponentBase
     {
-        [Inject]
-        ITokenService tokenService { get; set; } = default!;
-        [Inject]
-        IHttpClientFactory httpClient { get; set; } = default!;
-        [Inject]
-        INotifier notifier { get; set; } = default!;
-        [Inject]
-        IConfiguration configuration { get; set; } = default!;
-        [Inject]
-        IImageService imageService { get; set; } = default!;
-        [Inject]
-        NavigationManager NavigationManager { get; set; } = default!;
-
+        [Inject] ITokenService tokenService { get; set; } = default!;
+        [Inject] IHttpClientFactory httpClient { get; set; } = default!;
+        [Inject] INotifier notifier { get; set; } = default!;
+        [Inject] IConfiguration configuration { get; set; } = default!;
+        [Inject] IImageService imageService { get; set; } = default!;
+        [Inject] NavigationManager NavigationManager { get; set; } = default!;
         [Parameter] public string id { get; set; } = default!;
+        [Parameter] public bool fromHomePage { get; set; } = false;
 
         public TeamDto currentTeam = new();
 
@@ -52,6 +48,9 @@
         public double winratio { get; set; }
         public int gamesPlayed { get; set; }
         public double winrationPercentage { get; set; }
+
+        TeamDto team = new();
+
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
@@ -66,8 +65,19 @@
                 else { NavigationManager.NavigateTo("/login"); }
 
                 using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
-
-                var team = await client.GetFromJsonAsync<TeamDto>($"/api/Teams/{id}");
+                if (!fromHomePage)
+                {
+                    var tempTeam = await client.GetFromJsonAsync<TeamDto>($"/api/Teams/{id}");
+                    if (tempTeam != null)
+                        team = tempTeam;
+                }
+                else
+                {
+                    var tempTeam = await client.GetFromJsonAsync<TeamDto>($"api/Teams/bestTeam");
+                    if(tempTeam != null)
+                        team = tempTeam;
+                }
+                
                 if (team != null)
                     currentTeam = team;
                 var test = await client.GetFromJsonAsync<List<GameDto>>($"/api/Teams/Game_History/{id}");

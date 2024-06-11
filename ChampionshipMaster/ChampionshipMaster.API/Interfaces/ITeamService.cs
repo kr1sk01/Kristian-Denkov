@@ -9,6 +9,7 @@ namespace ChampionshipMaster.API.Interfaces
         Task<List<TeamDto>> GetAllTeamsPlayerParticipation(string userId);
         Task<ActionResult<TeamDto?>> GetTeam(int id);
         Task<ActionResult<List<GameDto>>> GameHistory(int id);
+        Task<ActionResult<TeamDto>> BestTeam();
         Task<ActionResult<TeamDto>> PostTeam(TeamDto team, StringValues authHeader);
         Task<ActionResult<TeamDto>> SetTeamMembers(string teamId, List<string> playerIds, StringValues authHeader);
         //Task<IActionResult> EditTeam(int id, Team team);

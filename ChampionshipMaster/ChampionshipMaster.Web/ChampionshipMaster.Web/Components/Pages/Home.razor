@@ -9,8 +9,13 @@
 <PageTitle>Home</PageTitle>
 
 <div class="container mt-4">
-    <Carousel @bind-SelectedSlide="@selectedSlide" Autoplay Interval="3000" AutoRepeat Loop="true" ShowIndicators=true Crossfade=true>
+    <Carousel @bind-SelectedSlide="@selectedSlide" Autoplay Interval="3000" AutoRepeat Loop="true">
          <CarouselSlide Name="1">
+             <div class="carouselItem">
+                <ChampionshipMaster.Web.Components.Pages.User.Team.TeamHistory fromHomePage=true id="@(bestTeam.Id.ToString())"></ChampionshipMaster.Web.Components.Pages.User.Team.TeamHistory>
+             </div>
+         </CarouselSlide>
+         <CarouselSlide Name="2">
              <div class="carouselItem">
                  <a @onclick="openCreateTeam">
                      <Image Source="Images/teamvsteam.png" class="d-block w-100 cover" Alt="FoosBallRules" />
@@ -21,7 +26,7 @@
                  </div>
              </div>
          </CarouselSlide>
-         <CarouselSlide Name="2">
+         <CarouselSlide Name="3">
              <div class="carouselItem">
                  <a @onclick="openChampionship">
                      <Image Source="/images/tournament.jpg" class="d-block w-100 scaledown" Alt="Slide 2" />
@@ -32,7 +37,7 @@
                  </div>
              </div>
          </CarouselSlide>
-         <CarouselSlide Name="3">
+         <CarouselSlide Name="4">
              <div class="carouselItem">
                  <a @onclick="openCreateTeam">
                      <Image Source="/images/mk.jpg" class="d-block w-100 cover" Alt="Slide 2" />
@@ -43,7 +48,7 @@
                  </div>
              </div>
          </CarouselSlide>
-         <CarouselSlide Name="4">
+         <CarouselSlide Name="5">
              <div class="carouselItem">
                  <a @onclick="openRulesPage">
                      <video autoplay loop muted>

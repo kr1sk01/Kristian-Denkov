@@ -52,6 +52,12 @@ namespace ChampionshipMaster.API.Controllers
             var result = await _teamService.GameHistory(id);
             return result;
         }
+        [HttpGet("bestTeam")]
+        public async Task<ActionResult<TeamDto>> BestTeam()
+        {
+            var result = await _teamService.BestTeam();
+            return result;
+        }
 
         // PUT: api/Teams/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
