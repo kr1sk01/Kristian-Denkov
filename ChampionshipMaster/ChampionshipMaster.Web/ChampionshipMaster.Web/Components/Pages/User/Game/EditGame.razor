@@ -22,7 +22,7 @@
                                @ref="@radioButtonList" Change="@OnChangeRadio" Value="@winnerTeamName" TValue="string">
             <Items>
                 <RadzenText TextAlign="TextAlign.Center" Text="Choose winner:"/>
-                <RadzenRadioButtonListItem  Style="padding-left:1rem;padding-right:11.6vw;" Value="@teams[0]" />
+                <RadzenRadioButtonListItem  Style="padding-left:1rem;padding-right:7vw;" Value="@teams[0]" />
                 <RadzenRadioButtonListItem  Value="@teams[1]" />
             </Items>
         </RadzenRadioButtonList><br />
@@ -60,5 +60,6 @@
     </div><br /><br />
     <center><RadzenButton Text="Save Changes" Disabled="@isValueInitial" Click="OnClickSave"></RadzenButton></center>
 </div>
+
 
 }

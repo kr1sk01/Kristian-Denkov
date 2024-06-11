@@ -1,9 +1,13 @@
 ﻿using Blazored.LocalStorage;
+using Blazorise;
 using ChampionshipMaster.Web.Components;
 using ChampionshipMaster.Web.Services;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Radzen;
 using Radzen.Blazor;
+using Blazorise;
+using Blazorise.Bootstrap5;
+using Blazorise.Icons.FontAwesome;
 
 namespace ChampionshipMaster.Web;
 public class Program
@@ -25,7 +29,6 @@ public class Program
         builder.Services.AddTransient<IImageService, ImageService>();
         builder.Services.AddTransient<IClientLotService, ClientLotService>();
         builder.Services.AddScoped<LayoutStateService>();
-        builder.Services.AddBootstrapBlazor();
         builder.Services.AddHttpClient(builder.Configuration["ClientName"]!, client =>
         {
             client.BaseAddress = new Uri(builder.Configuration["ApiBaseAddress"]!);
@@ -33,7 +36,15 @@ public class Program
 
         builder.Services.AddSignalR();
         builder.Services.AddBlazoredLocalStorage();
-        
+
+
+        builder.Services
+            .AddBlazorise(options =>
+            {
+                options.Immediate = true;
+            })
+            .AddBootstrap5Providers()
+            .AddFontAwesomeIcons();
 
         var app = builder.Build();
 
