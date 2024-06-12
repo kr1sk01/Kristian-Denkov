@@ -23,10 +23,10 @@ namespace ChampionshipMaster.Web.Components.Pages
         {
             using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
 
-            var team = await client.GetFromJsonAsync<TeamDto>($"api/Teams/bestTeam");
+            //var team = await client.GetFromJsonAsync<TeamDto>($"api/Teams/bestTeam");
 
-            if (team != null)
-                bestTeam = team;
+            //if (team != null)
+            //    bestTeam = team;
 
             StateHasChanged();
         }
@@ -36,6 +36,13 @@ namespace ChampionshipMaster.Web.Components.Pages
             {
                 if (await tokenService.ValidateToken())
                 {
+                    using HttpClient client = httpClient.CreateClient(configuration["ClientName"]!);
+
+                    var team = await client.GetFromJsonAsync<TeamDto>($"api/Teams/bestTeam");
+
+                    if (team != null)
+                        bestTeam = team;
+
                     var tokenString = await tokenService.GetToken();
                     if (tokenString == null)
                     {
