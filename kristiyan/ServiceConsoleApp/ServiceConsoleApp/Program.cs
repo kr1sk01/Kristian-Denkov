@@ -15,17 +15,30 @@
     internal class Program
     {
         private static FileSystemWatcher watcher = default!;
+
         private static string folderPath = @"C:\Users\a1bg535412\Documents"; // Change this to your desired folder path
         private static string failedFolderPath = @"C:\Users\a1bg535412\Documents\failed_to_process"; // Change this to your desired failed folder path
         private static string succeededFolderPath = @"C:\Users\a1bg535412\Documents\succeeded_to_process"; // Change this to your desired succeeded folder path
+
         private static readonly string logDirectory = AppDomain.CurrentDomain.BaseDirectory;
         private static readonly string logFileName = "app.log";
         private static readonly string logFilePath = Path.Combine(logDirectory, logFileName);
+
         private static CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+
         private static Master masterToAdd = new Master();
-        private static List<CsvData> csvDataList = new();
+
         private static bool first = true;
-        private static CsvContext context;
+        private static CsvContext context = new();
+
+        private static string fromAddress = "championshipmaster.a1@gmail.com";
+        private static string toAddress = "cross.2001@abv.bg";
+        private static string host = "smtp.gmail.com"; // Update with your SMTP server
+        private static int port = 465; // Update with your SMTP port
+
+        private static bool enableSsl = true;
+        private static string fromPassword = "fjen jevt wfgh miib"; // Update with your email password
+
         static void Main(string[] args)
         {
             EnsureCreatedDb();
@@ -106,7 +119,6 @@
                 WriteLog("Error on stop: " + ex.Message);
             }
         }
-
         private static void OnFileCreated(object sender, FileSystemEventArgs e)
         {
             try
@@ -135,7 +147,6 @@
                 WriteLog("Error on file created: " + ex.Message);
             }
         }
-
         private static bool ReadCsvAndInsertToDatabase(string filePath)
         {
             try
@@ -185,23 +196,26 @@
                 return false; // Indicate failure due to exception
             }
         }
-
         private static void SendEmail(string filePath, bool succeeded)
         {
             try
             {
-                string fromAddress = "championshipmaster.a1@gmail.com";
-                string toAddress = "cross.2001@abv.bg";
-                string host = "smtp.gmail.com"; // Update with your SMTP server
-                int port = 465; // Update with your SMTP port
-                bool enableSsl = true;
-                const string fromPassword = "fjen jevt wfgh miib"; // Update with your email password
-                const string subject = "CSV File Processing Succeeded";
+
+
+                string subject;
                 string body;
                 if (succeeded)
+                {
                     body = $"The CSV file '{Path.GetFileName(filePath)}' was successfully processed and moved to the succeeded_to_process folder.";
+                    subject = "CSV File Processing Succeeded!";
+                }
+
                 else
-                    body = $"The CSV file '{Path.GetFileName(filePath)}' coudn'l be inserted into database.";
+                {
+                    body = $"The CSV file '{Path.GetFileName(filePath)}' couldn't be inserted into database.";
+                    subject = "CSV File Processing Failed!";
+                }
+
 
                 using var client = new SmtpClient();
 
@@ -231,7 +245,6 @@
                 WriteLog("Error sending email: " + ex.Message);
             }
         }
-
         private static bool InsertDataToDatabase(string col1, string col2, string col3, string col4, CsvContext context)
         {
             try
@@ -268,8 +281,6 @@
                 return false;
             }
         }
-
-
         private static void MoveFileToFolder(string filePath, string destinationFolderPath)
         {
             try
@@ -293,7 +304,6 @@
                 WriteLog($"Error moving file to {destinationFolderPath}: " + ex.Message);
             }
         }
-
         private static void WriteLog(string logMessage)
         {
             try
