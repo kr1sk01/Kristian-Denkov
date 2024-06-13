@@ -200,8 +200,6 @@
         {
             try
             {
-
-
                 string subject;
                 string body;
                 if (succeeded)
@@ -216,9 +214,7 @@
                     subject = "CSV File Processing Failed!";
                 }
 
-
                 using var client = new SmtpClient();
-
 
                 // Enable SSL/TLS for secure connection
                 client.Connect(host, port, enableSsl);
