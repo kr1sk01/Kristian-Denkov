@@ -39,9 +39,9 @@ namespace Termis_Service
 
                 watcher.EnableRaisingEvents = true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                LogError("General error when starting serive.", ex);
             }
         }
 
@@ -57,7 +57,7 @@ namespace Termis_Service
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                LogError("Error in stopping service.", ex);
             }
         }
 
@@ -70,12 +70,13 @@ namespace Termis_Service
                 CreateDirectoryIfNotExists(csvDirectory);
                 CreateDirectoryIfNotExists(processedDirectory);
                 CreateDirectoryIfNotExists(errorDirectory);
+                CreateDirectoryIfNotExists(Path.GetDirectoryName(logFilePath));
 
                 EnsureDatabaseExists();
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                LogError("Error initializing service.", ex);
             }
         }
 
@@ -155,12 +156,20 @@ namespace Termis_Service
             {
                 errorMessage = ex.Message;
                 isSuccess = false;
+                LogError($"Error when reading row [{row}].", ex);
             }
 
             if (isSuccess)
             {
-                var processedFileName = Path.Combine(processedDirectory, Path.GetFileName(csvFile));
-                File.Move(csvFile, processedFileName);
+                try
+                {
+                    var processedFileName = Path.Combine(processedDirectory, Path.GetFileName(csvFile));
+                    File.Move(csvFile, processedFileName);
+                }
+                catch (Exception ex)
+                {
+                    LogError($"Error when moving file [{csvFile}]", ex);
+                }
             }
             else
             {
@@ -170,13 +179,20 @@ namespace Termis_Service
 
         void HandleCsvError(string message, string csvFile)
         {
-            var errorFileName = Path.Combine(errorDirectory, Path.GetFileNameWithoutExtension(csvFile) + ".err");
-            File.WriteAllText(errorFileName, message);
+            try
+            {
+                var errorFileName = Path.Combine(errorDirectory, Path.GetFileNameWithoutExtension(csvFile) + ".err");
+                File.WriteAllText(errorFileName, message);
 
-            var unreadFileName = Path.Combine(errorDirectory, Path.GetFileName(csvFile));
-            File.Move(csvFile, unreadFileName);
+                var unreadFileName = Path.Combine(errorDirectory, Path.GetFileName(csvFile));
+                File.Move(csvFile, unreadFileName);
 
-            SendErrorEmail(toEmail, unreadFileName, message);
+                SendErrorEmail(toEmail, unreadFileName, message);
+            }
+            catch (Exception ex)
+            {
+                LogError($"Error when moving file [{csvFile}]", ex);
+            }
         }
 
         DetailParseResponse ParseDetail(string[] values, int row, out Detail detail)
@@ -186,89 +202,100 @@ namespace Termis_Service
                 IsSuccess = true
             };
 
-            detail = null;
+            detail = new Detail();
 
-            if (values.Length != 4)
+            try
             {
-                string errorMessage = $"Invalid data format in row [{row}]. This row does not contain the necessary amount of values.";
-                response.IsSuccess = false;
-                response.ErrorMessage = errorMessage;
-                return response;
-            }
+                if ((hasSoilTemp && values.Length != 5) || (!hasSoilTemp && values.Length != 4))
+                {
+                    string errorMessage = $"Invalid data format in row [{row}]. This row does not contain the necessary amount of columns.";
+                    response.IsSuccess = false;
+                    response.ErrorMessage = errorMessage;
+                    return response;
+                }
 
-            //Parse Month value
-            if (!int.TryParse(values[0], out int month))
-            {
-                string errorMessage = $"Invalid data format in row [{row}]. Month value could not be parsed.";
-                response.IsSuccess = false;
-                response.ErrorMessage = errorMessage;
-                return response;
-            }
-            if (month > 12)
-            {
-                string errorMessage = $"Invalid data format in row [{row}]. Month value is not valid.";
-                response.IsSuccess = false;
-                response.ErrorMessage = errorMessage;
-                return response;
-            }
+                //Parse Month value
+                if (!int.TryParse(values[monthIndex], out int month))
+                {
+                    string errorMessage = $"Invalid data format in row [{row}]. Month value could not be parsed.";
+                    response.IsSuccess = false;
+                    response.ErrorMessage = errorMessage;
+                    return response;
+                }
+                if (month > 12)
+                {
+                    string errorMessage = $"Invalid data format in row [{row}]. Month value is not valid.";
+                    response.IsSuccess = false;
+                    response.ErrorMessage = errorMessage;
+                    return response;
+                }
 
-            //Parse Day value
-            if (!int.TryParse(values[1], out int day))
-            {
-                string errorMessage = $"Invalid data format in row [{row}]. Day value could not be parsed.";
-                response.IsSuccess = false;
-                response.ErrorMessage = errorMessage;
-                return response;
-            }
-            if (day > 31)
-            {
-                string errorMessage = $"Invalid data format in row [{row}]. Day value is not valid.";
-                response.IsSuccess = false;
-                response.ErrorMessage = errorMessage;
-                return response;
-            }
+                //Parse Day value
+                if (!int.TryParse(values[dayIndex], out int day))
+                {
+                    string errorMessage = $"Invalid data format in row [{row}]. Day value could not be parsed.";
+                    response.IsSuccess = false;
+                    response.ErrorMessage = errorMessage;
+                    return response;
+                }
+                if (day > 31)
+                {
+                    string errorMessage = $"Invalid data format in row [{row}]. Day value is not valid.";
+                    response.IsSuccess = false;
+                    response.ErrorMessage = errorMessage;
+                    return response;
+                }
 
-            //Parse Hour value
-            if (!int.TryParse(values[2], out int hour))
-            {
-                string errorMessage = $"Invalid data format in row [{row}]. Hour value could not be parsed.";
-                response.IsSuccess = false;
-                response.ErrorMessage = errorMessage;
-                return response;
-            }
-            if (hour > 23)
-            {
-                string errorMessage = $"Invalid data format in row [{row}]. Hour value is not valid.";
-                response.IsSuccess = false;
-                response.ErrorMessage = errorMessage;
-                return response;
-            }
+                //Parse Hour value
+                if (!int.TryParse(values[hourIndex], out int hour))
+                {
+                    string errorMessage = $"Invalid data format in row [{row}]. Hour value could not be parsed.";
+                    response.IsSuccess = false;
+                    response.ErrorMessage = errorMessage;
+                    return response;
+                }
+                if (hour > 23)
+                {
+                    string errorMessage = $"Invalid data format in row [{row}]. Hour value is not valid.";
+                    response.IsSuccess = false;
+                    response.ErrorMessage = errorMessage;
+                    return response;
+                }
 
-            //Parse Temperature value
-            if (!double.TryParse(values[3], NumberStyles.Any, CultureInfo.InvariantCulture, out double temp))
-            {
-                string errorMessage = $"Invalid data format in row [{row}]. Temperature value is not valid.";
-                response.IsSuccess = false;
-                response.ErrorMessage = errorMessage;
-                return response;
+                //Parse Temperature value
+                if (!double.TryParse(values[tempIndex], NumberStyles.Any, CultureInfo.InvariantCulture, out double temp))
+                {
+                    string errorMessage = $"Invalid data format in row [{row}]. Temperature value is not valid.";
+                    response.IsSuccess = false;
+                    response.ErrorMessage = errorMessage;
+                    return response;
+                }
+
+                //Parse Soil Temperature value
+                double soilTemp = 0;
+                if (hasSoilTemp)
+                {
+                    if (!double.TryParse(values[soilTempIndex], NumberStyles.Any, CultureInfo.InvariantCulture, out soilTemp))
+                    {
+                        string errorMessage = $"Invalid data format in row [{row}]. Soil temperature value is not valid.";
+                        response.IsSuccess = false;
+                        response.ErrorMessage = errorMessage;
+                        return response;
+                    }
+
+                    detail.SoilTemp = soilTemp;
+                }
+
+                detail.Month = month;
+                detail.Day = day;
+                detail.Hour = hour;
+                detail.Temp = temp;
             }
-
-            //Parse Temperature value
-            //if (!double.TryParse(values[4], out double soilTemp))
-            //{
-            //    string errorMessage = $"Invalid data format in row [{row}]. Temperature value is not valid.";
-            //    response.isSuccess = false;
-            //    response.ErrorMessage = errorMessage;
-            //    return response;
-            //}
-
-            detail = new Detail
+            catch (Exception ex)
             {
-                Month = month,
-                Day = day,
-                Hour = hour,
-                Temp = temp
-            };
+                response.IsSuccess = false;
+                response.ErrorMessage = $"Data parsing error in row [{row}]. {ex.Message}";
+            }
 
             return response;
         }
@@ -294,16 +321,23 @@ namespace Termis_Service
 
         void SendErrorEmail(string toEmail, string csvFile, string errorMessage)
         {
-            string template;
-            using (var reader = new StreamReader("ErrorTemplate.html"))
+            try
             {
-                template = reader.ReadToEnd();
+                string template;
+                using (var reader = new StreamReader("ErrorTemplate.html"))
+                {
+                    template = reader.ReadToEnd();
+                }
+
+                var body = template.Replace("[Csv File]", csvFile)
+                    .Replace("[Error Message]", errorMessage);
+
+                SendEmail(toEmail, "Error in NIMH .csv file", body);
             }
-
-            var body = template.Replace("[Csv File]", csvFile)
-                .Replace("[Error Message]", errorMessage);
-
-            SendEmail(toEmail, "Error in NIMH .csv file", body);
+            catch (Exception ex)
+            {
+                LogError($"Error sending email for file [{csvFile}]", ex);
+            }
         }
 
         void SendEmail(string toEmail, string subject, string body)
@@ -329,27 +363,59 @@ namespace Termis_Service
             smtpClient.Send(mailMessage);
         }
 
+        void LogError(string message, Exception ex)
+        {
+            try
+            {
+                using (StreamWriter writer = new StreamWriter(logFilePath, true))
+                {
+                    writer.WriteLine($"{DateTime.Now} - ERROR: {message}");
+                    writer.WriteLine($"Exception: {ex.Message}");
+                    writer.WriteLine($"Stack Trace: {ex.StackTrace}");
+                    writer.WriteLine();
+                }
+            }
+            catch (Exception logEx)
+            {
+                Console.WriteLine($"Failed to log error: {logEx.Message}");
+            }
+        }
+
         void GetConfigSettings()
         {
             try
             {
+                //Get Service config settings
                 ServiceSettings serviceSettings = (ServiceSettings)ConfigurationManager.GetSection("serviceSettings");
                 if (serviceSettings == null)
                 {
                     throw new ConfigurationErrorsException("'serviceSettings' section is missing from config file");
                 }
-
                 csvDirectory = serviceSettings.CsvDirectory;
                 processedDirectory = serviceSettings.ProcessedDirectory;
                 errorDirectory = serviceSettings.ErrorDirectory;
+                logFilePath = serviceSettings.LogFilePath;
                 csvSeparator = serviceSettings.CsvSeparator;
 
+                //Get Column indexes config settings
+                ColumnIndexSettings columnIndex = (ColumnIndexSettings)ConfigurationManager.GetSection("columnIndexes");
+                if (columnIndex == null)
+                {
+                    throw new ConfigurationErrorsException("'columnIndexes' section is missing from config file");
+                }
+                monthIndex = columnIndex.MonthColumnIndex;
+                dayIndex = columnIndex.DayColumnIndex;
+                hourIndex = columnIndex.HourColumnIndex;
+                tempIndex = columnIndex.TempColumnIndex;
+                soilTempIndex = columnIndex.SoilTempColumnIndex;
+                hasSoilTemp = columnIndex.HasSoilTempColumn;
+
+                //Get Email config settings
                 EmailSettings emailSettings = (EmailSettings)ConfigurationManager.GetSection("emailSettings");
                 if (emailSettings == null)
                 {
                     throw new ConfigurationErrorsException("'emailSettings' section is missing from config file");
                 }
-
                 host = emailSettings.Host;
                 port = emailSettings.Port;
                 username = emailSettings.Username;
@@ -373,7 +439,15 @@ namespace Termis_Service
         private string csvDirectory;
         private string processedDirectory;
         private string errorDirectory;
+        private string logFilePath;
         private char csvSeparator;
+
+        private int monthIndex;
+        private int dayIndex;
+        private int hourIndex;
+        private int tempIndex;
+        private int soilTempIndex;
+        private bool hasSoilTemp;
 
         private string host;
         private int port;
