@@ -1,4 +1,4 @@
-﻿using ServiceConsoleApp;
+﻿using TermisWorkerService;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 

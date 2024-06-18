@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-namespace ServiceConsoleApp;
+namespace TermisWorkerService;
 public class Master
 {
     [Key]

@@ -1,10 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TermisImporterService;
+using TermisWorkerService;
 
 public class CsvContext : DbContext
 {
-    public DbSet<CsvData> CsvData { get; set; }
-    public DbSet<Master> Masters { get; set; }
+    public DbSet<CsvData> CsvData { get; set; } = default!;
+    public DbSet<Master> Masters { get; set; } = default!;
+
+    public CsvContext(DbContextOptions<CsvContext> options) : base(options)
+    {
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

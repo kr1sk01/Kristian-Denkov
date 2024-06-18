@@ -1,190 +1,143 @@
-﻿namespace ServiceConsoleApp
+using System;
+using System.Globalization;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
+using MailKit.Net.Smtp;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+using MimeKit;
+
+namespace TermisWorkerService
 {
-    using MailKit.Net.Smtp;
-    using Microsoft.Extensions.Configuration;
-    using MimeKit;
-    using System;
-    using System.Globalization;
-    using System.IO;
-    using System.Threading;
-
-    internal class Program
+    public class Worker : BackgroundService
     {
+        private readonly IConfiguration _configuration;
+        private readonly IServiceScopeFactory _scopeFactory;
         private static FileSystemWatcher watcher = default!;
-
+        private static CsvContext dbcontext;
         private static string folderPath = "";
         private static string failedFolderPath = "";
         private static string succeededFolderPath = "";
-
         private static readonly string logDirectory = AppDomain.CurrentDomain.BaseDirectory;
         private static readonly string logFileName = "app.log";
         private static readonly string logFilePath = Path.Combine(logDirectory, logFileName);
-
         private static CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-
         private static Master masterToAdd = new Master();
-
         private static bool first = true;
-        private static CsvContext dbcontext = new();
-
         private static string fromAddress = "";
         private static string toAddress = "";
         private static string host = "";
         private static int port;
         private static bool enableSsl;
         private static string fromPassword = "";
-
-
         private static int monthColumnIndex = 0;
         private static int dateColumnIndex = 0;
         private static int hourColumnIndex = 0;
-
         private static int earthTempColumnIndex = 0;
         private static int airTempColumnIndex = 0;
 
-        static void Main(string[] args)
+        public Worker(IConfiguration configuration, IServiceScopeFactory scopeFactory)
+        {
+            _configuration = configuration;
+            _scopeFactory = scopeFactory;
+            dbcontext = _scopeFactory.CreateScope().ServiceProvider.GetRequiredService<CsvContext>();
+        }
+
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        {
+            stoppingToken.Register(() => cancellationTokenSource.Cancel());
+
+            LoadConfiguration();
+            EnsureCreatedDb();
+            watcher = new FileSystemWatcher
+            {
+                Path = folderPath,
+                Filter = "*.csv"
+            };
+            watcher.Created += OnFileCreated;
+            watcher.EnableRaisingEvents = true;
+            WriteLog("Started service and watching directory: " + folderPath);
+            await Task.Delay(Timeout.Infinite, stoppingToken);
+        }
+
+        private void LoadConfiguration()
         {
             try
             {
-                var config = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .Build();
-                try
+                folderPath = _configuration["AppSettings:FolderPath"]!;
+                failedFolderPath = _configuration["AppSettings:FailedFolderPath"]!;
+                succeededFolderPath = _configuration["AppSettings:SucceededFolderPath"]!;
+                fromAddress = _configuration["AppSettings:FromAddress"]!;
+                toAddress = _configuration["AppSettings:ToAddress"]!;
+                host = _configuration["AppSettings:Host"]!;
+                port = int.Parse(_configuration["AppSettings:Port"]!);
+                enableSsl = bool.Parse(_configuration["AppSettings:EnableSsl"]!);
+                fromPassword = _configuration["AppSettings:FromPassword"]!;
+                monthColumnIndex = int.Parse(_configuration["AppSettings:MonthColumnIndex"]!);
+                dateColumnIndex = int.Parse(_configuration["AppSettings:DateColumnIndex"]!);
+                hourColumnIndex = int.Parse(_configuration["AppSettings:HourColumnIndex"]!);
+                earthTempColumnIndex = int.Parse(_configuration["AppSettings:EarthTempColumnIndex"]!);
+                airTempColumnIndex = int.Parse(_configuration["AppSettings:AirTempColumnIndex"]!);
+
+                if (monthColumnIndex < 0 || dateColumnIndex < 0 || hourColumnIndex < 0 || earthTempColumnIndex < 0 || airTempColumnIndex < 0)
                 {
-                    folderPath = config["AppSettings:FolderPath"]!;
-                    failedFolderPath = config["AppSettings:FailedFolderPath"]!;
-                    succeededFolderPath = config["AppSettings:SucceededFolderPath"]!;
-                    fromAddress = config["AppSettings:FromAddress"]!;
-                    toAddress = config["AppSettings:ToAddress"]!;
-                    host = config["AppSettings:Host"]!;
-                    port = int.Parse(config["AppSettings:Port"]!);
-                    enableSsl = bool.Parse(config["AppSettings:EnableSsl"]!);
-                    fromPassword = config["AppSettings:FromPassword"]!;
-                    monthColumnIndex = int.Parse(config["AppSettings:MonthColumnIndex"]!);
-                    dateColumnIndex = int.Parse(config["AppSettings:DateColumnIndex"]!);
-                    hourColumnIndex = int.Parse(config["AppSettings:HourColumnIndex"]!);
-                    earthTempColumnIndex = int.Parse(config["AppSettings:EarthTempColumnIndex"]!);
-                    airTempColumnIndex = int.Parse(config["AppSettings:AirTempColumnIndex"]!);
-
-                    if (monthColumnIndex < 0 || dateColumnIndex < 0 || hourColumnIndex < 0 || earthTempColumnIndex < 0 || airTempColumnIndex < 0)
-                    {
-                        throw new Exception("Invalid index values!");
-                    }
-                    if (port < 0)
-                    {
-                        throw new Exception("Invalid port value!");
-                    }
-
+                    throw new Exception("Invalid index values!");
                 }
-                catch (Exception ex)
+                if (port < 0)
                 {
-                    WriteLog("Couldn't load data from config" + ex);
+                    throw new Exception("Invalid port value!");
                 }
             }
             catch (Exception ex)
             {
-                WriteLog("Couldn't load config" + ex);
-            }
-
-            EnsureCreatedDb();
-            dbcontext = new CsvContext();
-
-            Console.CancelKeyPress += (sender, eventArgs) =>
-            {
-                eventArgs.Cancel = true;
-                cancellationTokenSource.Cancel();
-            };
-
-            try
-            {
-                OnStart(args);
-                cancellationTokenSource.Token.WaitHandle.WaitOne();
-            }
-            finally
-            {
-                OnStop();
+                WriteLog("Couldn't load data from config" + ex);
             }
         }
-        private static void EnsureCreatedDb()
+
+        private void EnsureCreatedDb()
         {
             try
             {
-                using (var context = new CsvContext())
+                using (var scope = _scopeFactory.CreateScope())
                 {
-                    // Ensure the database is created
-                    context.Database.EnsureCreated();
-
+                    
+                    dbcontext.Database.EnsureCreated();
                     Console.WriteLine("Database created successfully.");
                 }
-
-                Console.WriteLine("Press any key to exit...");
-                Console.ReadKey();
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
         }
-        private static void OnStart(string[] args)
-        {
-            try
-            {
-                // Initialize and configure FileSystemWatcher
-                watcher = new FileSystemWatcher
-                {
-                    Path = folderPath,
-                    Filter = "*.csv"
-                };
-                watcher.Created += OnFileCreated;
 
-                // Start monitoring
-                watcher.EnableRaisingEvents = true;
-                WriteLog("Started service and watching directory: " + folderPath);
-            }
-            catch (Exception ex)
-            {
-                WriteLog("Error on start: " + ex.Message);
-            }
-        }
-        private static void OnStop()
+        private void OnFileCreated(object sender, FileSystemEventArgs e)
         {
             try
             {
-                // Stop monitoring
-                if (watcher != null)
-                {
-                    watcher.EnableRaisingEvents = false;
-                    watcher.Dispose();
-                }
-                WriteLog("Stopped service!");
-            }
-            catch (Exception ex)
-            {
-                WriteLog("Error on stop: " + ex.Message);
-            }
-        }
-        private static void OnFileCreated(object sender, FileSystemEventArgs e)
-        {
-            try
-            {
-                // Handle new .csv file created
                 string filePath = e.FullPath;
                 WriteLog($"New .csv file created: {filePath}");
 
-                // Read the CSV file and insert its contents into the database
-                bool isSuccess = ReadCsvAndInsertToDatabase(filePath);
+                bool isSuccess = false;
+                using (var scope = _scopeFactory.CreateScope())
+                {
+                    var dbContext = scope.ServiceProvider.GetRequiredService<CsvContext>();
+                    isSuccess = ReadCsvAndInsertToDatabase(filePath);
+                }
 
-                // Move the file based on success or failure
                 if (isSuccess)
                 {
                     SendEmail(filePath, true);
                     MoveFileToFolder(filePath, succeededFolderPath);
+                    first = true;
                 }
                 else
                 {
                     SendEmail(filePath, false);
                     MoveFileToFolder(filePath, failedFolderPath);
+                    first = true;
                 }
             }
             catch (Exception ex)
@@ -192,7 +145,7 @@
                 WriteLog("Error on file created: " + ex.Message);
             }
         }
-        private static bool ReadCsvAndInsertToDatabase(string filePath)
+        private bool ReadCsvAndInsertToDatabase(string filePath)
         {
             try
             {
@@ -409,12 +362,14 @@
                         test.AirTemperature = csvData.AirTemperature;
                         test.Master = masterToAdd;
                         context.Entry(test).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+                        context.SaveChanges();
                     }
                     else
                     {
                         context.CsvData.Add(csvData);
+                        context.SaveChanges();
                     }
-                    context.SaveChanges();
+                    
                     // Add the CsvData entry to the context
                     WriteLog($"Data inserted to database: {month}, {day}, {hour}, {earthTemp}");
                 }
@@ -437,11 +392,13 @@
                         test.AirTemperature = csvData.AirTemperature;
                         test.Master = masterToAdd;
                         context.Entry(test).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+                        context.SaveChanges();
                     }
                     else
                     {
                         context.CsvData.Add(csvData);
-                        // Save changes to persist both Master and CsvData entries                     
+                        // Save changes to persist both Master and CsvData entries
+                        // context.SaveChanges();
                     }
                     context.SaveChanges();
                     // Add the CsvData entry to the context
@@ -466,10 +423,12 @@
                         test.AirTemperature = csvData.AirTemperature;
                         test.Master = masterToAdd;
                         context.Entry(test).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+                        context.SaveChanges();
                     }
                     else
                     {
                         context.CsvData.Add(csvData);
+                        context.SaveChanges();
                     }
                     context.SaveChanges();
                     // Add the CsvData entry to the context
@@ -507,6 +466,7 @@
                 WriteLog($"Error moving file to {destinationFolderPath}: " + ex.Message);
             }
         }
+
         private static void WriteLog(string logMessage)
         {
             try

@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34525.116
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TermisImporterService", "TermisImporterService\TermisImporterService.csproj", "{90CD329B-3D18-4B89-9608-EBC907CD3CAF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TermisWorkerService", "TermisWorkerService\TermisWorkerService.csproj", "{09242CA7-41EE-4265-B2BA-83CDA6069943}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{90CD329B-3D18-4B89-9608-EBC907CD3CAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{90CD329B-3D18-4B89-9608-EBC907CD3CAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{90CD329B-3D18-4B89-9608-EBC907CD3CAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{90CD329B-3D18-4B89-9608-EBC907CD3CAF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09242CA7-41EE-4265-B2BA-83CDA6069943}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09242CA7-41EE-4265-B2BA-83CDA6069943}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09242CA7-41EE-4265-B2BA-83CDA6069943}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09242CA7-41EE-4265-B2BA-83CDA6069943}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {B426D57E-A306-4099-9779-3ED0BB9559A8}
+		SolutionGuid = {39048420-0B73-4ED0-BA7F-8951310165A2}
 	EndGlobalSection
 EndGlobal
