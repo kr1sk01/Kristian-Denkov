@@ -22,7 +22,7 @@ namespace TermisWorkerService
         private readonly IServiceScopeFactory _scopeFactory;
         private FileSystemWatcher watcher;
         private static readonly string logDirectory = AppDomain.CurrentDomain.BaseDirectory;
-        private static readonly string logFileName = "app.log";
+        private static readonly string logFileName = $"{DateTime.UtcNow.ToString("dd_MM_yyyy HH_mm")}.log";
         private static readonly string logFilePath = Path.Combine(logDirectory, logFileName);
         private static CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
         private static Master masterToAdd = new Master();
@@ -68,14 +68,13 @@ namespace TermisWorkerService
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex);
             }
         }
 
         private void OnFileCreated(object sender, FileSystemEventArgs e)
         {
-            Task.Run(() =>
-            {
+
                 try
                 {
                     string filePath = e.FullPath;
@@ -103,9 +102,9 @@ namespace TermisWorkerService
                 }
                 catch (Exception ex)
                 {
-                    WriteLog("Error on file created: " + ex.Message);
+                    WriteLog("Error on file created: " + ex);
                 }
-            });
+           
         }
 
         private bool ReadCsvAndInsertToDatabase(string filePath, CsvContext dbContext)
@@ -182,7 +181,7 @@ namespace TermisWorkerService
             }
             catch (Exception ex)
             {
-                WriteLog("Error reading CSV file: " + ex.Message);
+                WriteLog("Error reading CSV file: " + ex);
                 return false;
             }
         }
@@ -223,12 +222,12 @@ namespace TermisWorkerService
                 // Set the message body (can be plain text or HTML)
                 message.Body = new TextPart("html") { Text = body }; // Assuming HTML template
 
-                client.Send(message);
-                WriteLog("Success email sent for file: " + filePath);
+                client.SendAsync(message);
+                WriteLog("Email sent for file: " + filePath);
             }
             catch (Exception ex)
             {
-                WriteLog("Error sending email: " + ex.Message);
+                WriteLog("Error sending email: " + ex);
             }
         }
 
@@ -242,22 +241,19 @@ namespace TermisWorkerService
                     test.EarthTemperature = csvData.EarthTemperature;
                     test.AirTemperature = csvData.AirTemperature;
                     test.Master = masterToAdd;
-                    context.Entry(test).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-                    context.SaveChanges();
                 }
                 else
                 {
-                    context.CsvData.Add(csvData);
-                    context.SaveChanges();
+                    context.CsvData.Add(csvData);                   
                 }
-
+                context.SaveChanges();
                 // Add the CsvData entry to the context
                 WriteLog($"Data inserted to database: {month}, {day}, {hour}, {csvData.EarthTemperature},{csvData.AirTemperature}");
                 return true;
             }
             catch (Exception ex)
             {
-                WriteLog("Error inserting data to database: " + ex.Message);
+                WriteLog("Error inserting data to database: " + ex);
                 return false;
             }
         }
@@ -268,6 +264,7 @@ namespace TermisWorkerService
             {
                 if (!Directory.Exists(destinationFolderPath))
                 {
+
                     Directory.CreateDirectory(destinationFolderPath);
                 }
                 string destinationFilePath = Path.Combine(destinationFolderPath, Path.GetFileName(filePath));
@@ -280,7 +277,7 @@ namespace TermisWorkerService
             }
             catch (Exception ex)
             {
-                WriteLog($"Error moving file to {destinationFolderPath}: " + ex.Message);
+                WriteLog($"Error moving file to {destinationFolderPath}: " + ex);
             }
         }
 
@@ -307,7 +304,7 @@ namespace TermisWorkerService
             {
                 // Handle any exceptions that occur during file operations
                 // Log the error to the console
-                Console.WriteLine($"Error writing log: {ex.Message}");
+                Console.WriteLine($"Error writing log: {ex}");
             }
         }
         public bool HasDuplicates(List<int> numbers)
@@ -326,37 +323,7 @@ namespace TermisWorkerService
     }
 
 }
-public class AppSettings
-{
-    public string FolderPath { get; set; }
-    public string FailedFolderPath { get; set; }
-    public string SucceededFolderPath { get; set; }
 
-    // Parameterless constructor
-    public AppSettings() { }
-}
 
-public class EmailSettings
-{
-    public string FromAddress { get; set; }
-    public string ToAddress { get; set; }
-    public string Host { get; set; }
-    public int Port { get; set; }
-    public bool EnableSsl { get; set; }
-    public string FromPassword { get; set; }
 
-    // Parameterless constructor
-    public EmailSettings() { }
-}
 
-public class ColumnIndexes
-{
-    public int MonthColumnIndex { get; set; } = -1;
-    public int DateColumnIndex { get; set; } = -1;
-    public int HourColumnIndex { get; set; } = -1;
-    public int EarthTempColumnIndex { get; set; } = -1;
-    public int AirTempColumnIndex { get; set; } = -1;
-
-    // Parameterless constructor
-    public ColumnIndexes() { }
-}
