@@ -1,6 +1,7 @@
-﻿using MailKit.Net.Smtp;
-using MimeKit;
+﻿using MimeKit;
 using System.Globalization;
+using System.Net;
+using System.Net.Mail;
 using System.Text.RegularExpressions;
 
 namespace Termis_Console
@@ -10,6 +11,8 @@ namespace Termis_Console
         private static string csvDirectory = @"C:\TermisImporterFiles\CsvFiles";
         private static string processedDirectory = @"C:\TermisImporterFiles\ProcessedFiles";
         private static string errorDirectory = @"C:\TermisImporterFiles\ErrorFiles";
+
+        private static char csvSeparator = ' ';
 
         private static string emailHost = "smtp.gmail.com";
         private static int emailPort = 465;
@@ -50,7 +53,6 @@ namespace Termis_Console
 
             foreach (var csvFile in csvFiles)
             {
-
                 int row = 0;
                 bool isSuccess = true;
                 string errorMessage = string.Empty;
@@ -59,7 +61,7 @@ namespace Termis_Console
                 {
                     var master = new Master
                     {
-                        Date = DateTime.UtcNow
+                        Date = DateTime.Now
                     };
 
                     _context.Masters.Add(master);
@@ -71,12 +73,17 @@ namespace Termis_Console
                     {
                         row++;
                         string[] values;
-                        values = line.Contains(',') ? line.Split(',', StringSplitOptions.RemoveEmptyEntries) : line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                        values = line.TrimStart().Split(csvSeparator, StringSplitOptions.RemoveEmptyEntries);
 
                         var parsingResponse = ParseDetail(values, row, out Detail? detail);
 
                         if (parsingResponse.IsSuccess)
                         {
+                            if (master.Details.Count == 0)
+                            {
+                                master.ForecastDate = new DateTime(DateTime.Now.Year, detail!.Month, detail.Day, detail.Hour, 0, 0);
+                            }
+
                             var isDetailToUpdate = IsDetailToUpdate(_context, detail!, out int detailId);
 
                             if (isDetailToUpdate)
@@ -102,7 +109,7 @@ namespace Termis_Console
                 }
                 catch (Exception ex)
                 {
-                    errorMessage = ex.ToString();
+                    errorMessage = ex.Message;
                     isSuccess = false;
                 }
 
@@ -120,7 +127,7 @@ namespace Termis_Console
 
         private static void HandleError(string message, string csvFile)
         {
-            var errorFileName = Path.Combine(errorDirectory, Path.GetFileNameWithoutExtension(csvFile) + ".txt");
+            var errorFileName = Path.Combine(errorDirectory, Path.GetFileNameWithoutExtension(csvFile) + ".err");
             File.WriteAllText(errorFileName, message);
 
             var unreadFileName = Path.Combine(errorDirectory, Path.GetFileName(csvFile));
@@ -136,11 +143,14 @@ namespace Termis_Console
                 IsSuccess = true
             };
 
+            detail = null;
+
             if (values.Length != 4)
             {
-                string errorMessage = $"Invalid data format in row [{row}]. This row does not contain 5 values.";
+                string errorMessage = $"Invalid data format in row [{row}]. This row does not contain the necessary amount of values.";
                 response.IsSuccess = false;
                 response.ErrorMessage = errorMessage;
+                return response;
             }
 
             //Parse Month value
@@ -149,12 +159,14 @@ namespace Termis_Console
                 string errorMessage = $"Invalid data format in row [{row}]. Month value could not be parsed.";
                 response.IsSuccess = false;
                 response.ErrorMessage = errorMessage;
+                return response;
             }
             if (month > 12)
             {
                 string errorMessage = $"Invalid data format in row [{row}]. Month value is not valid.";
                 response.IsSuccess = false;
                 response.ErrorMessage = errorMessage;
+                return response;
             }
 
             //Parse Day value
@@ -163,12 +175,14 @@ namespace Termis_Console
                 string errorMessage = $"Invalid data format in row [{row}]. Day value could not be parsed.";
                 response.IsSuccess = false;
                 response.ErrorMessage = errorMessage;
+                return response;
             }
             if (day > 31)
             {
                 string errorMessage = $"Invalid data format in row [{row}]. Day value is not valid.";
                 response.IsSuccess = false;
                 response.ErrorMessage = errorMessage;
+                return response;
             }
 
             //Parse Hour value
@@ -177,12 +191,14 @@ namespace Termis_Console
                 string errorMessage = $"Invalid data format in row [{row}]. Hour value could not be parsed.";
                 response.IsSuccess = false;
                 response.ErrorMessage = errorMessage;
+                return response;
             }
             if (hour > 23)
             {
                 string errorMessage = $"Invalid data format in row [{row}]. Hour value is not valid.";
                 response.IsSuccess = false;
                 response.ErrorMessage = errorMessage;
+                return response;
             }
 
             //Parse Temperature value
@@ -191,6 +207,7 @@ namespace Termis_Console
                 string errorMessage = $"Invalid data format in row [{row}]. Temperature value is not valid.";
                 response.IsSuccess = false;
                 response.ErrorMessage = errorMessage;
+                return response;
             }
 
             //Parse Temperature value
@@ -199,22 +216,16 @@ namespace Termis_Console
             //    string errorMessage = $"Invalid data format in row [{row}]. Temperature value is not valid.";
             //    response.isSuccess = false;
             //    response.ErrorMessage = errorMessage;
+            //    return response;
             //}
 
-            if (response.IsSuccess)
+            detail = new Detail
             {
-                detail = new Detail
-                {
-                    Month = month,
-                    Day = day,
-                    Hour = hour,
-                    Temp = temp
-                };
-            }
-            else
-            {
-                detail = null;
-            }
+                Month = month,
+                Day = day,
+                Hour = hour,
+                Temp = temp
+            };
 
             return response;
         }
@@ -254,12 +265,12 @@ namespace Termis_Console
 
         private static void SendEmail(string toEmail, string subject, string body)
         {
-            using (var client = new SmtpClient())
+            /*using (var client = new SmtpClient())
             {
-                // Enable SSL/TLS for secure connection
+                 Enable SSL/TLS for secure connection
                 client.Connect(emailHost, emailPort, emailEnableSsl);
 
-                // Authenticate if using a password-protected email account
+                 Authenticate if using a password-protected email account
                 client.Authenticate(emailUsername, emailPassword);
 
                 var message = new MimeMessage();
@@ -267,11 +278,31 @@ namespace Termis_Console
                 message.To.Add(new MailboxAddress("Recipient", toEmail));
                 message.Subject = subject;
 
-                // Set the message body (can be plain text or HTML)
-                message.Body = new TextPart("html") { Text = body }; // Assuming HTML template
+                 Set the message body (can be plain text or HTML)
+                message.Body = new TextPart("html") { Text = body };  Assuming HTML template
 
                 client.Send(message);
-            }
+            }*/
+
+            SmtpClient smtpClient = new SmtpClient(emailHost) // Replace with your SMTP server
+            {
+                Port = 587, // Common port for TLS
+                Credentials = new NetworkCredential(emailUsername, emailPassword),
+                EnableSsl = emailEnableSsl,
+            };
+
+            // Create the email message
+            MailMessage mailMessage = new MailMessage
+            {
+                From = new MailAddress(emailUsername),
+                Subject = subject,
+                Body = body,
+                IsBodyHtml = true,
+            };
+            mailMessage.To.Add(toEmail);
+
+            // Send the email
+            smtpClient.Send(mailMessage);
         }
     }
 }
