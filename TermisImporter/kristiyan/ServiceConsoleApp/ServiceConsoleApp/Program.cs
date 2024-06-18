@@ -66,12 +66,22 @@
                     host = config["AppSettings:Host"]!;
                     port = int.Parse(config["AppSettings:Port"]!);
                     enableSsl = bool.Parse(config["AppSettings:EnableSsl"]!);
-                    fromPassword = config["AppSettings:FromPassword"]!;
+                    fromPassword = config["AppSettings:FromPassword"]!;                  
                     monthColumnIndex = int.Parse(config["AppSettings:MonthColumnIndex"]!);
                     dateColumnIndex = int.Parse(config["AppSettings:DateColumnIndex"]!);
                     hourColumnIndex = int.Parse(config["AppSettings:HourColumnIndex"]!);
                     earthTempColumnIndex = int.Parse(config["AppSettings:EarthTempColumnIndex"]!);
                     airTempColumnIndex = int.Parse(config["AppSettings:AirTempColumnIndex"]!);
+
+                    if(monthColumnIndex < 0 || dateColumnIndex < 0 || hourColumnIndex < 0 || earthTempColumnIndex < 0 || airTempColumnIndex< 0)
+                    {
+                        throw new Exception("Invalid index values!");
+                    }
+                    if(port < 0)
+                    {
+                        throw new Exception("Invalid port value!");
+                    }
+
                 }
                 catch (Exception ex)
                 {
@@ -409,15 +419,13 @@
                         test.EarthTemperature = csvData.EarthTemperature;
                         test.AirTemperature = csvData.AirTemperature;
                         test.Master = masterToAdd;
-                        context.Entry(test).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-                        context.SaveChanges();
+                        context.Entry(test).State = Microsoft.EntityFrameworkCore.EntityState.Modified;                       
                     }
                     else
                     {
                         context.CsvData.Add(csvData);
-                        // Save changes to persist both Master and CsvData entries
-                        context.SaveChanges();
                     }
+                    context.SaveChanges();
                     // Add the CsvData entry to the context
                     WriteLog($"Data inserted to database: {month}, {day}, {hour}, {earthTemp}");
                 }else if (hasEarthTemp == false && hasAirTemp == true)
@@ -439,14 +447,13 @@
                         test.AirTemperature = csvData.AirTemperature;
                         test.Master = masterToAdd;
                         context.Entry(test).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-                        context.SaveChanges();
                     }
                     else
                     {
                         context.CsvData.Add(csvData);
-                        // Save changes to persist both Master and CsvData entries
-                        context.SaveChanges();
+                        // Save changes to persist both Master and CsvData entries                     
                     }
+                    context.SaveChanges();
                     // Add the CsvData entry to the context
                     WriteLog($"Data inserted to database: {month}, {day}, {hour}, {airTemp}");
                 }
@@ -468,15 +475,13 @@
                         test.EarthTemperature = csvData.EarthTemperature;
                         test.AirTemperature = csvData.AirTemperature;
                         test.Master = masterToAdd;
-                        context.Entry(test).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-                        context.SaveChanges();
+                        context.Entry(test).State = Microsoft.EntityFrameworkCore.EntityState.Modified;                        
                     }
                     else
                     {
                         context.CsvData.Add(csvData);
-                        // Save changes to persist both Master and CsvData entries
-                        context.SaveChanges();
                     }
+                    context.SaveChanges();
                     // Add the CsvData entry to the context
                     WriteLog($"Data inserted to database: {month}, {day}, {hour}, {airTemp},{earthTemp}");
                 }
