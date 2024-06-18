@@ -448,7 +448,7 @@
                         context.SaveChanges();
                     }
                     // Add the CsvData entry to the context
-                    WriteLog($"Data inserted to database: {month}, {day}, {hour}, {earthTemp}");
+                    WriteLog($"Data inserted to database: {month}, {day}, {hour}, {airTemp}");
                 }
                 else
                 {
@@ -478,7 +478,7 @@
                         context.SaveChanges();
                     }
                     // Add the CsvData entry to the context
-                    WriteLog($"Data inserted to database: {month}, {day}, {hour}, {earthTemp}");
+                    WriteLog($"Data inserted to database: {month}, {day}, {hour}, {airTemp},{earthTemp}");
                 }
 
                 return true;
