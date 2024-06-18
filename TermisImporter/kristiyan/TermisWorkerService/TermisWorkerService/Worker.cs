@@ -7,93 +7,52 @@ using MailKit.Net.Smtp;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using MimeKit;
+using Microsoft.Extensions.Options;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace TermisWorkerService
 {
     public class Worker : BackgroundService
     {
-        private readonly IConfiguration _configuration;
+        private readonly AppSettings _appSettings;
+        private readonly EmailSettings _emailSettings;
+        private readonly ColumnIndexes _columnIndexes;
         private readonly IServiceScopeFactory _scopeFactory;
-        private static FileSystemWatcher watcher = default!;
-        private static CsvContext dbcontext;
-        private static string folderPath = "";
-        private static string failedFolderPath = "";
-        private static string succeededFolderPath = "";
+        private FileSystemWatcher watcher;
         private static readonly string logDirectory = AppDomain.CurrentDomain.BaseDirectory;
         private static readonly string logFileName = "app.log";
         private static readonly string logFilePath = Path.Combine(logDirectory, logFileName);
         private static CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
         private static Master masterToAdd = new Master();
         private static bool first = true;
-        private static string fromAddress = "";
-        private static string toAddress = "";
-        private static string host = "";
-        private static int port;
-        private static bool enableSsl;
-        private static string fromPassword = "";
-        private static int monthColumnIndex = 0;
-        private static int dateColumnIndex = 0;
-        private static int hourColumnIndex = 0;
-        private static int earthTempColumnIndex = 0;
-        private static int airTempColumnIndex = 0;
 
-        public Worker(IConfiguration configuration, IServiceScopeFactory scopeFactory)
+        public Worker(IOptions<AppSettings> appSettings, IOptions<EmailSettings> emailSettings, IOptions<ColumnIndexes> columnIndexes, IServiceScopeFactory scopeFactory)
         {
-            _configuration = configuration;
+            _appSettings = appSettings.Value;
+            _emailSettings = emailSettings.Value;
+            _columnIndexes = columnIndexes.Value;
             _scopeFactory = scopeFactory;
-            dbcontext = _scopeFactory.CreateScope().ServiceProvider.GetRequiredService<CsvContext>();
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             stoppingToken.Register(() => cancellationTokenSource.Cancel());
 
-            LoadConfiguration();
             EnsureCreatedDb();
+
             watcher = new FileSystemWatcher
             {
-                Path = folderPath,
-                Filter = "*.csv"
+                Path = _appSettings.FolderPath,
+                Filter = "*.csv",
+                NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite
             };
             watcher.Created += OnFileCreated;
             watcher.EnableRaisingEvents = true;
-            WriteLog("Started service and watching directory: " + folderPath);
+
+            WriteLog("Started service and watching directory: " + _appSettings.FolderPath);
             await Task.Delay(Timeout.Infinite, stoppingToken);
-        }
-
-        private void LoadConfiguration()
-        {
-            try
-            {
-                folderPath = _configuration["AppSettings:FolderPath"]!;
-                failedFolderPath = _configuration["AppSettings:FailedFolderPath"]!;
-                succeededFolderPath = _configuration["AppSettings:SucceededFolderPath"]!;
-                fromAddress = _configuration["AppSettings:FromAddress"]!;
-                toAddress = _configuration["AppSettings:ToAddress"]!;
-                host = _configuration["AppSettings:Host"]!;
-                port = int.Parse(_configuration["AppSettings:Port"]!);
-                enableSsl = bool.Parse(_configuration["AppSettings:EnableSsl"]!);
-                fromPassword = _configuration["AppSettings:FromPassword"]!;
-                monthColumnIndex = int.Parse(_configuration["AppSettings:MonthColumnIndex"]!);
-                dateColumnIndex = int.Parse(_configuration["AppSettings:DateColumnIndex"]!);
-                hourColumnIndex = int.Parse(_configuration["AppSettings:HourColumnIndex"]!);
-                earthTempColumnIndex = int.Parse(_configuration["AppSettings:EarthTempColumnIndex"]!);
-                airTempColumnIndex = int.Parse(_configuration["AppSettings:AirTempColumnIndex"]!);
-
-                if (monthColumnIndex < 0 || dateColumnIndex < 0 || hourColumnIndex < 0 || earthTempColumnIndex < 0 || airTempColumnIndex < 0)
-                {
-                    throw new Exception("Invalid index values!");
-                }
-                if (port < 0)
-                {
-                    throw new Exception("Invalid port value!");
-                }
-            }
-            catch (Exception ex)
-            {
-                WriteLog("Couldn't load data from config" + ex);
-            }
         }
 
         private void EnsureCreatedDb()
@@ -102,8 +61,8 @@ namespace TermisWorkerService
             {
                 using (var scope = _scopeFactory.CreateScope())
                 {
-                    
-                    dbcontext.Database.EnsureCreated();
+                    var context = scope.ServiceProvider.GetRequiredService<CsvContext>();
+                    context.Database.EnsureCreated();
                     Console.WriteLine("Database created successfully.");
                 }
             }
@@ -115,187 +74,120 @@ namespace TermisWorkerService
 
         private void OnFileCreated(object sender, FileSystemEventArgs e)
         {
-            try
+            Task.Run(() =>
             {
-                string filePath = e.FullPath;
-                WriteLog($"New .csv file created: {filePath}");
+                try
+                {
+                    string filePath = e.FullPath;
+                    WriteLog($"New .csv file created: {filePath}");
 
-                bool isSuccess = false;
-                using (var scope = _scopeFactory.CreateScope())
-                {
-                    var dbContext = scope.ServiceProvider.GetRequiredService<CsvContext>();
-                    isSuccess = ReadCsvAndInsertToDatabase(filePath);
-                }
-
-                if (isSuccess)
-                {
-                    SendEmail(filePath, true);
-                    MoveFileToFolder(filePath, succeededFolderPath);
-                    first = true;
-                }
-                else
-                {
-                    SendEmail(filePath, false);
-                    MoveFileToFolder(filePath, failedFolderPath);
-                    first = true;
-                }
-            }
-            catch (Exception ex)
-            {
-                WriteLog("Error on file created: " + ex.Message);
-            }
-        }
-        private bool ReadCsvAndInsertToDatabase(string filePath)
-        {
-            try
-            {
-                if (monthColumnIndex != 0 || dateColumnIndex != 0 || hourColumnIndex != 0)
-                {
-                    if (earthTempColumnIndex != 0 && airTempColumnIndex == 0)
+                    bool isSuccess = false;
+                    using (var scope = _scopeFactory.CreateScope())
                     {
-                        using (StreamReader reader = new StreamReader(filePath))
-                        {
-                            string line;
-                            while ((line = reader.ReadLine()) != null)
-                            {
-                                // Split the line by spaces, removing empty entries
-                                var columns = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-
-                                if (columns.Length == 4 &&
-                                    !string.IsNullOrWhiteSpace(columns[0]) &&
-                                    !string.IsNullOrWhiteSpace(columns[1]) &&
-                                    !string.IsNullOrWhiteSpace(columns[2]) &&
-                                    !string.IsNullOrWhiteSpace(columns[3]))
-                                {
-                                    if (first)
-                                    {
-                                        masterToAdd = new Master
-                                        {
-                                            ImportDate = DateTime.Now,
-                                            ForecastDate = new DateTime(DateTime.UtcNow.Year, int.Parse(columns[0]), int.Parse(columns[1])),
-                                        };
-                                        dbcontext.Masters.Add(masterToAdd);
-                                        dbcontext.SaveChanges();
-                                        first = false;
-                                    }
-                                    var month = columns[monthColumnIndex - 1];
-                                    var day = columns[dateColumnIndex - 1];
-                                    var hour = columns[hourColumnIndex - 1];
-                                    var earthTemperature = columns[earthTempColumnIndex - 1];
-
-                                    InsertDataToDatabase(month, day, hour, true, false, dbcontext, earthTemp: earthTemperature);
-                                }
-                                else
-                                {
-                                    WriteLog($"Invalid line format or missing values: {line}");
-                                    return false; // Indicate failure due to invalid line
-                                }
-                            }
-                        }
-                        return true; // Indicate success if all lines are valid
+                        var dbContext = scope.ServiceProvider.GetRequiredService<CsvContext>();
+                        isSuccess = ReadCsvAndInsertToDatabase(filePath, dbContext);
                     }
-                    else if (earthTempColumnIndex == 0 && airTempColumnIndex != 0)
+
+                    if (isSuccess)
                     {
-                        using (StreamReader reader = new StreamReader(filePath))
-                        {
-                            string line;
-                            while ((line = reader.ReadLine()) != null)
-                            {
-                                // Split the line by spaces, removing empty entries
-                                var columns = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-
-                                if (columns.Length == 4 &&
-                                    !string.IsNullOrWhiteSpace(columns[0]) &&
-                                    !string.IsNullOrWhiteSpace(columns[1]) &&
-                                    !string.IsNullOrWhiteSpace(columns[2]) &&
-                                    !string.IsNullOrWhiteSpace(columns[3]))
-                                {
-                                    if (first)
-                                    {
-                                        masterToAdd = new Master
-                                        {
-                                            ImportDate = DateTime.Now,
-                                            ForecastDate = new DateTime(DateTime.UtcNow.Year, int.Parse(columns[0]), int.Parse(columns[1])),
-                                        };
-                                        dbcontext.Masters.Add(masterToAdd);
-                                        dbcontext.SaveChanges();
-                                        first = false;
-                                    }
-                                    var month = columns[monthColumnIndex - 1];
-                                    var day = columns[dateColumnIndex - 1];
-                                    var hour = columns[hourColumnIndex - 1];
-                                    var airTemperature = columns[airTempColumnIndex - 1];
-
-                                    InsertDataToDatabase(month, day, hour, false, true, dbcontext, airTemp: airTemperature);
-                                }
-                                else
-                                {
-                                    WriteLog($"Invalid line format or missing values: {line}");
-                                    return false; // Indicate failure due to invalid line
-                                }
-                            }
-                        }
-                        return true;
+                        SendEmail(filePath, true);
+                        MoveFileToFolder(filePath, _appSettings.SucceededFolderPath);
+                        first = true;
                     }
                     else
                     {
-                        using (StreamReader reader = new StreamReader(filePath))
+                        SendEmail(filePath, false);
+                        MoveFileToFolder(filePath, _appSettings.FailedFolderPath);
+                        first = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    WriteLog("Error on file created: " + ex.Message);
+                }
+            });
+        }
+
+        private bool ReadCsvAndInsertToDatabase(string filePath, CsvContext dbContext)
+        {
+            try
+            {
+                List<int> indexes =
+                [
+                    _columnIndexes.MonthColumnIndex,
+                    _columnIndexes.DateColumnIndex,
+                    _columnIndexes.HourColumnIndex,
+                    _columnIndexes.EarthTempColumnIndex,
+                    _columnIndexes.AirTempColumnIndex,
+                ];
+                if (HasDuplicates(indexes))
+                {
+                    WriteLog("You have setup 2 different properies in 1 colums, check the config file!");
+                    return false;
+                }
+
+                if (_columnIndexes.MonthColumnIndex > -1 || _columnIndexes.DateColumnIndex > -1 || _columnIndexes.HourColumnIndex > -1)
+                {
+
+                    using (StreamReader reader = new StreamReader(filePath))
+                    {
+                        string line;
+                        while ((line = reader.ReadLine()) != null)
                         {
-                            string line;
-                            while ((line = reader.ReadLine()) != null)
+                            var columns = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+                            if (columns.Length > 3 &&
+                                !string.IsNullOrWhiteSpace(columns[0]) &&
+                                !string.IsNullOrWhiteSpace(columns[1]) &&
+                                !string.IsNullOrWhiteSpace(columns[2]) &&
+                                !string.IsNullOrWhiteSpace(columns[3]))
                             {
-                                // Split the line by spaces, removing empty entries
-                                var columns = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-
-                                if (columns.Length == 5 &&
-                                    !string.IsNullOrWhiteSpace(columns[0]) &&
-                                    !string.IsNullOrWhiteSpace(columns[1]) &&
-                                    !string.IsNullOrWhiteSpace(columns[2]) &&
-                                    !string.IsNullOrWhiteSpace(columns[3]) &&
-                                    !string.IsNullOrWhiteSpace(columns[4]))
+                                if (first)
                                 {
-                                    if (first)
+                                    masterToAdd = new Master
                                     {
-                                        masterToAdd = new Master
-                                        {
-                                            ImportDate = DateTime.Now,
-                                            ForecastDate = new DateTime(DateTime.UtcNow.Year, int.Parse(columns[0]), int.Parse(columns[1])),
-                                        };
-                                        dbcontext.Masters.Add(masterToAdd);
-                                        dbcontext.SaveChanges();
-                                        first = false;
-                                    }
-                                    var month = columns[monthColumnIndex - 1];
-                                    var day = columns[dateColumnIndex - 1];
-                                    var hour = columns[hourColumnIndex - 1];
-                                    var earthTemperature = columns[earthTempColumnIndex - 1];
-                                    var airTemperature = columns[airTempColumnIndex - 1];
-
-                                    InsertDataToDatabase(month, day, hour, true, true, dbcontext, earthTemp: earthTemperature, airTemp: airTemperature);
+                                        ImportDate = DateTime.Now,
+                                        ForecastDate = new DateTime(DateTime.UtcNow.Year, int.Parse(columns[0]), int.Parse(columns[1])),
+                                    };
+                                    dbContext.Masters.Add(masterToAdd);
+                                    dbContext.SaveChanges();
+                                    first = false;
                                 }
-                                else
+                                CsvData csvData = new CsvData
                                 {
-                                    WriteLog($"Invalid line format or missing values: {line}");
-                                    return false; // Indicate failure due to invalid line
-                                }
+                                    Month = columns[_columnIndexes.MonthColumnIndex],
+                                    Day = columns[_columnIndexes.DateColumnIndex],
+                                    Hour = columns[_columnIndexes.HourColumnIndex],
+                                    EarthTemperature = _columnIndexes.EarthTempColumnIndex > -1 ? double.Parse(columns[_columnIndexes.EarthTempColumnIndex], System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture) : 0,
+                                    AirTemperature = _columnIndexes.AirTempColumnIndex > -1 ? double.Parse(columns[_columnIndexes.AirTempColumnIndex], System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture) : 0,
+                                    Master = masterToAdd
+                                };
+
+                                InsertDataToDatabase(columns[_columnIndexes.MonthColumnIndex], columns[_columnIndexes.DateColumnIndex], columns[_columnIndexes.HourColumnIndex], csvData, dbContext);
+                            }
+                            else
+                            {
+                                WriteLog($"Invalid line format or missing values: {line}");
+                                return false;
                             }
                         }
-                        return true;
                     }
+                    return true;
                 }
                 else
                 {
-                    WriteLog("Error reading CSV file please check the config ! ");
+                    WriteLog("Error reading CSV file please check the config !");
                     return false;
                 }
             }
             catch (Exception ex)
             {
                 WriteLog("Error reading CSV file: " + ex.Message);
-                return false; // Indicate failure due to exception
+                return false;
             }
         }
-        private static void SendEmail(string filePath, bool succeeded)
+
+        private void SendEmail(string filePath, bool succeeded)
         {
             try
             {
@@ -315,17 +207,17 @@ namespace TermisWorkerService
                 using var client = new SmtpClient();
 
                 // Enable SSL/TLS for secure connection
-                client.Connect(host, port, enableSsl);
+                client.Connect(_emailSettings.Host, _emailSettings.Port, _emailSettings.EnableSsl);
 
                 // Authenticate if using a password-protected email account
-                if (!string.IsNullOrEmpty(fromAddress))
+                if (!string.IsNullOrEmpty(_emailSettings.FromAddress))
                 {
-                    client.Authenticate(fromAddress, fromPassword);
+                    client.Authenticate(_emailSettings.FromAddress, _emailSettings.FromPassword);
                 }
 
                 var message = new MimeMessage();
-                message.From.Add(new MailboxAddress("Termis", fromAddress));
-                message.To.Add(new MailboxAddress("Recipient", toAddress));
+                message.From.Add(new MailboxAddress("Termis", _emailSettings.FromAddress));
+                message.To.Add(new MailboxAddress("Recipient", _emailSettings.ToAddress));
                 message.Subject = subject;
 
                 // Set the message body (can be plain text or HTML)
@@ -339,102 +231,28 @@ namespace TermisWorkerService
                 WriteLog("Error sending email: " + ex.Message);
             }
         }
-        private static bool InsertDataToDatabase(string month, string day, string hour, bool hasEarthTemp, bool hasAirTemp, CsvContext context, string earthTemp = "0", string airTemp = "0")
+
+        private bool InsertDataToDatabase(string month, string day, string hour, CsvData csvData, CsvContext context)
         {
             try
             {
-                if (hasEarthTemp == true && hasAirTemp == false)
+                var test = context.CsvData.FirstOrDefault(x => x.Day == csvData.Day && x.Month == csvData.Month && x.Hour == csvData.Hour);
+                if (test != null)
                 {
-                    // Create a new CsvData entry and link it to the Master entry
-                    var csvData = new CsvData
-                    {
-                        Month = month, // Example mapping, adjust based on your CSV structure
-                        Day = day,
-                        Hour = hour,
-                        EarthTemperature = double.Parse(earthTemp, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture),
-                        AirTemperature = 0,
-                        Master = masterToAdd // Link the CsvData to the Master entry
-                    };
-                    var test = context.CsvData.FirstOrDefault(x => x.Day == csvData.Day && x.Month == csvData.Month && x.Hour == csvData.Hour);
-                    if (test != null)
-                    {
-                        test.EarthTemperature = csvData.EarthTemperature;
-                        test.AirTemperature = csvData.AirTemperature;
-                        test.Master = masterToAdd;
-                        context.Entry(test).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-                        context.SaveChanges();
-                    }
-                    else
-                    {
-                        context.CsvData.Add(csvData);
-                        context.SaveChanges();
-                    }
-                    
-                    // Add the CsvData entry to the context
-                    WriteLog($"Data inserted to database: {month}, {day}, {hour}, {earthTemp}");
-                }
-                else if (hasEarthTemp == false && hasAirTemp == true)
-                {
-                    // Create a new CsvData entry and link it to the Master entry
-                    var csvData = new CsvData
-                    {
-                        Month = month, // Example mapping, adjust based on your CSV structure
-                        Day = day,
-                        Hour = hour,
-                        EarthTemperature = 0,
-                        AirTemperature = double.Parse(airTemp, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture),
-                        Master = masterToAdd // Link the CsvData to the Master entry
-                    };
-                    var test = context.CsvData.FirstOrDefault(x => x.Day == csvData.Day && x.Month == csvData.Month && x.Hour == csvData.Hour);
-                    if (test != null)
-                    {
-                        test.EarthTemperature = csvData.EarthTemperature;
-                        test.AirTemperature = csvData.AirTemperature;
-                        test.Master = masterToAdd;
-                        context.Entry(test).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-                        context.SaveChanges();
-                    }
-                    else
-                    {
-                        context.CsvData.Add(csvData);
-                        // Save changes to persist both Master and CsvData entries
-                        // context.SaveChanges();
-                    }
+                    test.EarthTemperature = csvData.EarthTemperature;
+                    test.AirTemperature = csvData.AirTemperature;
+                    test.Master = masterToAdd;
+                    context.Entry(test).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
                     context.SaveChanges();
-                    // Add the CsvData entry to the context
-                    WriteLog($"Data inserted to database: {month}, {day}, {hour}, {airTemp}");
                 }
                 else
                 {
-                    // Create a new CsvData entry and link it to the Master entry
-                    var csvData = new CsvData
-                    {
-                        Month = month, // Example mapping, adjust based on your CSV structure
-                        Day = day,
-                        Hour = hour,
-                        EarthTemperature = double.Parse(earthTemp, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture),
-                        AirTemperature = double.Parse(airTemp, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture),
-                        Master = masterToAdd // Link the CsvData to the Master entry
-                    };
-                    var test = context.CsvData.FirstOrDefault(x => x.Day == csvData.Day && x.Month == csvData.Month && x.Hour == csvData.Hour);
-                    if (test != null)
-                    {
-                        test.EarthTemperature = csvData.EarthTemperature;
-                        test.AirTemperature = csvData.AirTemperature;
-                        test.Master = masterToAdd;
-                        context.Entry(test).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-                        context.SaveChanges();
-                    }
-                    else
-                    {
-                        context.CsvData.Add(csvData);
-                        context.SaveChanges();
-                    }
+                    context.CsvData.Add(csvData);
                     context.SaveChanges();
-                    // Add the CsvData entry to the context
-                    WriteLog($"Data inserted to database: {month}, {day}, {hour}, {airTemp},{earthTemp}");
                 }
 
+                // Add the CsvData entry to the context
+                WriteLog($"Data inserted to database: {month}, {day}, {hour}, {csvData.EarthTemperature},{csvData.AirTemperature}");
                 return true;
             }
             catch (Exception ex)
@@ -443,7 +261,8 @@ namespace TermisWorkerService
                 return false;
             }
         }
-        private static void MoveFileToFolder(string filePath, string destinationFolderPath)
+
+        private void MoveFileToFolder(string filePath, string destinationFolderPath)
         {
             try
             {
@@ -451,15 +270,13 @@ namespace TermisWorkerService
                 {
                     Directory.CreateDirectory(destinationFolderPath);
                 }
-
                 string destinationFilePath = Path.Combine(destinationFolderPath, Path.GetFileName(filePath));
                 if (File.Exists(destinationFilePath))
                 {
                     File.Delete(destinationFilePath); // Remove if already exists
                 }
-
                 File.Move(filePath, destinationFilePath);
-                WriteLog($"File moved to {destinationFolderPath}: {filePath}");
+                WriteLog($"File moved to {destinationFolderPath}");
             }
             catch (Exception ex)
             {
@@ -467,7 +284,7 @@ namespace TermisWorkerService
             }
         }
 
-        private static void WriteLog(string logMessage)
+        private void WriteLog(string logMessage)
         {
             try
             {
@@ -493,5 +310,53 @@ namespace TermisWorkerService
                 Console.WriteLine($"Error writing log: {ex.Message}");
             }
         }
+        public bool HasDuplicates(List<int> numbers)
+        {
+            HashSet<int> seenNumbers = new HashSet<int>();
+            foreach (int number in numbers)
+            {
+                if (seenNumbers.Contains(number))
+                {
+                    return true; // Found a duplicate
+                }
+                seenNumbers.Add(number);
+            }
+            return false; // No duplicates found
+        }
     }
+
+}
+public class AppSettings
+{
+    public string FolderPath { get; set; }
+    public string FailedFolderPath { get; set; }
+    public string SucceededFolderPath { get; set; }
+
+    // Parameterless constructor
+    public AppSettings() { }
+}
+
+public class EmailSettings
+{
+    public string FromAddress { get; set; }
+    public string ToAddress { get; set; }
+    public string Host { get; set; }
+    public int Port { get; set; }
+    public bool EnableSsl { get; set; }
+    public string FromPassword { get; set; }
+
+    // Parameterless constructor
+    public EmailSettings() { }
+}
+
+public class ColumnIndexes
+{
+    public int MonthColumnIndex { get; set; } = -1;
+    public int DateColumnIndex { get; set; } = -1;
+    public int HourColumnIndex { get; set; } = -1;
+    public int EarthTempColumnIndex { get; set; } = -1;
+    public int AirTempColumnIndex { get; set; } = -1;
+
+    // Parameterless constructor
+    public ColumnIndexes() { }
 }

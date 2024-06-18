@@ -18,6 +18,11 @@ builder.Services.AddDbContext<CsvContext>(options =>
     options.UseSqlServer(connectionString);
 });
 
+// Configure AppSettings sections
+builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.Configure<ColumnIndexes>(builder.Configuration.GetSection("ColumnIndexes"));
+
 // Register the Worker as a singleton service
 builder.Services.AddSingleton<Worker>();
 builder.Services.AddHostedService<Worker>();
