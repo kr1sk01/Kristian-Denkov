@@ -37,6 +37,13 @@ namespace Termis_Service.Models
             set { this["ErrorDirectory"] = value; }
         }
 
+        [ConfigurationProperty("LogFilePath", IsRequired = true)]
+        public string LogFilePath
+        {
+            get { return (string)this["LogFilePath"]; }
+            set { this["LogFilePath"] = value; }
+        }
+
         [ConfigurationProperty("CsvSeparator", IsRequired = true)]
         public char CsvSeparator
         {

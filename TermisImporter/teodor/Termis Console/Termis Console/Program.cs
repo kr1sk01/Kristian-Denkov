@@ -15,7 +15,7 @@ namespace Termis_Console
         private static char csvSeparator = ' ';
 
         private static string emailHost = "smtp.gmail.com";
-        private static int emailPort = 465;
+        private static int emailPort = 587;
         private static string emailApplicationName = "ChampionshipMaster";
         private static string emailUsername = "championshipmaster.a1@gmail.com";
         private static string emailPassword = "fjen jevt wfgh miib";
@@ -23,10 +23,26 @@ namespace Termis_Console
 
         private static string toEmail = "sitikom2007@gmail.com";
 
+        private static int monthColumnIndex = 0;
+        private static int dayColumnIndex = 1;
+        private static int hourhColumnIndex = 2;
+        private static int tempColumnIndex = 3;
+        private static int soilTempColumnIndex = 4;
+        private static bool hasSoilTempColumn = true;
+
+        private static string logFilePath = @"C:\TermisImporterFiles\termisErrorLog.txt";
+
         static void Main(string[] args)
         {
-            InitializeService(out ServiceDbContext context);
-            ProcessCsvFiles(context);
+            try
+            {
+                InitializeService();
+                ProcessCsvFiles();
+            }
+            catch (Exception ex)
+            {
+                LogError("General service error.", ex);
+            }
         }
 
         private static void CreateDirectoryIfNotExists(string path)
@@ -37,18 +53,27 @@ namespace Termis_Console
             }
         }
 
-        private static void InitializeService(out ServiceDbContext context)
+        private static void InitializeService()
         {
-            CreateDirectoryIfNotExists(csvDirectory);
-            CreateDirectoryIfNotExists(processedDirectory);
-            CreateDirectoryIfNotExists(errorDirectory);
+            try
+            {
+                CreateDirectoryIfNotExists(csvDirectory);
+                CreateDirectoryIfNotExists(processedDirectory);
+                CreateDirectoryIfNotExists(errorDirectory);
+                CreateDirectoryIfNotExists(Path.GetDirectoryName(logFilePath));
 
-            context = new ServiceDbContext();
-            context.Database.EnsureCreated();
+                var context = new ServiceDbContext();
+                context.Database.EnsureCreated();
+            }
+            catch (Exception ex)
+            {
+                LogError("Error while initializing service.", ex);
+            }
         }
 
-        private static void ProcessCsvFiles(ServiceDbContext _context)
+        private static void ProcessCsvFiles()
         {
+            var _context = new ServiceDbContext();
             var csvFiles = Directory.GetFiles(csvDirectory, "*.csv");
 
             foreach (var csvFile in csvFiles)
@@ -127,13 +152,20 @@ namespace Termis_Console
 
         private static void HandleError(string message, string csvFile)
         {
-            var errorFileName = Path.Combine(errorDirectory, Path.GetFileNameWithoutExtension(csvFile) + ".err");
-            File.WriteAllText(errorFileName, message);
+            try
+            {
+                var errorFileName = Path.Combine(errorDirectory, Path.GetFileNameWithoutExtension(csvFile) + ".err");
+                File.WriteAllText(errorFileName, message);
 
-            var unreadFileName = Path.Combine(errorDirectory, Path.GetFileName(csvFile));
-            File.Move(csvFile, unreadFileName);
+                var unreadFileName = Path.Combine(errorDirectory, Path.GetFileName(csvFile));
+                File.Move(csvFile, unreadFileName);
 
-            SendErrorEmail(toEmail, unreadFileName, message);
+                SendErrorEmail(toEmail, unreadFileName, message);
+            }
+            catch (Exception ex)
+            {
+                LogError("Error moving files.", ex);
+            }
         }
 
         private static DetailParseResponse ParseDetail(string[] values, int row, out Detail? detail)
@@ -145,87 +177,100 @@ namespace Termis_Console
 
             detail = null;
 
-            if (values.Length != 4)
+            try
             {
-                string errorMessage = $"Invalid data format in row [{row}]. This row does not contain the necessary amount of values.";
-                response.IsSuccess = false;
-                response.ErrorMessage = errorMessage;
-                return response;
-            }
+                if ((hasSoilTempColumn && values.Length != 5) || (!hasSoilTempColumn && values.Length != 4))
+                {
+                    string errorMessage = $"Invalid data format in row [{row}]. This row does not contain the necessary amount of columns.";
+                    response.IsSuccess = false;
+                    response.ErrorMessage = errorMessage;
+                    return response;
+                }
 
-            //Parse Month value
-            if (!int.TryParse(values[0], out int month))
-            {
-                string errorMessage = $"Invalid data format in row [{row}]. Month value could not be parsed.";
-                response.IsSuccess = false;
-                response.ErrorMessage = errorMessage;
-                return response;
-            }
-            if (month > 12)
-            {
-                string errorMessage = $"Invalid data format in row [{row}]. Month value is not valid.";
-                response.IsSuccess = false;
-                response.ErrorMessage = errorMessage;
-                return response;
-            }
+                //Parse Month value
+                if (!int.TryParse(values[monthColumnIndex], out int month))
+                {
+                    string errorMessage = $"Invalid data format in row [{row}]. Month value could not be parsed.";
+                    response.IsSuccess = false;
+                    response.ErrorMessage = errorMessage;
+                    return response;
+                }
+                if (month > 12)
+                {
+                    string errorMessage = $"Invalid data format in row [{row}]. Month value is not valid.";
+                    response.IsSuccess = false;
+                    response.ErrorMessage = errorMessage;
+                    return response;
+                }
 
-            //Parse Day value
-            if (!int.TryParse(values[1], out int day))
-            {
-                string errorMessage = $"Invalid data format in row [{row}]. Day value could not be parsed.";
-                response.IsSuccess = false;
-                response.ErrorMessage = errorMessage;
-                return response;
-            }
-            if (day > 31)
-            {
-                string errorMessage = $"Invalid data format in row [{row}]. Day value is not valid.";
-                response.IsSuccess = false;
-                response.ErrorMessage = errorMessage;
-                return response;
-            }
+                //Parse Day value
+                if (!int.TryParse(values[dayColumnIndex], out int day))
+                {
+                    string errorMessage = $"Invalid data format in row [{row}]. Day value could not be parsed.";
+                    response.IsSuccess = false;
+                    response.ErrorMessage = errorMessage;
+                    return response;
+                }
+                if (day > 31)
+                {
+                    string errorMessage = $"Invalid data format in row [{row}]. Day value is not valid.";
+                    response.IsSuccess = false;
+                    response.ErrorMessage = errorMessage;
+                    return response;
+                }
 
-            //Parse Hour value
-            if (!int.TryParse(values[2], out int hour))
-            {
-                string errorMessage = $"Invalid data format in row [{row}]. Hour value could not be parsed.";
-                response.IsSuccess = false;
-                response.ErrorMessage = errorMessage;
-                return response;
-            }
-            if (hour > 23)
-            {
-                string errorMessage = $"Invalid data format in row [{row}]. Hour value is not valid.";
-                response.IsSuccess = false;
-                response.ErrorMessage = errorMessage;
-                return response;
-            }
+                //Parse Hour value
+                if (!int.TryParse(values[hourhColumnIndex], out int hour))
+                {
+                    string errorMessage = $"Invalid data format in row [{row}]. Hour value could not be parsed.";
+                    response.IsSuccess = false;
+                    response.ErrorMessage = errorMessage;
+                    return response;
+                }
+                if (hour > 23)
+                {
+                    string errorMessage = $"Invalid data format in row [{row}]. Hour value is not valid.";
+                    response.IsSuccess = false;
+                    response.ErrorMessage = errorMessage;
+                    return response;
+                }
 
-            //Parse Temperature value
-            if (!double.TryParse(values[3], NumberStyles.Any, CultureInfo.InvariantCulture, out double temp))
-            {
-                string errorMessage = $"Invalid data format in row [{row}]. Temperature value is not valid.";
-                response.IsSuccess = false;
-                response.ErrorMessage = errorMessage;
-                return response;
+                //Parse Temperature value
+                if (!double.TryParse(values[tempColumnIndex], NumberStyles.Any, CultureInfo.InvariantCulture, out double temp))
+                {
+                    string errorMessage = $"Invalid data format in row [{row}]. Temperature value is not valid.";
+                    response.IsSuccess = false;
+                    response.ErrorMessage = errorMessage;
+                    return response;
+                }
+
+                //Parse Soil Temperature value
+                double soilTemp = 0;
+                if (hasSoilTempColumn)
+                {
+                    if (!double.TryParse(values[soilTempColumnIndex], NumberStyles.Any, CultureInfo.InvariantCulture, out soilTemp))
+                    {
+                        string errorMessage = $"Invalid data format in row [{row}]. Soil temperature value is not valid.";
+                        response.IsSuccess = false;
+                        response.ErrorMessage = errorMessage;
+                        return response;
+                    } 
+                }
+
+                detail = new Detail
+                {
+                    Month = month,
+                    Day = day,
+                    Hour = hour,
+                    Temp = temp,
+                    SoilTemp = hasSoilTempColumn ? soilTemp : null
+                };
             }
-
-            //Parse Temperature value
-            //if (!double.TryParse(values[4], out double soilTemp))
-            //{
-            //    string errorMessage = $"Invalid data format in row [{row}]. Temperature value is not valid.";
-            //    response.isSuccess = false;
-            //    response.ErrorMessage = errorMessage;
-            //    return response;
-            //}
-
-            detail = new Detail
+            catch (Exception ex)
             {
-                Month = month,
-                Day = day,
-                Hour = hour,
-                Temp = temp
-            };
+                response.IsSuccess = false;
+                response.ErrorMessage = $"Data parsing error in row [{row}]. {ex.Message}";
+            }
 
             return response;
         }
@@ -251,16 +296,23 @@ namespace Termis_Console
 
         private static void SendErrorEmail(string toEmail, string csvFile, string errorMessage)
         {
-            string template;
-            using (var reader = new StreamReader("ErrorTemplate.html"))
+            try
             {
-                template = reader.ReadToEnd();
+                string template;
+                using (var reader = new StreamReader("ErrorTemplate.html"))
+                {
+                    template = reader.ReadToEnd();
+                }
+
+                var body = template.Replace("[Csv File]", csvFile)
+                    .Replace("[Error Message]", errorMessage);
+
+                SendEmail(toEmail, "Error in NIMH .csv file", body);
             }
-
-            var body = template.Replace("[Csv File]", csvFile)
-                .Replace("[Error Message]", errorMessage);
-
-            SendEmail(toEmail, "Error in NIMH .csv file", body);
+            catch (Exception ex)
+            {
+                LogError("Error sending email.", ex);
+            }
         }
 
         private static void SendEmail(string toEmail, string subject, string body)
@@ -286,7 +338,7 @@ namespace Termis_Console
 
             SmtpClient smtpClient = new SmtpClient(emailHost) // Replace with your SMTP server
             {
-                Port = 587, // Common port for TLS
+                Port = emailPort, // Common port for TLS
                 Credentials = new NetworkCredential(emailUsername, emailPassword),
                 EnableSsl = emailEnableSsl,
             };
@@ -303,6 +355,24 @@ namespace Termis_Console
 
             // Send the email
             smtpClient.Send(mailMessage);
+        }
+
+        private static void LogError(string message, Exception ex)
+        {
+            try
+            {
+                using (StreamWriter writer = new StreamWriter(logFilePath, true))
+                {
+                    writer.WriteLine($"{DateTime.Now} - ERROR: {message}");
+                    writer.WriteLine($"Exception: {ex.Message}");
+                    writer.WriteLine($"Stack Trace: {ex.StackTrace}");
+                    writer.WriteLine();
+                }
+            }
+            catch (Exception logEx)
+            {
+                Console.WriteLine($"Failed to log error: {logEx.Message}");
+            }
         }
     }
 }
