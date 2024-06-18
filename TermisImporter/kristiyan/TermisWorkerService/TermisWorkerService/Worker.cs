@@ -3,6 +3,7 @@ using System.Globalization;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Diagnostics;
 using MailKit.Net.Smtp;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -74,51 +75,58 @@ namespace TermisWorkerService
 
         private void OnFileCreated(object sender, FileSystemEventArgs e)
         {
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
 
-                try
+            try
+            {
+                string filePath = e.FullPath;
+                WriteLog($"New .csv file created: {filePath}");
+
+                bool isSuccess = false;
+                using (var scope = _scopeFactory.CreateScope())
                 {
-                    string filePath = e.FullPath;
-                    WriteLog($"New .csv file created: {filePath}");
-
-                    bool isSuccess = false;
-                    using (var scope = _scopeFactory.CreateScope())
-                    {
-                        var dbContext = scope.ServiceProvider.GetRequiredService<CsvContext>();
-                        isSuccess = ReadCsvAndInsertToDatabase(filePath, dbContext);
-                    }
-
-                    if (isSuccess)
-                    {
-                        SendEmail(filePath, true);
-                        MoveFileToFolder(filePath, _appSettings.SucceededFolderPath);
-                        first = true;
-                    }
-                    else
-                    {
-                        SendEmail(filePath, false);
-                        MoveFileToFolder(filePath, _appSettings.FailedFolderPath);
-                        first = true;
-                    }
+                    var dbContext = scope.ServiceProvider.GetRequiredService<CsvContext>();
+                    isSuccess = ReadCsvAndInsertToDatabase(filePath, dbContext);
                 }
-                catch (Exception ex)
+
+                if (isSuccess)
                 {
-                    WriteLog("Error on file created: " + ex);
+                    SendEmail(filePath, true);
+                    MoveFileToFolder(filePath, _appSettings.SucceededFolderPath);
+                    first = true;
                 }
-           
+                else
+                {
+                    SendEmail(filePath, false);
+                    MoveFileToFolder(filePath, _appSettings.FailedFolderPath);
+                    first = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                WriteLog("Error on file created: " + ex);
+            }
+            finally
+            {
+                stopwatch.Stop();
+                WriteLog($"Elapsed time for processing file '{e.FullPath}': {stopwatch.ElapsedMilliseconds} ms");
+            }
         }
 
         private bool ReadCsvAndInsertToDatabase(string filePath, CsvContext dbContext)
         {
             try
             {
-                List<int> indexes =
-                [
+                List<int> indexes = new List<int>
+                {
                     _columnIndexes.MonthColumnIndex,
                     _columnIndexes.DateColumnIndex,
                     _columnIndexes.HourColumnIndex,
                     _columnIndexes.EarthTempColumnIndex,
                     _columnIndexes.AirTempColumnIndex,
-                ];
+                };
+
                 if (HasDuplicates(indexes))
                 {
                     WriteLog("You have setup 2 different properies in 1 colums, check the config file!");
@@ -127,7 +135,6 @@ namespace TermisWorkerService
 
                 if (_columnIndexes.MonthColumnIndex > -1 || _columnIndexes.DateColumnIndex > -1 || _columnIndexes.HourColumnIndex > -1)
                 {
-
                     using (StreamReader reader = new StreamReader(filePath))
                     {
                         string line;
@@ -157,8 +164,8 @@ namespace TermisWorkerService
                                     Month = columns[_columnIndexes.MonthColumnIndex],
                                     Day = columns[_columnIndexes.DateColumnIndex],
                                     Hour = columns[_columnIndexes.HourColumnIndex],
-                                    EarthTemperature = _columnIndexes.EarthTempColumnIndex > -1 ? double.Parse(columns[_columnIndexes.EarthTempColumnIndex], System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture) : 0,
-                                    AirTemperature = _columnIndexes.AirTempColumnIndex > -1 ? double.Parse(columns[_columnIndexes.AirTempColumnIndex], System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture) : 0,
+                                    EarthTemperature = _columnIndexes.EarthTempColumnIndex > -1 ? double.Parse(columns[_columnIndexes.EarthTempColumnIndex], NumberStyles.Any, CultureInfo.InvariantCulture) : 0,
+                                    AirTemperature = _columnIndexes.AirTempColumnIndex > -1 ? double.Parse(columns[_columnIndexes.AirTempColumnIndex], NumberStyles.Any, CultureInfo.InvariantCulture) : 0,
                                     Master = masterToAdd
                                 };
 
@@ -244,7 +251,7 @@ namespace TermisWorkerService
                 }
                 else
                 {
-                    context.CsvData.Add(csvData);                   
+                    context.CsvData.Add(csvData);
                 }
                 context.SaveChanges();
                 // Add the CsvData entry to the context
@@ -264,7 +271,6 @@ namespace TermisWorkerService
             {
                 if (!Directory.Exists(destinationFolderPath))
                 {
-
                     Directory.CreateDirectory(destinationFolderPath);
                 }
                 string destinationFilePath = Path.Combine(destinationFolderPath, Path.GetFileName(filePath));
@@ -321,9 +327,4 @@ namespace TermisWorkerService
             return false; // No duplicates found
         }
     }
-
 }
-
-
-
-
