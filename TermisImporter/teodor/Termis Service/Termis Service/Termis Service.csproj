@@ -164,6 +164,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Models\ColumnIndexSettings.cs" />
     <Compile Include="Models\Detail.cs" />
     <Compile Include="Models\DetailParseResponse.cs" />
     <Compile Include="Models\Master.cs" />

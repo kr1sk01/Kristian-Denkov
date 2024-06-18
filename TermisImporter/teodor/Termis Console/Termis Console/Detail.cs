@@ -20,6 +20,6 @@ namespace Termis_Console
         public int Day { get; set; }
         public int Hour { get; set; }
         public double Temp { get; set; }
-        //public double SoilTemp { get; set; }
+        public double? SoilTemp { get; set; }
     }
 }
