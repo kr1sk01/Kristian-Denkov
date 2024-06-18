@@ -6,19 +6,17 @@
     using MailKit.Net.Smtp;
     using System.Threading;
     using System.Data.SqlClient;
-    using ServiceConsoleApp;
-    using System.Globalization;
-    using Microsoft.EntityFrameworkCore;
-    using System.Diagnostics.Metrics;
-    using Org.BouncyCastle.Crypto.Macs;
+    using Microsoft.Extensions.Configuration;
     using MimeKit;
+    using System.Globalization;
+
     internal class Program
     {
         private static FileSystemWatcher watcher = default!;
 
-        private static string folderPath = @"C:\Users\a1bg535412\Documents"; // Change this to your desired folder path
-        private static string failedFolderPath = @"C:\Users\a1bg535412\Documents\failed_to_process"; // Change this to your desired failed folder path
-        private static string succeededFolderPath = @"C:\Users\a1bg535412\Documents\succeeded_to_process"; // Change this to your desired succeeded folder path
+        private static string folderPath = "";
+        private static string failedFolderPath = "";
+        private static string succeededFolderPath = "";
 
         private static readonly string logDirectory = AppDomain.CurrentDomain.BaseDirectory;
         private static readonly string logFileName = "app.log";
@@ -29,20 +27,64 @@
         private static Master masterToAdd = new Master();
 
         private static bool first = true;
-        private static CsvContext context = new();
+        private static CsvContext dbcontext = new();
 
-        private static string fromAddress = "championshipmaster.a1@gmail.com";
-        private static string toAddress = "cross.2001@abv.bg";
-        private static string host = "smtp.gmail.com"; // Update with your SMTP server
-        private static int port = 465; // Update with your SMTP port
+        private static string fromAddress = "";
+        private static string toAddress = "";
+        private static string host = "";
+        private static int port;
+        private static bool enableSsl;
+        private static string fromPassword = "";
 
-        private static bool enableSsl = true;
-        private static string fromPassword = "fjen jevt wfgh miib"; // Update with your email password
+
+        private static int monthColumnIndex = 0;
+        private static int dateColumnIndex = 0;
+        private static int hourColumnIndex = 0;
+
+        private static int earthTempColumnIndex = 0;
+        private static int airTempColumnIndex = 0;
+
+
+
+
 
         static void Main(string[] args)
         {
+            try
+            {
+                var config = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .Build();
+                try
+                {
+                    folderPath = config["AppSettings:FolderPath"]!;
+                    failedFolderPath = config["AppSettings:FailedFolderPath"]!;
+                    succeededFolderPath = config["AppSettings:SucceededFolderPath"]!;
+                    fromAddress = config["AppSettings:FromAddress"]!;
+                    toAddress = config["AppSettings:ToAddress"]!;
+                    host = config["AppSettings:Host"]!;
+                    port = int.Parse(config["AppSettings:Port"]!);
+                    enableSsl = bool.Parse(config["AppSettings:EnableSsl"]!);
+                    fromPassword = config["AppSettings:FromPassword"]!;
+                    monthColumnIndex = int.Parse(config["AppSettings:MonthColumnIndex"]!);
+                    dateColumnIndex = int.Parse(config["AppSettings:DateColumnIndex"]!);
+                    hourColumnIndex = int.Parse(config["AppSettings:HourColumnIndex"]!);
+                    earthTempColumnIndex = int.Parse(config["AppSettings:EarthTempColumnIndex"]!);
+                    airTempColumnIndex = int.Parse(config["AppSettings:AirTempColumnIndex"]!);
+                }
+                catch (Exception ex)
+                {
+                    WriteLog("Couldn't load data from config" + ex);
+                }
+            }
+            catch (Exception ex)
+            {
+                WriteLog("Couldn't load config" + ex);
+            }
+
             EnsureCreatedDb();
-            context = new CsvContext();
+            dbcontext = new CsvContext();
 
             Console.CancelKeyPress += (sender, eventArgs) =>
             {
@@ -60,6 +102,7 @@
                 OnStop();
             }
         }
+
         private static void EnsureCreatedDb()
         {
             try
@@ -79,8 +122,8 @@
             {
                 Console.WriteLine(ex.Message);
             }
-
         }
+
         private static void OnStart(string[] args)
         {
             try
@@ -102,6 +145,7 @@
                 WriteLog("Error on start: " + ex.Message);
             }
         }
+
         private static void OnStop()
         {
             try
@@ -119,6 +163,7 @@
                 WriteLog("Error on stop: " + ex.Message);
             }
         }
+
         private static void OnFileCreated(object sender, FileSystemEventArgs e)
         {
             try
@@ -147,48 +192,149 @@
                 WriteLog("Error on file created: " + ex.Message);
             }
         }
+
         private static bool ReadCsvAndInsertToDatabase(string filePath)
         {
             try
             {
-                using (StreamReader reader = new StreamReader(filePath))
-                {
-                    string line;
-                    while ((line = reader.ReadLine()) != null)
+                if (monthColumnIndex != 0 || dateColumnIndex != 0 || hourColumnIndex != 0)
+                {                
+                    if (earthTempColumnIndex != 0 && airTempColumnIndex == 0)
                     {
-
-                        // Split the line by spaces, removing empty entries
-                        var columns = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-
-                        if (columns.Length == 4 &&
-                            !string.IsNullOrWhiteSpace(columns[0]) &&
-                            !string.IsNullOrWhiteSpace(columns[1]) &&
-                            !string.IsNullOrWhiteSpace(columns[2]) &&
-                            !string.IsNullOrWhiteSpace(columns[3]))
+                        using (StreamReader reader = new StreamReader(filePath))
                         {
-                            if (first)
+                            string line;
+                            while ((line = reader.ReadLine()) != null)
                             {
-                                masterToAdd = new Master
+                                // Split the line by spaces, removing empty entries
+                                var columns = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+                                if (columns.Length == 4 &&
+                                    !string.IsNullOrWhiteSpace(columns[0]) &&
+                                    !string.IsNullOrWhiteSpace(columns[1]) &&
+                                    !string.IsNullOrWhiteSpace(columns[2]) &&
+                                    !string.IsNullOrWhiteSpace(columns[3]))
                                 {
-                                    ImportDate = DateTime.Now,
-                                    ForecastDate = new DateTime(DateTime.UtcNow.Year, int.Parse(columns[0]), int.Parse(columns[1])),
-                                };
-                                context.Masters.Add(masterToAdd);
-                                context.SaveChanges();
-                                first = false;
+                                    if (first)
+                                    {
+                                        masterToAdd = new Master
+                                        {
+                                            ImportDate = DateTime.Now,
+                                            ForecastDate = new DateTime(DateTime.UtcNow.Year, int.Parse(columns[0]), int.Parse(columns[1])),
+                                        };
+                                        dbcontext.Masters.Add(masterToAdd);
+                                        dbcontext.SaveChanges();
+                                        first = false;
+                                    }
+                                    var month = columns[monthColumnIndex-1];
+                                    var day = columns[dateColumnIndex - 1];
+                                    var hour = columns[hourColumnIndex - 1];
+                                    var earthTemperature = columns[earthTempColumnIndex - 1];
 
+                                    InsertDataToDatabase(month, day, hour, true, false, dbcontext, earthTemp: earthTemperature);
+                                }
+                                else
+                                {
+                                    WriteLog($"Invalid line format or missing values: {line}");
+                                    return false; // Indicate failure due to invalid line
+                                }
                             }
-                            InsertDataToDatabase(columns[0], columns[1], columns[2], columns[3], context);
                         }
-                        else
+                        return true; // Indicate success if all lines are valid
+                    }else if(earthTempColumnIndex == 0 && airTempColumnIndex != 0)
+                    {
+                        using (StreamReader reader = new StreamReader(filePath))
                         {
-                            WriteLog($"Invalid line format or missing values: {line}");
-                            return false; // Indicate failure due to invalid line
-                        }
-                    }
+                            string line;
+                            while ((line = reader.ReadLine()) != null)
+                            {
+                                // Split the line by spaces, removing empty entries
+                                var columns = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
+                                if (columns.Length == 4 &&
+                                    !string.IsNullOrWhiteSpace(columns[0]) &&
+                                    !string.IsNullOrWhiteSpace(columns[1]) &&
+                                    !string.IsNullOrWhiteSpace(columns[2]) &&
+                                    !string.IsNullOrWhiteSpace(columns[3]))
+                                {
+                                    if (first)
+                                    {
+                                        masterToAdd = new Master
+                                        {
+                                            ImportDate = DateTime.Now,
+                                            ForecastDate = new DateTime(DateTime.UtcNow.Year, int.Parse(columns[0]), int.Parse(columns[1])),
+                                        };
+                                        dbcontext.Masters.Add(masterToAdd);
+                                        dbcontext.SaveChanges();
+                                        first = false;
+                                    }
+                                    var month = columns[monthColumnIndex - 1];
+                                    var day = columns[dateColumnIndex - 1];
+                                    var hour = columns[hourColumnIndex - 1];
+                                    var airTemperature = columns[airTempColumnIndex - 1];
+
+                                    InsertDataToDatabase(month, day, hour, false, true, dbcontext, airTemp: airTemperature);
+                                }
+                                else
+                                {
+                                    WriteLog($"Invalid line format or missing values: {line}");
+                                    return false; // Indicate failure due to invalid line
+                                }
+                            }
+                        }
+                        return true;
+                    }
+                    else
+                    {
+                        using (StreamReader reader = new StreamReader(filePath))
+                        {
+                            string line;
+                            while ((line = reader.ReadLine()) != null)
+                            {
+                                // Split the line by spaces, removing empty entries
+                                var columns = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+                                if (columns.Length == 5 &&
+                                    !string.IsNullOrWhiteSpace(columns[0]) &&
+                                    !string.IsNullOrWhiteSpace(columns[1]) &&
+                                    !string.IsNullOrWhiteSpace(columns[2]) &&
+                                    !string.IsNullOrWhiteSpace(columns[3]) &&
+                                    !string.IsNullOrWhiteSpace(columns[4]))
+                                {
+                                    if (first)
+                                    {
+                                        masterToAdd = new Master
+                                        {
+                                            ImportDate = DateTime.Now,
+                                            ForecastDate = new DateTime(DateTime.UtcNow.Year, int.Parse(columns[0]), int.Parse(columns[1])),
+                                        };
+                                        dbcontext.Masters.Add(masterToAdd);
+                                        dbcontext.SaveChanges();
+                                        first = false;
+                                    }
+                                    var month = columns[monthColumnIndex - 1];
+                                    var day = columns[dateColumnIndex - 1];
+                                    var hour = columns[hourColumnIndex - 1];
+                                    var earthTemperature = columns[earthTempColumnIndex - 1];
+                                    var airTemperature = columns[airTempColumnIndex - 1];
+
+                                    InsertDataToDatabase(month, day, hour, true, true, dbcontext, earthTemp: earthTemperature, airTemp: airTemperature);
+                                }
+                                else
+                                {
+                                    WriteLog($"Invalid line format or missing values: {line}");
+                                    return false; // Indicate failure due to invalid line
+                                }
+                            }
+                        }
+                        return true;
+                    }
                 }
-                return true; // Indicate success if all lines are valid
+                else
+                {
+                    WriteLog("Error reading CSV file please check the config ! ");
+                    return false;
+                }
             }
             catch (Exception ex)
             {
@@ -207,7 +353,6 @@
                     body = $"The CSV file '{Path.GetFileName(filePath)}' was successfully processed and moved to the succeeded_to_process folder.";
                     subject = "CSV File Processing Succeeded!";
                 }
-
                 else
                 {
                     body = $"The CSV file '{Path.GetFileName(filePath)}' couldn't be inserted into database.";
@@ -241,34 +386,101 @@
                 WriteLog("Error sending email: " + ex.Message);
             }
         }
-        private static bool InsertDataToDatabase(string col1, string col2, string col3, string col4, CsvContext context)
+
+        private static bool InsertDataToDatabase(string month, string day, string hour, bool hasEarthTemp, bool hasAirTemp, CsvContext context, string earthTemp = "0", string airTemp = "0")
         {
             try
             {
-                // Create a new CsvData entry and link it to the Master entry
-                var csvData = new CsvData
+                if (hasEarthTemp == true && hasAirTemp == false)
                 {
-                    Month = col1, // Example mapping, adjust based on your CSV structure
-                    Day = col2,
-                    Hour = col3,
-                    Parameter = double.Parse(col4, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture),
-                    Master = masterToAdd // Link the CsvData to the Master entry
-                };
-                var test = context.CsvData.FirstOrDefault(x => x.Day == csvData.Day && x.Month == csvData.Month && x.Hour == csvData.Hour);
-                if (test != null)
+                    // Create a new CsvData entry and link it to the Master entry
+                    var csvData = new CsvData
+                    {
+                        Month = month, // Example mapping, adjust based on your CSV structure
+                        Day = day,
+                        Hour = hour,
+                        EarthTemperature = double.Parse(earthTemp, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture),
+                        AirTemperature = 0,
+                        Master = masterToAdd // Link the CsvData to the Master entry
+                    };
+                    var test = context.CsvData.FirstOrDefault(x => x.Day == csvData.Day && x.Month == csvData.Month && x.Hour == csvData.Hour);
+                    if (test != null)
+                    {
+                        test.EarthTemperature = csvData.EarthTemperature;
+                        test.AirTemperature = csvData.AirTemperature;
+                        test.Master = masterToAdd;
+                        context.Entry(test).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+                        context.SaveChanges();
+                    }
+                    else
+                    {
+                        context.CsvData.Add(csvData);
+                        // Save changes to persist both Master and CsvData entries
+                        context.SaveChanges();
+                    }
+                    // Add the CsvData entry to the context
+                    WriteLog($"Data inserted to database: {month}, {day}, {hour}, {earthTemp}");
+                }else if (hasEarthTemp == false && hasAirTemp == true)
                 {
-                    test.Master = masterToAdd;
-                    context.Entry(test).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-                    context.SaveChanges();
+                    // Create a new CsvData entry and link it to the Master entry
+                    var csvData = new CsvData
+                    {
+                        Month = month, // Example mapping, adjust based on your CSV structure
+                        Day = day,
+                        Hour = hour,
+                        EarthTemperature = 0,
+                        AirTemperature = double.Parse(airTemp, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture),
+                        Master = masterToAdd // Link the CsvData to the Master entry
+                    };
+                    var test = context.CsvData.FirstOrDefault(x => x.Day == csvData.Day && x.Month == csvData.Month && x.Hour == csvData.Hour);
+                    if (test != null)
+                    {
+                        test.EarthTemperature = csvData.EarthTemperature;
+                        test.AirTemperature = csvData.AirTemperature;
+                        test.Master = masterToAdd;
+                        context.Entry(test).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+                        context.SaveChanges();
+                    }
+                    else
+                    {
+                        context.CsvData.Add(csvData);
+                        // Save changes to persist both Master and CsvData entries
+                        context.SaveChanges();
+                    }
+                    // Add the CsvData entry to the context
+                    WriteLog($"Data inserted to database: {month}, {day}, {hour}, {earthTemp}");
                 }
                 else
                 {
-                    context.CsvData.Add(csvData);
-                    // Save changes to persist both Master and CsvData entries
-                    context.SaveChanges();
+                    // Create a new CsvData entry and link it to the Master entry
+                    var csvData = new CsvData
+                    {
+                        Month = month, // Example mapping, adjust based on your CSV structure
+                        Day = day,
+                        Hour = hour,
+                        EarthTemperature = double.Parse(earthTemp, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture),
+                        AirTemperature = double.Parse(airTemp, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture),
+                        Master = masterToAdd // Link the CsvData to the Master entry
+                    };
+                    var test = context.CsvData.FirstOrDefault(x => x.Day == csvData.Day && x.Month == csvData.Month && x.Hour == csvData.Hour);
+                    if (test != null)
+                    {
+                        test.EarthTemperature = csvData.EarthTemperature;
+                        test.AirTemperature = csvData.AirTemperature;
+                        test.Master = masterToAdd;
+                        context.Entry(test).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+                        context.SaveChanges();
+                    }
+                    else
+                    {
+                        context.CsvData.Add(csvData);
+                        // Save changes to persist both Master and CsvData entries
+                        context.SaveChanges();
+                    }
+                    // Add the CsvData entry to the context
+                    WriteLog($"Data inserted to database: {month}, {day}, {hour}, {earthTemp}");
                 }
-                // Add the CsvData entry to the context
-                WriteLog($"Data inserted to database: {col1}, {col2}, {col3}, {col4}");
+
                 return true;
             }
             catch (Exception ex)
@@ -277,6 +489,7 @@
                 return false;
             }
         }
+
         private static void MoveFileToFolder(string filePath, string destinationFolderPath)
         {
             try
@@ -300,6 +513,7 @@
                 WriteLog($"Error moving file to {destinationFolderPath}: " + ex.Message);
             }
         }
+
         private static void WriteLog(string logMessage)
         {
             try

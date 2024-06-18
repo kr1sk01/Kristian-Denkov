@@ -19,10 +19,12 @@ public class CsvData
     [Required]
     public string Hour { get; set; } = default!;
 
-    [Required]
-    public double Parameter { get; set; } = default!;
+    public double EarthTemperature { get; set; } = default!;
+
+    public double AirTemperature { get; set; } = default!;
 
     public int MasterId { get; set; } = default!;
+
     public Master Master { get; set; } = default!;
 }
 
