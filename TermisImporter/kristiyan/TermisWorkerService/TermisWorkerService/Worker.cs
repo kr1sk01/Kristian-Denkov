@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using MimeKit;
 using Microsoft.Extensions.Options;
 using static System.Net.Mime.MediaTypeNames;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace TermisWorkerService
 {
@@ -23,8 +24,6 @@ namespace TermisWorkerService
         private readonly IServiceScopeFactory _scopeFactory;
         private FileSystemWatcher watcher;
         private static readonly string logDirectory = AppDomain.CurrentDomain.BaseDirectory;
-        private static readonly string logFileName = $"{DateTime.UtcNow.ToString("dd_MM_yyyy HH_mm")}.log";
-        private static readonly string logFilePath = Path.Combine(logDirectory, logFileName);
         private static CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
         private static Master masterToAdd = new Master();
         private static bool first = true;
@@ -108,10 +107,11 @@ namespace TermisWorkerService
         }
         private bool ReadCsvAndInsertToDatabase(string filePath)
         {
+            int lineCounter = 0;
+
             bool isSuccess = true;
-            try
-            {
-                List<int> indexes = new List<int>
+
+            List<int> indexes = new List<int>
                 {
                     _columnIndexes.MonthColumnIndex,
                     _columnIndexes.DateColumnIndex,
@@ -208,47 +208,41 @@ namespace TermisWorkerService
         }
         private void SendEmail(string filePath, bool succeeded)
         {
-            try
+
+            string subject;
+            string body;
+            if (succeeded)
             {
-                string subject;
-                string body;
-                if (succeeded)
-                {
-                    body = $"The CSV file '{Path.GetFileName(filePath)}' was successfully processed and moved to the succeeded_to_process folder.";
-                    subject = "CSV File Processing Succeeded!";
-                }
-                else
-                {
-                    body = $"The CSV file '{Path.GetFileName(filePath)}' couldn't be inserted into database.";
-                    subject = "CSV File Processing Failed!";
-                }
-
-                using var client = new SmtpClient();
-
-                // Enable SSL/TLS for secure connection
-                client.Connect(_emailSettings.Host, _emailSettings.Port, _emailSettings.EnableSsl);
-
-                // Authenticate if using a password-protected email account
-                if (!string.IsNullOrEmpty(_emailSettings.FromAddress))
-                {
-                    client.Authenticate(_emailSettings.FromAddress, _emailSettings.FromPassword);
-                }
-
-                var message = new MimeMessage();
-                message.From.Add(new MailboxAddress("Termis", _emailSettings.FromAddress));
-                message.To.Add(new MailboxAddress("Recipient", _emailSettings.ToAddress));
-                message.Subject = subject;
-
-                // Set the message body (can be plain text or HTML)
-                message.Body = new TextPart("html") { Text = body }; // Assuming HTML template
-
-                client.SendAsync(message);
-                WriteLog("Email sent for file: " + filePath);
+                body = $"The CSV file '{Path.GetFileName(filePath)}' was successfully processed and moved to the succeeded_to_process folder.";
+                subject = "CSV File Processing Succeeded!";
             }
-            catch (Exception ex)
+            else
             {
-                WriteLog("Error sending email: " + ex);
+                body = $"The CSV file '{Path.GetFileName(filePath)}' couldn't be inserted into database.";
+                subject = "CSV File Processing Failed!";
             }
+
+            using var client = new SmtpClient();
+
+            // Enable SSL/TLS for secure connection
+            client.Connect(_emailSettings.Host, _emailSettings.Port, _emailSettings.EnableSsl);
+
+            // Authenticate if using a password-protected email account
+            if (!string.IsNullOrEmpty(_emailSettings.FromAddress))
+            {
+                client.Authenticate(_emailSettings.FromAddress, _emailSettings.FromPassword);
+            }
+
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress("Termis", _emailSettings.FromAddress));
+            message.To.Add(new MailboxAddress("Recipient", _emailSettings.ToAddress));
+            message.Subject = subject;
+
+            // Set the message body (can be plain text or HTML)
+            message.Body = new TextPart("html") { Text = body }; // Assuming HTML template
+
+            client.SendAsync(message);
+            WriteLog("Email sent for file: " + filePath, Path.Combine(logDirectory, $"{DateTime.UtcNow.ToString("dd_MM_yyyy")}.log"));
         }
 <<<<<<< HEAD
         private bool InsertDataToDatabase(string month, string day, string hour, CsvData csvData)
