@@ -23,7 +23,7 @@ namespace TermisWorkerService
         private readonly IServiceScopeFactory _scopeFactory;
         private FileSystemWatcher watcher;
         private static readonly string logDirectory = AppDomain.CurrentDomain.BaseDirectory;
-        private static string logFileName;
+        private static readonly string logFileName = $"{DateTime.UtcNow.ToString("dd_MM_yyyy HH_mm")}.log";
         private static readonly string logFilePath = Path.Combine(logDirectory, logFileName);
         private static CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
         private static Master masterToAdd = new Master();
@@ -80,7 +80,7 @@ namespace TermisWorkerService
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
             string filePath = e.FullPath;
-            string? fileName = e.Name;
+            string fileName = e.Name;
             WriteLog($"New .csv file created: {filePath}");
 
             bool isSuccess = false;
@@ -88,6 +88,7 @@ namespace TermisWorkerService
             {
                 isSuccess = ReadCsvAndInsertToDatabase(filePath);
             }
+
             if (isSuccess)
             {
                 SendEmail(filePath, true);
@@ -126,7 +127,6 @@ namespace TermisWorkerService
                     return false;
                 }
                 data = _context.CsvData.ToList();
-                logFileName = $"{DateTime.UtcNow.ToString("dd_MM_yyyy HH_mm")}.log";
                 using (StreamReader reader = new StreamReader(filePath))
                 {
                     string line;
