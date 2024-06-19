@@ -23,99 +23,86 @@ namespace TermisWorkerService
         private readonly IServiceScopeFactory _scopeFactory;
         private FileSystemWatcher watcher;
         private static readonly string logDirectory = AppDomain.CurrentDomain.BaseDirectory;
-        private static readonly string logFileName = $"{DateTime.UtcNow.ToString("dd_MM_yyyy HH_mm")}.log";
+        private static string logFileName;
         private static readonly string logFilePath = Path.Combine(logDirectory, logFileName);
         private static CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
         private static Master masterToAdd = new Master();
         private static bool first = true;
         private static List<CsvData> data = new();
+        private readonly CsvContext _context;
 
-        public Worker(IOptions<AppSettings> appSettings, IOptions<EmailSettings> emailSettings, IOptions<ColumnIndexes> columnIndexes, IServiceScopeFactory scopeFactory)
+        public Worker(IOptions<AppSettings> appSettings, IOptions<EmailSettings> emailSettings, IOptions<ColumnIndexes> columnIndexes, IServiceScopeFactory scopeFactory, CsvContext _context)
         {
             _appSettings = appSettings.Value;
             _emailSettings = emailSettings.Value;
             _columnIndexes = columnIndexes.Value;
             _scopeFactory = scopeFactory;
+            this._context = _context;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            stoppingToken.Register(() => cancellationTokenSource.Cancel());
-
-            EnsureCreatedDb();
-
-            watcher = new FileSystemWatcher
+            try
             {
-                Path = _appSettings.FolderPath,
-                Filter = "*.csv",
-                NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite
-            };
-            watcher.Created += OnFileCreated;
-            watcher.EnableRaisingEvents = true;
+                stoppingToken.Register(() => cancellationTokenSource.Cancel());
 
-            WriteLog("Started service and watching directory: " + _appSettings.FolderPath);
-            await Task.Delay(Timeout.Infinite, stoppingToken);
+                EnsureCreatedDb();
+
+                watcher = new FileSystemWatcher
+                {
+                    Path = _appSettings.FolderPath,
+                    Filter = "*.csv",
+                    NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite
+                };
+                watcher.Created += OnFileCreated;
+                watcher.EnableRaisingEvents = true;
+
+                WriteLog("Started service and watching directory: " + _appSettings.FolderPath);
+                await Task.Delay(Timeout.Infinite, stoppingToken);
+            }
+            catch (Exception ex)
+            {
+                WriteLog($"" + ex);
+            }
         }
 
         private void EnsureCreatedDb()
         {
-            try
+            using (var scope = _scopeFactory.CreateScope())
             {
-                using (var scope = _scopeFactory.CreateScope())
-                {
-                    var context = scope.ServiceProvider.GetRequiredService<CsvContext>();
-                    context.Database.EnsureCreated();
-                    Console.WriteLine("Database created successfully.");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
+                var context = scope.ServiceProvider.GetRequiredService<CsvContext>();
+                context.Database.EnsureCreated();
+                WriteLog("Database created successfully.");
             }
         }
-
         private void OnFileCreated(object sender, FileSystemEventArgs e)
         {
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
+            string filePath = e.FullPath;
+            string? fileName = e.Name;
+            WriteLog($"New .csv file created: {filePath}");
 
-            try
+            bool isSuccess = false;
+            using (var scope = _scopeFactory.CreateScope())
             {
-                string filePath = e.FullPath;
-                WriteLog($"New .csv file created: {filePath}");
-
-                bool isSuccess = false;
-                using (var scope = _scopeFactory.CreateScope())
-                {
-                    var dbContext = scope.ServiceProvider.GetRequiredService<CsvContext>();
-                    isSuccess = ReadCsvAndInsertToDatabase(filePath, dbContext);
-                }
-
-                if (isSuccess)
-                {
-                    SendEmail(filePath, true);
-                    MoveFileToFolder(filePath, _appSettings.SucceededFolderPath);
-                    first = true;
-                }
-                else
-                {
-                    SendEmail(filePath, false);
-                    MoveFileToFolder(filePath, _appSettings.FailedFolderPath);
-                    first = true;
-                }
+                isSuccess = ReadCsvAndInsertToDatabase(filePath);
             }
-            catch (Exception ex)
+            if (isSuccess)
             {
-                WriteLog("Error on file created: " + ex);
+                SendEmail(filePath, true);
+                MoveFileToFolder(filePath, _appSettings.SucceededFolderPath);
+                first = true;
             }
-            finally
+            else
             {
-                stopwatch.Stop();
-                WriteLog($"Elapsed time for processing file '{e.FullPath}': {stopwatch.ElapsedMilliseconds} ms");
+                SendEmail(filePath, false);
+                MoveFileToFolder(filePath, _appSettings.FailedFolderPath);
+                first = true;
             }
+            stopwatch.Stop();
         }
-
-        private bool ReadCsvAndInsertToDatabase(string filePath, CsvContext dbContext)
+        private bool ReadCsvAndInsertToDatabase(string filePath)
         {
             bool isSuccess = true;
             try
@@ -128,20 +115,18 @@ namespace TermisWorkerService
                     _columnIndexes.EarthTempColumnIndex,
                     _columnIndexes.AirTempColumnIndex,
                 };
-
                 if (HasDuplicates(indexes))
                 {
                     WriteLog("You have setup 2 different properies in 1 colums, check the config file!");
                     return false;
                 }
-
                 if (_columnIndexes.MonthColumnIndex <= -1 || _columnIndexes.DateColumnIndex <= -1 || _columnIndexes.HourColumnIndex <= -1)
                 {
                     WriteLog("Error reading CSV file please check the config !");
                     return false;
                 }
-
-                data = dbContext.CsvData.ToList();
+                data = _context.CsvData.ToList();
+                logFileName = $"{DateTime.UtcNow.ToString("dd_MM_yyyy HH_mm")}.log";
                 using (StreamReader reader = new StreamReader(filePath))
                 {
                     string line;
@@ -167,7 +152,7 @@ namespace TermisWorkerService
                                 ImportDate = DateTime.Now,
                                 ForecastDate = new DateTime(DateTime.UtcNow.Year, int.Parse(columns[0]), int.Parse(columns[1])),
                             };
-                            dbContext.Masters.Add(masterToAdd);
+                            _context.Masters.Add(masterToAdd);
                             first = false;
                         }
                         CsvData csvData = new CsvData
@@ -180,21 +165,18 @@ namespace TermisWorkerService
                             Master = masterToAdd
                         };
 
-                        InsertDataToDatabase(columns[_columnIndexes.MonthColumnIndex], columns[_columnIndexes.DateColumnIndex], columns[_columnIndexes.HourColumnIndex], csvData, dbContext);
+                        InsertDataToDatabase(columns[_columnIndexes.MonthColumnIndex], columns[_columnIndexes.DateColumnIndex], columns[_columnIndexes.HourColumnIndex], csvData);
                     }
-                    dbContext.SaveChanges();
-                }               
+                    _context.SaveChanges();
+                }
             }
             catch (Exception ex)
             {
                 WriteLog("Error reading CSV file: " + ex);
                 isSuccess = false;
             }
-
             return isSuccess;
-
         }
-
         private void SendEmail(string filePath, bool succeeded)
         {
             try
@@ -239,78 +221,54 @@ namespace TermisWorkerService
                 WriteLog("Error sending email: " + ex);
             }
         }
-        private bool InsertDataToDatabase(string month, string day, string hour, CsvData csvData, CsvContext context)
+        private bool InsertDataToDatabase(string month, string day, string hour, CsvData csvData)
         {
-            try
+            var test = data.FirstOrDefault(x => x.Day == csvData.Day && x.Month == csvData.Month && x.Hour == csvData.Hour);
+            if (test != null)
             {
-                var test = data.FirstOrDefault(x => x.Day == csvData.Day && x.Month == csvData.Month && x.Hour == csvData.Hour);
-                if (test != null)
-                {
-                    test.EarthTemperature = csvData.EarthTemperature;
-                    test.AirTemperature = csvData.AirTemperature;
-                    test.Master = masterToAdd;
-                }
-                else
-                {
-                    context.CsvData.Add(csvData);
-                }
+                test.EarthTemperature = csvData.EarthTemperature;
+                test.AirTemperature = csvData.AirTemperature;
+                test.Master = masterToAdd;
+            }
+            else
+            {
+                _context.CsvData.Add(csvData);
+            }
 
-                // Add the CsvData entry to the context
-                WriteLog($"Data inserted to database: {month}, {day}, {hour}, {csvData.EarthTemperature},{csvData.AirTemperature}");
-                return true;
-            }
-            catch (Exception ex)
-            {
-                WriteLog("Error inserting data to database: " + ex);
-                return false;
-            }
+            // Add the CsvData entry to the _context
+            WriteLog($"Data inserted to database: {month}, {day}, {hour}, {csvData.EarthTemperature},{csvData.AirTemperature}");
+            return true;
         }
         private void MoveFileToFolder(string filePath, string destinationFolderPath)
         {
-            try
+            if (!Directory.Exists(destinationFolderPath))
             {
-                if (!Directory.Exists(destinationFolderPath))
-                {
-                    Directory.CreateDirectory(destinationFolderPath);
-                }
-                string destinationFilePath = Path.Combine(destinationFolderPath, Path.GetFileName(filePath));
-                if (File.Exists(destinationFilePath))
-                {
-                    File.Delete(destinationFilePath); // Remove if already exists
-                }
-                File.Move(filePath, destinationFilePath);
-                WriteLog($"File moved to {destinationFolderPath}");
+                Directory.CreateDirectory(destinationFolderPath);
             }
-            catch (Exception ex)
+            string destinationFilePath = Path.Combine(destinationFolderPath, Path.GetFileName(filePath));
+            if (File.Exists(destinationFilePath))
             {
-                WriteLog($"Error moving file to {destinationFolderPath}: " + ex);
+                File.Delete(destinationFilePath); // Remove if already exists
             }
+            File.Move(filePath, destinationFilePath);
+            WriteLog($"File moved to {destinationFolderPath}");
         }
         private void WriteLog(string logMessage)
         {
-            try
+            // Ensure the directory exists
+            if (!Directory.Exists(logDirectory))
             {
-                // Ensure the directory exists
-                if (!Directory.Exists(logDirectory))
-                {
-                    Directory.CreateDirectory(logDirectory);
-                }
-
-                // Write the log message to the file
-                using (StreamWriter writer = new StreamWriter(logFilePath, true))
-                {
-                    writer.WriteLine($"{DateTime.Now}: {logMessage}");
-                }
-
-                // Additionally, write to the Event Viewer
-                Console.WriteLine(logMessage);
+                Directory.CreateDirectory(logDirectory);
             }
-            catch (Exception ex)
+
+            // Write the log message to the file
+            using (StreamWriter writer = new StreamWriter(logFilePath, true))
             {
-                // Handle any exceptions that occur during file operations
-                // Log the error to the console
-                Console.WriteLine($"Error writing log: {ex}");
+                writer.WriteLine($"{DateTime.Now}: {logMessage}");
             }
+
+            // Additionally, write to the Event Viewer
+            Console.WriteLine(logMessage);
         }
         public bool HasDuplicates(List<int> numbers)
         {

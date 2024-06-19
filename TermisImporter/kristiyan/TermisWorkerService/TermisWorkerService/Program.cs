@@ -3,29 +3,29 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
 using TermisWorkerService;
-using System.IO;
+using System.IO; 
 
-var builder = Host.CreateApplicationBuilder(args);
 
-builder.Configuration.SetBasePath(Directory.GetCurrentDirectory());
-builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-builder.Configuration.AddEnvironmentVariables();
+    var builder = Host.CreateApplicationBuilder(args);
 
-// Configure the database context
-builder.Services.AddDbContext<CsvContext>(options =>
-{
-    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-    options.UseSqlServer(connectionString);
-});
+    builder.Configuration.SetBasePath(Directory.GetCurrentDirectory());
+    builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+    builder.Configuration.AddEnvironmentVariables();
 
-// Configure AppSettings sections
-builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
-builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
-builder.Services.Configure<ColumnIndexes>(builder.Configuration.GetSection("ColumnIndexes"));
+    // Configure the database context
+    builder.Services.AddDbContext<CsvContext>(options =>
+    {
+        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+        options.UseSqlServer(connectionString);
+    }, ServiceLifetime.Transient);
 
-// Register the Worker as a singleton service
-builder.Services.AddSingleton<Worker>();
-builder.Services.AddHostedService<Worker>();
+    // Configure AppSettings sections
+    builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
+    builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+    builder.Services.Configure<ColumnIndexes>(builder.Configuration.GetSection("ColumnIndexes"));
 
-var host = builder.Build();
-host.Run();
+    // Register the Worker as a singleton service
+    builder.Services.AddSingleton<Worker>();
+    builder.Services.AddHostedService<Worker>();
+    var host = builder.Build();
+    host.Run();
