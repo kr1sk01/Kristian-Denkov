@@ -55,19 +55,12 @@ namespace Termis_Console
 
         private static void InitializeService()
         {
-            try
-            {
-                CreateDirectoryIfNotExists(csvDirectory);
-                CreateDirectoryIfNotExists(processedDirectory);
-                CreateDirectoryIfNotExists(errorDirectory);
-                CreateDirectoryIfNotExists(logDirectory);
+            CreateDirectoryIfNotExists(csvDirectory);
+            CreateDirectoryIfNotExists(processedDirectory);
+            CreateDirectoryIfNotExists(errorDirectory);
+            CreateDirectoryIfNotExists(logDirectory);
 
-                _context.Database.EnsureCreated();
-            }
-            catch (Exception ex)
-            {
-                LogError("Error while initializing service.", ex);
-            }
+            _context.Database.EnsureCreated();
         }
 
         private static void ProcessCsvFiles()
@@ -152,20 +145,13 @@ namespace Termis_Console
 
         private static void HandleCsvError(List<string> errros, string csvFile)
         {
-            try
-            {
-                var errorFileName = Path.Combine(errorDirectory, Path.GetFileNameWithoutExtension(csvFile) + ".err");
-                File.WriteAllLines(errorFileName, errros);
+            var errorFileName = Path.Combine(errorDirectory, Path.GetFileNameWithoutExtension(csvFile) + ".err");
+            File.WriteAllLines(errorFileName, errros);
 
-                var unreadFileName = Path.Combine(errorDirectory, Path.GetFileName(csvFile));
-                File.Move(csvFile, unreadFileName);
+            var unreadFileName = Path.Combine(errorDirectory, Path.GetFileName(csvFile));
+            File.Move(csvFile, unreadFileName);
 
-                SendErrorEmail(toEmail, unreadFileName, errros);
-            }
-            catch (Exception ex)
-            {
-                LogError("Error moving files.", ex);
-            }
+            SendErrorEmail(toEmail, unreadFileName, errros);
         }
 
         private static DetailParseResponse ParseDetail(string[] values, int row, out Detail? detail)
@@ -288,29 +274,22 @@ namespace Termis_Console
 
         private static void SendErrorEmail(string toEmail, string csvFile, List<string> errorList)
         {
-            try
+            string template;
+            using (var reader = new StreamReader("ErrorTemplate.html"))
             {
-                string template;
-                using (var reader = new StreamReader("ErrorTemplate.html"))
-                {
-                    template = reader.ReadToEnd();
-                }
-
-                StringBuilder errors = new StringBuilder();
-                foreach (string error in errorList)
-                {
-                    errors.AppendLine($"<li>{error}</li>");
-                }
-
-                string body = template.Replace("[Csv File]", csvFile)
-                    .Replace("{{errors}}", errors.ToString());
-
-                SendEmail(toEmail, "Error in NIMH .csv file", body);
+                template = reader.ReadToEnd();
             }
-            catch (Exception ex)
+
+            StringBuilder errors = new StringBuilder();
+            foreach (string error in errorList)
             {
-                LogError("Error sending email.", ex);
+                errors.AppendLine($"<li>{error}</li>");
             }
+
+            string body = template.Replace("[Csv File]", csvFile)
+                .Replace("{{errors}}", errors.ToString());
+
+            SendEmail(toEmail, "Error in NIMH .csv file", body);
         }
 
         private static void SendEmail(string toEmail, string subject, string body)
@@ -359,7 +338,7 @@ namespace Termis_Console
         private static string GetLogFileToWrite()
         {
             string[] logFiles = Directory.GetFiles(logDirectory, ".txt");
-            var today = DateOnly.FromDateTime(DateTime.Now).ToString();
+            var today = DateOnly.FromDateTime(DateTime.Now).ToString("yyyy-MM-dd");
 
             string? todayLog = logFiles.FirstOrDefault(x => x.Contains(today));
 
