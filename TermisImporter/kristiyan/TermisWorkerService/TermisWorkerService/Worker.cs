@@ -28,84 +28,83 @@ namespace TermisWorkerService
         private static Master masterToAdd = new Master();
         private static bool first = true;
         private static List<CsvData> data = new();
-<<<<<<< HEAD
-        private readonly CsvContext _context;
-=======
->>>>>>> f195f2d (Updated & Optimized service)
+        private CsvContext _context;
+        private string importFileName = "";
 
-        public Worker(IOptions<AppSettings> appSettings, IOptions<EmailSettings> emailSettings, IOptions<ColumnIndexes> columnIndexes, IServiceScopeFactory scopeFactory, CsvContext _context)
+
+
+        public Worker(IOptions<AppSettings> appSettings, IOptions<EmailSettings> emailSettings, IOptions<ColumnIndexes> columnIndexes, IServiceScopeFactory scopeFactory)
         {
             _appSettings = appSettings.Value;
             _emailSettings = emailSettings.Value;
             _columnIndexes = columnIndexes.Value;
             _scopeFactory = scopeFactory;
-            this._context = _context;
+            _context = _scopeFactory.CreateScope().ServiceProvider.GetRequiredService<CsvContext>();
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            try
+            stoppingToken.Register(() => cancellationTokenSource.Cancel());
+
+            EnsureCreatedDb();
+
+            watcher = new FileSystemWatcher
             {
-                stoppingToken.Register(() => cancellationTokenSource.Cancel());
+                Path = _appSettings.FolderPath,
+                Filter = "*.csv",
+                NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite
+            };
+            watcher.Created += OnFileCreated;
+            watcher.EnableRaisingEvents = true;
 
-                EnsureCreatedDb();
-
-                watcher = new FileSystemWatcher
-                {
-                    Path = _appSettings.FolderPath,
-                    Filter = "*.csv",
-                    NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite
-                };
-                watcher.Created += OnFileCreated;
-                watcher.EnableRaisingEvents = true;
-
-                WriteLog("Started service and watching directory: " + _appSettings.FolderPath);
-                await Task.Delay(Timeout.Infinite, stoppingToken);
-            }
-            catch (Exception ex)
-            {
-                WriteLog($"" + ex);
-            }
+            WriteLog("Started service and watching directory: " + _appSettings.FolderPath, Path.Combine(logDirectory, $"{DateTime.UtcNow.ToString("dd_MM_yyyy")}.log"));
+            await Task.Delay(Timeout.Infinite, stoppingToken);
         }
 
         private void EnsureCreatedDb()
         {
-            using (var scope = _scopeFactory.CreateScope())
-            {
-                var context = scope.ServiceProvider.GetRequiredService<CsvContext>();
-                context.Database.EnsureCreated();
-                WriteLog("Database created successfully.");
-            }
+            _context.Database.EnsureCreated();
+            Console.WriteLine("Database created successfully.");
         }
+
         private void OnFileCreated(object sender, FileSystemEventArgs e)
         {
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-            string filePath = e.FullPath;
-            string fileName = e.Name;
-            WriteLog($"New .csv file created: {filePath}");
+            try
+            {
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
 
-            bool isSuccess = false;
-            using (var scope = _scopeFactory.CreateScope())
-            {
-                isSuccess = ReadCsvAndInsertToDatabase(filePath);
-            }
+                string filePath = e.FullPath;
+                importFileName = e.Name ?? "error_reading_imput_file_name";
+                importFileName = importFileName.Replace(".csv", ".err");
+                Console.WriteLine($"File name is {importFileName}");
+                WriteLog($"New .csv file created: {filePath}", Path.Combine(logDirectory, $"{DateTime.UtcNow.ToString("dd_MM_yyyy")}.log"));
+                bool isSuccess = false;
 
-            if (isSuccess)
-            {
-                SendEmail(filePath, true);
-                MoveFileToFolder(filePath, _appSettings.SucceededFolderPath);
-                first = true;
+                isSuccess = ReadCsvAndInsertToDatabase(filePath, _context);
+
+                if (isSuccess)
+                {
+                    SendEmail(filePath, true);
+                    MoveFileToFolder(filePath, _appSettings.SucceededFolderPath);
+                    first = true;
+                }
+                else
+                {
+                    SendEmail(filePath, false);
+                    MoveFileToFolder(filePath, _appSettings.FailedFolderPath);
+                    first = true;
+                }
+                stopwatch.Stop();
+                WriteLog($"Elapsed time for processing file '{e.FullPath}': {stopwatch.ElapsedMilliseconds} ms", Path.Combine(logDirectory, $"{DateTime.UtcNow.ToString("dd_MM_yyyy")}.log"));
             }
-            else
+            catch (Exception ex)
             {
-                SendEmail(filePath, false);
-                MoveFileToFolder(filePath, _appSettings.FailedFolderPath);
-                first = true;
+                WriteLog($"" + ex, Path.Combine(logDirectory, $"{DateTime.UtcNow.ToString("dd_MM_yyyy")}.log"));
             }
-            stopwatch.Stop();
         }
-        private bool ReadCsvAndInsertToDatabase(string filePath)
+
+        private bool ReadCsvAndInsertToDatabase(string filePath, CsvContext dbContext)
         {
             int lineCounter = 0;
 
@@ -119,92 +118,63 @@ namespace TermisWorkerService
                     _columnIndexes.EarthTempColumnIndex,
                     _columnIndexes.AirTempColumnIndex,
                 };
-                if (HasDuplicates(indexes))
-                {
-                    WriteLog("You have setup 2 different properies in 1 colums, check the config file!");
-                    return false;
-                }
-<<<<<<< HEAD
-=======
 
->>>>>>> f195f2d (Updated & Optimized service)
-                if (_columnIndexes.MonthColumnIndex <= -1 || _columnIndexes.DateColumnIndex <= -1 || _columnIndexes.HourColumnIndex <= -1)
-                {
-                    WriteLog("Error reading CSV file please check the config !");
-                    return false;
-                }
-<<<<<<< HEAD
-                data = _context.CsvData.ToList();
-=======
-
-                data = dbContext.CsvData.ToList();
->>>>>>> f195f2d (Updated & Optimized service)
-                using (StreamReader reader = new StreamReader(filePath))
-                {
-                    string line;
-                    while ((line = reader.ReadLine()) != null)
-                    {
-                        var columns = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-
-                        if (columns.Length <= 3 ||
-                            string.IsNullOrWhiteSpace(columns[0]) ||
-                            string.IsNullOrWhiteSpace(columns[1]) ||
-                            string.IsNullOrWhiteSpace(columns[2]) ||
-                            string.IsNullOrWhiteSpace(columns[3]))
-                        {
-                            WriteLog($"Invalid line format or missing values: {line}");
-                            isSuccess = false;
-                            continue;
-                        }
-
-                        if (first)
-                        {
-                            masterToAdd = new Master
-                            {
-                                ImportDate = DateTime.Now,
-                                ForecastDate = new DateTime(DateTime.UtcNow.Year, int.Parse(columns[0]), int.Parse(columns[1])),
-                            };
-<<<<<<< HEAD
-                            _context.Masters.Add(masterToAdd);
-=======
-                            dbContext.Masters.Add(masterToAdd);
->>>>>>> f195f2d (Updated & Optimized service)
-                            first = false;
-                        }
-                        CsvData csvData = new CsvData
-                        {
-                            Month = columns[_columnIndexes.MonthColumnIndex],
-                            Day = columns[_columnIndexes.DateColumnIndex],
-                            Hour = columns[_columnIndexes.HourColumnIndex],
-                            EarthTemperature = _columnIndexes.EarthTempColumnIndex > -1 ? double.Parse(columns[_columnIndexes.EarthTempColumnIndex], NumberStyles.Any, CultureInfo.InvariantCulture) : 0,
-                            AirTemperature = _columnIndexes.AirTempColumnIndex > -1 ? double.Parse(columns[_columnIndexes.AirTempColumnIndex], NumberStyles.Any, CultureInfo.InvariantCulture) : 0,
-                            Master = masterToAdd
-                        };
-
-<<<<<<< HEAD
-                        InsertDataToDatabase(columns[_columnIndexes.MonthColumnIndex], columns[_columnIndexes.DateColumnIndex], columns[_columnIndexes.HourColumnIndex], csvData);
-                    }
-                    _context.SaveChanges();
-                }
-=======
-                        InsertDataToDatabase(columns[_columnIndexes.MonthColumnIndex], columns[_columnIndexes.DateColumnIndex], columns[_columnIndexes.HourColumnIndex], csvData, dbContext);
-                    }
-                    dbContext.SaveChanges();
-                }               
->>>>>>> f195f2d (Updated & Optimized service)
-            }
-            catch (Exception ex)
+            if (HasDuplicates(indexes))
             {
-                WriteLog("Error reading CSV file: " + ex);
-                isSuccess = false;
+                WriteLog("You have setup 2 different properies in 1 colums, check the config file!", Path.Combine(logDirectory, $"{DateTime.UtcNow.ToString("dd_MM_yyyy")}.log"));
+                return false;
             }
-<<<<<<< HEAD
-            return isSuccess;
-=======
 
-            return isSuccess;
+            if (_columnIndexes.MonthColumnIndex <= -1 || _columnIndexes.DateColumnIndex <= -1 || _columnIndexes.HourColumnIndex <= -1)
+            {
+                //WriteLog("Error reading CSV file please check the config !", Path.Combine(logDirectory, logFileName));
+                return false;
+            }
 
->>>>>>> f195f2d (Updated & Optimized service)
+            data = dbContext.CsvData.ToList();
+            using (StreamReader reader = new StreamReader(filePath))
+            {
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    var columns = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    lineCounter++;
+                    if (columns.Length <= 3 ||
+                        string.IsNullOrWhiteSpace(columns[0]) ||
+                        string.IsNullOrWhiteSpace(columns[1]) ||
+                        string.IsNullOrWhiteSpace(columns[2]) ||
+                        string.IsNullOrWhiteSpace(columns[3]))
+                    {
+                        WriteLog($"Invalid line format or missing values on line {lineCounter}: {line}", Path.Combine(logDirectory, importFileName));
+                        isSuccess = false;
+                        continue;
+                    }
+
+                    if (first)
+                    {
+                        masterToAdd = new Master
+                        {
+                            ImportDate = DateTime.Now,
+                            ForecastDate = new DateTime(DateTime.UtcNow.Year, int.Parse(columns[0]), int.Parse(columns[1])),
+                        };
+                        dbContext.Masters.Add(masterToAdd);
+                        first = false;
+                    }
+                    CsvData csvData = new CsvData
+                    {
+                        Month = columns[_columnIndexes.MonthColumnIndex],
+                        Day = columns[_columnIndexes.DateColumnIndex],
+                        Hour = columns[_columnIndexes.HourColumnIndex],
+                        EarthTemperature = _columnIndexes.EarthTempColumnIndex > -1 ? double.Parse(columns[_columnIndexes.EarthTempColumnIndex], NumberStyles.Any, CultureInfo.InvariantCulture) : 0,
+                        AirTemperature = _columnIndexes.AirTempColumnIndex > -1 ? double.Parse(columns[_columnIndexes.AirTempColumnIndex], NumberStyles.Any, CultureInfo.InvariantCulture) : 0,
+                        Master = masterToAdd
+                    };
+
+                    InsertDataToDatabase(columns[_columnIndexes.MonthColumnIndex], columns[_columnIndexes.DateColumnIndex], columns[_columnIndexes.HourColumnIndex], csvData, dbContext);
+                }
+                dbContext.SaveChanges();
+            }
+            return isSuccess;
         }
         private void SendEmail(string filePath, bool succeeded)
         {
@@ -244,48 +214,25 @@ namespace TermisWorkerService
             client.SendAsync(message);
             WriteLog("Email sent for file: " + filePath, Path.Combine(logDirectory, $"{DateTime.UtcNow.ToString("dd_MM_yyyy")}.log"));
         }
-<<<<<<< HEAD
-        private bool InsertDataToDatabase(string month, string day, string hour, CsvData csvData)
-=======
         private bool InsertDataToDatabase(string month, string day, string hour, CsvData csvData, CsvContext context)
->>>>>>> f195f2d (Updated & Optimized service)
         {
+
             var test = data.FirstOrDefault(x => x.Day == csvData.Day && x.Month == csvData.Month && x.Hour == csvData.Hour);
             if (test != null)
             {
-<<<<<<< HEAD
                 test.EarthTemperature = csvData.EarthTemperature;
                 test.AirTemperature = csvData.AirTemperature;
                 test.Master = masterToAdd;
-=======
-                var test = data.FirstOrDefault(x => x.Day == csvData.Day && x.Month == csvData.Month && x.Hour == csvData.Hour);
-                if (test != null)
-                {
-                    test.EarthTemperature = csvData.EarthTemperature;
-                    test.AirTemperature = csvData.AirTemperature;
-                    test.Master = masterToAdd;
-                }
-                else
-                {
-                    context.CsvData.Add(csvData);
-                }
-
-                // Add the CsvData entry to the context
-                WriteLog($"Data inserted to database: {month}, {day}, {hour}, {csvData.EarthTemperature},{csvData.AirTemperature}");
-                return true;
->>>>>>> f195f2d (Updated & Optimized service)
             }
             else
             {
-                _context.CsvData.Add(csvData);
+                context.CsvData.Add(csvData);
             }
-<<<<<<< HEAD
 
-            // Add the CsvData entry to the _context
-            WriteLog($"Data inserted to database: {month}, {day}, {hour}, {csvData.EarthTemperature},{csvData.AirTemperature}");
+            // Add the CsvData entry to the context
+            WriteLog($"Data inserted to database: {month}, {day}, {hour}, {csvData.EarthTemperature},{csvData.AirTemperature}", Path.Combine(logDirectory, $"{DateTime.UtcNow.ToString("dd_MM_yyyy")}.log"));
             return true;
-=======
->>>>>>> f195f2d (Updated & Optimized service)
+
         }
         private void MoveFileToFolder(string filePath, string destinationFolderPath)
         {
@@ -299,9 +246,9 @@ namespace TermisWorkerService
                 File.Delete(destinationFilePath); // Remove if already exists
             }
             File.Move(filePath, destinationFilePath);
-            WriteLog($"File moved to {destinationFolderPath}");
+            WriteLog($"File moved to {destinationFolderPath}", Path.Combine(logDirectory, $"{DateTime.UtcNow.ToString("dd_MM_yyyy")}.log"));
         }
-        private void WriteLog(string logMessage)
+        private void WriteLog(string logMessage, string logFilePath)
         {
             // Ensure the directory exists
             if (!Directory.Exists(logDirectory))
