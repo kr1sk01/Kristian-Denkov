@@ -2,12 +2,14 @@
 using System.Globalization;
 using System.Net;
 using System.Net.Mail;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Termis_Console
 {
     public class Program
     {
+        private static ServiceDbContext _context = new ServiceDbContext();
         private static string csvDirectory = @"C:\TermisImporterFiles\CsvFiles";
         private static string processedDirectory = @"C:\TermisImporterFiles\ProcessedFiles";
         private static string errorDirectory = @"C:\TermisImporterFiles\ErrorFiles";
@@ -30,7 +32,7 @@ namespace Termis_Console
         private static int soilTempColumnIndex = 4;
         private static bool hasSoilTempColumn = true;
 
-        private static string logFilePath = @"C:\TermisImporterFiles\termisErrorLog.txt";
+        private static string logDirectory = @"C:\TermisImporterFiles\Logs";
 
         static void Main(string[] args)
         {
@@ -60,7 +62,7 @@ namespace Termis_Console
                 CreateDirectoryIfNotExists(csvDirectory);
                 CreateDirectoryIfNotExists(processedDirectory);
                 CreateDirectoryIfNotExists(errorDirectory);
-                CreateDirectoryIfNotExists(Path.GetDirectoryName(logFilePath));
+                CreateDirectoryIfNotExists(logDirectory);
 
                 var context = new ServiceDbContext();
                 context.Database.EnsureCreated();
@@ -73,7 +75,6 @@ namespace Termis_Console
 
         private static void ProcessCsvFiles()
         {
-            var _context = new ServiceDbContext();
             var csvFiles = Directory.GetFiles(csvDirectory, "*.csv");
 
             foreach (var csvFile in csvFiles)
@@ -81,6 +82,7 @@ namespace Termis_Console
                 int row = 0;
                 bool isSuccess = true;
                 string errorMessage = string.Empty;
+                List<string> errorList = new List<string>();
 
                 try
                 {
@@ -109,32 +111,31 @@ namespace Termis_Console
                                 master.ForecastDate = new DateTime(DateTime.Now.Year, detail!.Month, detail.Day, detail.Hour, 0, 0);
                             }
 
-                            var isDetailToUpdate = IsDetailToUpdate(_context, detail!, out int detailId);
+                            var isDetailToUpdate = IsDetailToUpdate(_context, detail!, out Detail? detailToUpdate);
 
                             if (isDetailToUpdate)
                             {
-                                Detail detailToUpdate = _context.Details.First(x => x.Id == detailId);
-                                detailToUpdate.Master = master;
+                                detailToUpdate!.Master = master;
                                 _context.Entry(detailToUpdate).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-                                _context.SaveChanges();
                             }
                             else
                             {
                                 detail!.Master = master;
                                 _context.Details.Add(detail);
-                                _context.SaveChanges();
                             }
+
+                            _context.SaveChanges();
                         }
                         else
                         {
                             isSuccess = false;
-                            errorMessage = parsingResponse.ErrorMessage!;
+                            errorList.Add(parsingResponse.ErrorMessage!);
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    errorMessage = ex.Message;
+                    errorList.Add(ex.Message);
                     isSuccess = false;
                 }
 
@@ -145,22 +146,22 @@ namespace Termis_Console
                 }
                 else
                 {
-                    HandleError(errorMessage, csvFile);
+                    HandleError(errorList, csvFile);
                 }
             }
         }
 
-        private static void HandleError(string message, string csvFile)
+        private static void HandleError(List<string> errros, string csvFile)
         {
             try
             {
                 var errorFileName = Path.Combine(errorDirectory, Path.GetFileNameWithoutExtension(csvFile) + ".err");
-                File.WriteAllText(errorFileName, message);
+                File.WriteAllLines(errorFileName, errros);
 
                 var unreadFileName = Path.Combine(errorDirectory, Path.GetFileName(csvFile));
                 File.Move(csvFile, unreadFileName);
 
-                SendErrorEmail(toEmail, unreadFileName, message);
+                SendErrorEmail(toEmail, unreadFileName, errros);
             }
             catch (Exception ex)
             {
@@ -195,7 +196,7 @@ namespace Termis_Console
                     response.ErrorMessage = errorMessage;
                     return response;
                 }
-                if (month > 12)
+                if (month > 12 || month < 1)
                 {
                     string errorMessage = $"Invalid data format in row [{row}]. Month value is not valid.";
                     response.IsSuccess = false;
@@ -211,7 +212,7 @@ namespace Termis_Console
                     response.ErrorMessage = errorMessage;
                     return response;
                 }
-                if (day > 31)
+                if (day > 31 || day < 1 || (month == 2 && day > 29))
                 {
                     string errorMessage = $"Invalid data format in row [{row}]. Day value is not valid.";
                     response.IsSuccess = false;
@@ -227,7 +228,7 @@ namespace Termis_Console
                     response.ErrorMessage = errorMessage;
                     return response;
                 }
-                if (hour > 23)
+                if (hour > 23 || hour < 0)
                 {
                     string errorMessage = $"Invalid data format in row [{row}]. Hour value is not valid.";
                     response.IsSuccess = false;
@@ -236,7 +237,7 @@ namespace Termis_Console
                 }
 
                 //Parse Temperature value
-                if (!double.TryParse(values[tempColumnIndex], NumberStyles.Any, CultureInfo.InvariantCulture, out double temp))
+                if (!double.TryParse(values[tempColumnIndex].Replace(',', '.'), NumberStyles.Any, CultureInfo.InvariantCulture, out double temp))
                 {
                     string errorMessage = $"Invalid data format in row [{row}]. Temperature value is not valid.";
                     response.IsSuccess = false;
@@ -248,7 +249,7 @@ namespace Termis_Console
                 double soilTemp = 0;
                 if (hasSoilTempColumn)
                 {
-                    if (!double.TryParse(values[soilTempColumnIndex], NumberStyles.Any, CultureInfo.InvariantCulture, out soilTemp))
+                    if (!double.TryParse(values[soilTempColumnIndex].Replace(',', '.'), NumberStyles.Any, CultureInfo.InvariantCulture, out soilTemp))
                     {
                         string errorMessage = $"Invalid data format in row [{row}]. Soil temperature value is not valid.";
                         response.IsSuccess = false;
@@ -265,6 +266,7 @@ namespace Termis_Console
                     Temp = temp,
                     SoilTemp = hasSoilTempColumn ? soilTemp : null
                 };
+
             }
             catch (Exception ex)
             {
@@ -275,26 +277,17 @@ namespace Termis_Console
             return response;
         }
 
-        private static bool IsDetailToUpdate(ServiceDbContext _context, Detail detail, out int detailId)
+        private static bool IsDetailToUpdate(ServiceDbContext _context, Detail detail, out Detail? detailToUpdate)
         {
-            var detailToUpdate = _context.Details.FirstOrDefault(x =>
+            detailToUpdate = _context.Details.FirstOrDefault(x =>
                     x.Month == detail.Month &&
                     x.Day == detail.Day &&
                     x.Hour == detail.Hour);
 
-            if (detailToUpdate != null)
-            {
-                detailId = detailToUpdate.Id;
-                return true;
-            }
-            else
-            {
-                detailId = 0;
-                return false;
-            }
+            return (detailToUpdate != null);
         }
 
-        private static void SendErrorEmail(string toEmail, string csvFile, string errorMessage)
+        private static void SendErrorEmail(string toEmail, string csvFile, List<string> errorList)
         {
             try
             {
@@ -304,8 +297,14 @@ namespace Termis_Console
                     template = reader.ReadToEnd();
                 }
 
-                var body = template.Replace("[Csv File]", csvFile)
-                    .Replace("[Error Message]", errorMessage);
+                StringBuilder errors = new StringBuilder();
+                foreach (string error in errorList)
+                {
+                    errors.AppendLine($"<li>{error}</li>");
+                }
+
+                string body = template.Replace("[Csv File]", csvFile)
+                    .Replace("{{errors}}", errors.ToString());
 
                 SendEmail(toEmail, "Error in NIMH .csv file", body);
             }
@@ -317,25 +316,6 @@ namespace Termis_Console
 
         private static void SendEmail(string toEmail, string subject, string body)
         {
-            /*using (var client = new SmtpClient())
-            {
-                 Enable SSL/TLS for secure connection
-                client.Connect(emailHost, emailPort, emailEnableSsl);
-
-                 Authenticate if using a password-protected email account
-                client.Authenticate(emailUsername, emailPassword);
-
-                var message = new MimeMessage();
-                message.From.Add(new MailboxAddress(emailApplicationName, emailUsername));
-                message.To.Add(new MailboxAddress("Recipient", toEmail));
-                message.Subject = subject;
-
-                 Set the message body (can be plain text or HTML)
-                message.Body = new TextPart("html") { Text = body };  Assuming HTML template
-
-                client.Send(message);
-            }*/
-
             SmtpClient smtpClient = new SmtpClient(emailHost) // Replace with your SMTP server
             {
                 Port = emailPort, // Common port for TLS
@@ -361,7 +341,9 @@ namespace Termis_Console
         {
             try
             {
-                using (StreamWriter writer = new StreamWriter(logFilePath, true))
+                string logFile = GetLogFileToWrite();
+
+                using (StreamWriter writer = new StreamWriter(logFile, true))
                 {
                     writer.WriteLine($"{DateTime.Now} - ERROR: {message}");
                     writer.WriteLine($"Exception: {ex.Message}");
@@ -372,6 +354,23 @@ namespace Termis_Console
             catch (Exception logEx)
             {
                 Console.WriteLine($"Failed to log error: {logEx.Message}");
+            }
+        }
+
+        private static string GetLogFileToWrite()
+        {
+            string[] logFiles = Directory.GetFiles(logDirectory, ".txt");
+            var today = DateOnly.FromDateTime(DateTime.Now).ToString();
+
+            string? todayLog = logFiles.FirstOrDefault(x => x.Contains(today));
+
+            if (todayLog != null)
+            {
+                return todayLog;
+            }
+            else
+            {
+                return $"{logDirectory}\\{today}-TermisErrorLog.txt";
             }
         }
     }

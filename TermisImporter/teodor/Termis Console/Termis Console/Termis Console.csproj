@@ -15,4 +15,10 @@
     <PackageReference Include="MimeKit" Version="4.6.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="ErrorTemplate.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
