@@ -81,7 +81,7 @@ namespace TermisWorkerService
                 WriteLog($"New .csv file created: {filePath}", Path.Combine(logDirectory, $"{DateTime.UtcNow.ToString("dd_MM_yyyy")}.log"));
                 bool isSuccess = false;
 
-                isSuccess = ReadCsvAndInsertToDatabase(filePath, _context);
+                isSuccess = ReadCsvAndInsertToDatabase(filePath);
 
                 if (isSuccess)
                 {
@@ -104,7 +104,7 @@ namespace TermisWorkerService
             }
         }
 
-        private bool ReadCsvAndInsertToDatabase(string filePath, CsvContext dbContext)
+        private bool ReadCsvAndInsertToDatabase(string filePath)
         {
             int lineCounter = 0;
 
@@ -118,20 +118,17 @@ namespace TermisWorkerService
                     _columnIndexes.EarthTempColumnIndex,
                     _columnIndexes.AirTempColumnIndex,
                 };
-
             if (HasDuplicates(indexes))
             {
                 WriteLog("You have setup 2 different properies in 1 colums, check the config file!", Path.Combine(logDirectory, $"{DateTime.UtcNow.ToString("dd_MM_yyyy")}.log"));
                 return false;
             }
-
             if (_columnIndexes.MonthColumnIndex <= -1 || _columnIndexes.DateColumnIndex <= -1 || _columnIndexes.HourColumnIndex <= -1)
             {
                 //WriteLog("Error reading CSV file please check the config !", Path.Combine(logDirectory, logFileName));
                 return false;
             }
-
-            data = dbContext.CsvData.ToList();
+            data = _context.CsvData.ToList();
             using (StreamReader reader = new StreamReader(filePath))
             {
                 string line;
@@ -157,7 +154,7 @@ namespace TermisWorkerService
                             ImportDate = DateTime.Now,
                             ForecastDate = new DateTime(DateTime.UtcNow.Year, int.Parse(columns[0]), int.Parse(columns[1])),
                         };
-                        dbContext.Masters.Add(masterToAdd);
+                        _context.Masters.Add(masterToAdd);
                         first = false;
                     }
                     CsvData csvData = new CsvData
@@ -170,9 +167,9 @@ namespace TermisWorkerService
                         Master = masterToAdd
                     };
 
-                    InsertDataToDatabase(columns[_columnIndexes.MonthColumnIndex], columns[_columnIndexes.DateColumnIndex], columns[_columnIndexes.HourColumnIndex], csvData, dbContext);
+                    InsertDataToDatabase(columns[_columnIndexes.MonthColumnIndex], columns[_columnIndexes.DateColumnIndex], columns[_columnIndexes.HourColumnIndex], csvData);
                 }
-                dbContext.SaveChanges();
+                _context.SaveChanges();
             }
             return isSuccess;
         }
@@ -214,7 +211,7 @@ namespace TermisWorkerService
             client.SendAsync(message);
             WriteLog("Email sent for file: " + filePath, Path.Combine(logDirectory, $"{DateTime.UtcNow.ToString("dd_MM_yyyy")}.log"));
         }
-        private bool InsertDataToDatabase(string month, string day, string hour, CsvData csvData, CsvContext context)
+        private bool InsertDataToDatabase(string month, string day, string hour, CsvData csvData)
         {
 
             var test = data.FirstOrDefault(x => x.Day == csvData.Day && x.Month == csvData.Month && x.Hour == csvData.Hour);
@@ -226,7 +223,7 @@ namespace TermisWorkerService
             }
             else
             {
-                context.CsvData.Add(csvData);
+                _context.CsvData.Add(csvData);
             }
 
             // Add the CsvData entry to the context
