@@ -13,8 +13,8 @@ namespace Termis_Console
         private static string csvDirectory = @"C:\TermisImporterFiles\CsvFiles";
         private static string processedDirectory = @"C:\TermisImporterFiles\ProcessedFiles";
         private static string errorDirectory = @"C:\TermisImporterFiles\ErrorFiles";
-
-        private static char csvSeparator = ' ';
+        private static string logDirectory = @"C:\TermisImporterFiles\Logs";
+        private static string csvSeparator = " ";
 
         private static string emailHost = "smtp.gmail.com";
         private static int emailPort = 587;
@@ -22,7 +22,6 @@ namespace Termis_Console
         private static string emailUsername = "championshipmaster.a1@gmail.com";
         private static string emailPassword = "fjen jevt wfgh miib";
         private static bool emailEnableSsl = true;
-
         private static string toEmail = "sitikom2007@gmail.com";
 
         private static int monthColumnIndex = 0;
@@ -32,8 +31,7 @@ namespace Termis_Console
         private static int soilTempColumnIndex = 4;
         private static bool hasSoilTempColumn = true;
 
-        private static string logDirectory = @"C:\TermisImporterFiles\Logs";
-
+        
         static void Main(string[] args)
         {
             try
@@ -64,8 +62,7 @@ namespace Termis_Console
                 CreateDirectoryIfNotExists(errorDirectory);
                 CreateDirectoryIfNotExists(logDirectory);
 
-                var context = new ServiceDbContext();
-                context.Database.EnsureCreated();
+                _context.Database.EnsureCreated();
             }
             catch (Exception ex)
             {
@@ -82,7 +79,7 @@ namespace Termis_Console
                 int row = 0;
                 bool isSuccess = true;
                 string errorMessage = string.Empty;
-                List<string> errorList = new List<string>();
+                List<string> errorList = [];
 
                 try
                 {
@@ -111,11 +108,13 @@ namespace Termis_Console
                                 master.ForecastDate = new DateTime(DateTime.Now.Year, detail!.Month, detail.Day, detail.Hour, 0, 0);
                             }
 
-                            var isDetailToUpdate = IsDetailToUpdate(_context, detail!, out Detail? detailToUpdate);
+                            var isDetailToUpdate = IsDetailToUpdate(detail!, out Detail? detailToUpdate);
 
                             if (isDetailToUpdate)
                             {
                                 detailToUpdate!.Master = master;
+                                detailToUpdate!.Temp = detail!.Temp;
+                                detailToUpdate!.SoilTemp = detail!.SoilTemp;
                                 _context.Entry(detailToUpdate).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
                             }
                             else
@@ -123,8 +122,6 @@ namespace Termis_Console
                                 detail!.Master = master;
                                 _context.Details.Add(detail);
                             }
-
-                            _context.SaveChanges();
                         }
                         else
                         {
@@ -132,6 +129,8 @@ namespace Termis_Console
                             errorList.Add(parsingResponse.ErrorMessage!);
                         }
                     }
+
+                    _context.SaveChanges();
                 }
                 catch (Exception ex)
                 {
@@ -146,12 +145,12 @@ namespace Termis_Console
                 }
                 else
                 {
-                    HandleError(errorList, csvFile);
+                    HandleCsvError(errorList, csvFile);
                 }
             }
         }
 
-        private static void HandleError(List<string> errros, string csvFile)
+        private static void HandleCsvError(List<string> errros, string csvFile)
         {
             try
             {
@@ -277,7 +276,7 @@ namespace Termis_Console
             return response;
         }
 
-        private static bool IsDetailToUpdate(ServiceDbContext _context, Detail detail, out Detail? detailToUpdate)
+        private static bool IsDetailToUpdate(Detail detail, out Detail? detailToUpdate)
         {
             detailToUpdate = _context.Details.FirstOrDefault(x =>
                     x.Month == detail.Month &&
