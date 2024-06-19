@@ -1,7 +1,7 @@
 ﻿using MimeKit;
 using System.Globalization;
 using System.Net;
-using System.Net.Mail;
+using MailKit.Net.Smtp;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -294,25 +294,22 @@ namespace Termis_Console
 
         private static void SendEmail(string toEmail, string subject, string body)
         {
-            SmtpClient smtpClient = new SmtpClient(emailHost) // Replace with your SMTP server
-            {
-                Port = emailPort, // Common port for TLS
-                Credentials = new NetworkCredential(emailUsername, emailPassword),
-                EnableSsl = emailEnableSsl,
-            };
+            using var client = new SmtpClient();
+            //Enable SSL/TLS for secure connection
+            client.Connect(emailHost, emailPort, emailEnableSsl);
 
-            // Create the email message
-            MailMessage mailMessage = new MailMessage
-            {
-                From = new MailAddress(emailUsername),
-                Subject = subject,
-                Body = body,
-                IsBodyHtml = true,
-            };
-            mailMessage.To.Add(toEmail);
+            //Authenticate if using a password-protected email account
+            client.Authenticate(emailUsername, emailPassword);
 
-            // Send the email
-            smtpClient.Send(mailMessage);
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress(emailApplicationName, emailUsername));
+            message.To.Add(new MailboxAddress("Recipient", toEmail));
+            message.Subject = subject;
+
+            //Set the message body (can be plain text or HTML)
+            message.Body = new TextPart("html") { Text = body };  //Assuming HTML template
+
+            client.Send(message);
         }
 
         private static void LogError(string message, Exception ex)
@@ -321,13 +318,11 @@ namespace Termis_Console
             {
                 string logFile = GetLogFileToWrite();
 
-                using (StreamWriter writer = new StreamWriter(logFile, true))
-                {
-                    writer.WriteLine($"{DateTime.Now} - ERROR: {message}");
-                    writer.WriteLine($"Exception: {ex.Message}");
-                    writer.WriteLine($"Stack Trace: {ex.StackTrace}");
-                    writer.WriteLine();
-                }
+                using StreamWriter writer = new StreamWriter(logFile, true);
+                writer.WriteLine($"{DateTime.Now} - ERROR: {message}");
+                writer.WriteLine($"Exception: {ex.Message}");
+                writer.WriteLine($"Stack Trace: {ex.StackTrace}");
+                writer.WriteLine();
             }
             catch (Exception logEx)
             {
