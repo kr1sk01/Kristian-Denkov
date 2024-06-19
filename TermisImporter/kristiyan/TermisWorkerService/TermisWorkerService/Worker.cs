@@ -29,7 +29,10 @@ namespace TermisWorkerService
         private static Master masterToAdd = new Master();
         private static bool first = true;
         private static List<CsvData> data = new();
+<<<<<<< HEAD
         private readonly CsvContext _context;
+=======
+>>>>>>> f195f2d (Updated & Optimized service)
 
         public Worker(IOptions<AppSettings> appSettings, IOptions<EmailSettings> emailSettings, IOptions<ColumnIndexes> columnIndexes, IServiceScopeFactory scopeFactory, CsvContext _context)
         {
@@ -121,12 +124,21 @@ namespace TermisWorkerService
                     WriteLog("You have setup 2 different properies in 1 colums, check the config file!");
                     return false;
                 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> f195f2d (Updated & Optimized service)
                 if (_columnIndexes.MonthColumnIndex <= -1 || _columnIndexes.DateColumnIndex <= -1 || _columnIndexes.HourColumnIndex <= -1)
                 {
                     WriteLog("Error reading CSV file please check the config !");
                     return false;
                 }
+<<<<<<< HEAD
                 data = _context.CsvData.ToList();
+=======
+
+                data = dbContext.CsvData.ToList();
+>>>>>>> f195f2d (Updated & Optimized service)
                 using (StreamReader reader = new StreamReader(filePath))
                 {
                     string line;
@@ -152,7 +164,11 @@ namespace TermisWorkerService
                                 ImportDate = DateTime.Now,
                                 ForecastDate = new DateTime(DateTime.UtcNow.Year, int.Parse(columns[0]), int.Parse(columns[1])),
                             };
+<<<<<<< HEAD
                             _context.Masters.Add(masterToAdd);
+=======
+                            dbContext.Masters.Add(masterToAdd);
+>>>>>>> f195f2d (Updated & Optimized service)
                             first = false;
                         }
                         CsvData csvData = new CsvData
@@ -165,17 +181,30 @@ namespace TermisWorkerService
                             Master = masterToAdd
                         };
 
+<<<<<<< HEAD
                         InsertDataToDatabase(columns[_columnIndexes.MonthColumnIndex], columns[_columnIndexes.DateColumnIndex], columns[_columnIndexes.HourColumnIndex], csvData);
                     }
                     _context.SaveChanges();
                 }
+=======
+                        InsertDataToDatabase(columns[_columnIndexes.MonthColumnIndex], columns[_columnIndexes.DateColumnIndex], columns[_columnIndexes.HourColumnIndex], csvData, dbContext);
+                    }
+                    dbContext.SaveChanges();
+                }               
+>>>>>>> f195f2d (Updated & Optimized service)
             }
             catch (Exception ex)
             {
                 WriteLog("Error reading CSV file: " + ex);
                 isSuccess = false;
             }
+<<<<<<< HEAD
             return isSuccess;
+=======
+
+            return isSuccess;
+
+>>>>>>> f195f2d (Updated & Optimized service)
         }
         private void SendEmail(string filePath, bool succeeded)
         {
@@ -221,23 +250,48 @@ namespace TermisWorkerService
                 WriteLog("Error sending email: " + ex);
             }
         }
+<<<<<<< HEAD
         private bool InsertDataToDatabase(string month, string day, string hour, CsvData csvData)
+=======
+        private bool InsertDataToDatabase(string month, string day, string hour, CsvData csvData, CsvContext context)
+>>>>>>> f195f2d (Updated & Optimized service)
         {
             var test = data.FirstOrDefault(x => x.Day == csvData.Day && x.Month == csvData.Month && x.Hour == csvData.Hour);
             if (test != null)
             {
+<<<<<<< HEAD
                 test.EarthTemperature = csvData.EarthTemperature;
                 test.AirTemperature = csvData.AirTemperature;
                 test.Master = masterToAdd;
+=======
+                var test = data.FirstOrDefault(x => x.Day == csvData.Day && x.Month == csvData.Month && x.Hour == csvData.Hour);
+                if (test != null)
+                {
+                    test.EarthTemperature = csvData.EarthTemperature;
+                    test.AirTemperature = csvData.AirTemperature;
+                    test.Master = masterToAdd;
+                }
+                else
+                {
+                    context.CsvData.Add(csvData);
+                }
+
+                // Add the CsvData entry to the context
+                WriteLog($"Data inserted to database: {month}, {day}, {hour}, {csvData.EarthTemperature},{csvData.AirTemperature}");
+                return true;
+>>>>>>> f195f2d (Updated & Optimized service)
             }
             else
             {
                 _context.CsvData.Add(csvData);
             }
+<<<<<<< HEAD
 
             // Add the CsvData entry to the _context
             WriteLog($"Data inserted to database: {month}, {day}, {hour}, {csvData.EarthTemperature},{csvData.AirTemperature}");
             return true;
+=======
+>>>>>>> f195f2d (Updated & Optimized service)
         }
         private void MoveFileToFolder(string filePath, string destinationFolderPath)
         {
