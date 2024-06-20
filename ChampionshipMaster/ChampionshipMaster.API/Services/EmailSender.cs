@@ -81,11 +81,14 @@ namespace ChampionshipMaster.API.Services
             var templatePath = "Services/EmailTemplates/GameScheduledTemplate.html";
             var template = GetEmailTemplate(templatePath);
 
+            DateTimeOffset dateTimeOffset = new DateTimeOffset(date);
+            string formattedDate = dateTimeOffset.ToString("dd/MM/yyyy HH:mm zz");
+
             var body = template.Replace("[User Name]", userName)
                 .Replace("[Game Name]", gameName)
                 .Replace("[User Team]", userTeam)
                 .Replace("[Opponent Team]", opponentTeam)
-                .Replace("[Game Date]", date.ToUniversalTime().ToString("dd/MM/yyyy HH:mm"));
+                .Replace("[Game Date]", formattedDate);
 
             await SendEmailAsync(userEmail, $"Game scheduled", body);
         }
@@ -129,7 +132,13 @@ namespace ChampionshipMaster.API.Services
             var templatePath = "Services/EmailTemplates/ChampionshipLotTemplate.html";
             var template = GetEmailTemplate(templatePath);
 
-            string dateText = date != null ? $"{date?.ToUniversalTime().ToString("dd/MM/yyyy HH:mm")} GMT" : "TBD";
+            var formattedDate = "TBD";
+            if (date != null)
+            {
+                DateTimeOffset dateTimeOffset = new DateTimeOffset(date.Value);
+                formattedDate = dateTimeOffset.ToString("dd/MM/yyyy HH:mm zz");
+            }
+
             string clientAddress = _configuration["CustomEnvironment"] == "Development" ? "https://localhost:50399" : "http://10.244.44.38:8090";
             string lotLink = $"{clientAddress}/championshipDetails/{championshipId}";
 
@@ -137,7 +146,7 @@ namespace ChampionshipMaster.API.Services
                 .Replace("[Championship Name]", championshipName)
                 .Replace("[User Team]", userTeam)
                 .Replace("[Opponent Team]", opponentTeam)
-                .Replace("[Date]", dateText)
+                .Replace("[Date]", formattedDate)
                 .Replace("[Lot Link]", lotLink);
 
             await SendEmailAsync(userEmail, "Championship Lot Drawn", body);
