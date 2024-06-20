@@ -59,6 +59,13 @@ public partial class ManageTeams : ComponentBase
     {
         if (firstRender)
         {
+            if (!await tokenService.ValidateToken())
+            {
+                notifier.SendWarningNotification("Your session has run out or you're not logged in");
+                NavigationManager.NavigateTo("/login");
+                return;
+            }
+
             var token = new JwtSecurityTokenHandler().ReadJwtToken(await tokenService.GetToken());
             playerId = token.Claims.FirstOrDefault(x => x.Type == "nameid")?.Value ?? "";
             role = token.Claims.FirstOrDefault(x => x.Type == "role")?.Value ?? "";
