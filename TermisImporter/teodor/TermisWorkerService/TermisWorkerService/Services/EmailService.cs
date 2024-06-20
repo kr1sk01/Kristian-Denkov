@@ -38,6 +38,8 @@ namespace TermisWorkerService.Services
                 .Replace("{{errors}}", errors.ToString());
 
             SendEmail(_emailSettings.ToEmail, "Error in NIMH .csv file", body);
+
+            _logger.LogInformation($"Error email sent successfully to {_emailSettings.ToEmail} for file [{csvFile}]");
         }
 
         private void SendEmail(string toEmail, string subject, string body)

@@ -116,8 +116,10 @@ namespace TermisWorkerService.Services
             if (File.Exists(destinationFilePath))
             {
                 File.Delete(destinationFilePath);
+                _logger.LogInformation($"File [{destinationFilePath}] has been overwritten");
             }
             File.Move(sourceFilePath, destinationFilePath);
+            _logger.LogInformation($"File [{sourceFilePath}] moved successfully to [{Path.GetDirectoryName(destinationFilePath)}]");
         }
 
         private DetailParseResponse ParseDetail(string[] values, int row, out Detail? detail)
