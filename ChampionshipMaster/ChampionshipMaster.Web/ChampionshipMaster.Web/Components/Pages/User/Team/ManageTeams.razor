@@ -22,7 +22,7 @@
     <HeaderTemplate>
         <RadzenButton Style="right: 6.5rem; float: right; position: absolute" Icon="note_add" Text="Create" ButtonStyle="Radzen.ButtonStyle.Secondary" Click=@OpenCreateTeam />
         <RadzenButton Style="right: 1rem; float: right; position: absolute;" Disabled=@disabledEdit Click="@(()=> OpenEditTeam(selectedTeam.FirstOrDefault()!.Id.ToString()))" Icon="edit" Text="Edit" />
-        <RadzenButton Style="margin-right: 0.5rem;" Icon="history" Text="History" ButtonStyle="Radzen.ButtonStyle.Success" Disabled=@disabledEdit Click=@(()=> NavigationManager.NavigateTo($"/history/{selectedTeam.FirstOrDefault()!.Id.ToString()}")) />
+        <RadzenButton Style="margin-right: 0.5rem;" Icon="history" Text="History" ButtonStyle="Radzen.ButtonStyle.Success" Disabled=@(selectedTeam == null || selectedTeam.Count == 0) Click=@(()=> NavigationManager.NavigateTo($"/history/{selectedTeam.FirstOrDefault()!.Id.ToString()}")) />
     </HeaderTemplate>
     <Columns>
         <RadzenDataGridColumn TItem="TeamDto" Property="Name" Title="Team">
