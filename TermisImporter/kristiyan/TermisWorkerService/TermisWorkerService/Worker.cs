@@ -43,13 +43,13 @@ namespace TermisWorkerService
 
         private static Status operationStatus;
 
-        public Worker(IOptions<AppSettings> appSettings, IOptions<EmailSettings> emailSettings, IOptions<ColumnIndexes> columnIndexes, IServiceScopeFactory scopeFactory)
+        public Worker(IOptions<AppSettings> appSettings, IOptions<EmailSettings> emailSettings, IOptions<ColumnIndexes> columnIndexes, CsvContext context)
         {
             _appSettings = appSettings.Value;
             _emailSettings = emailSettings.Value;
             _columnIndexes = columnIndexes.Value;
-            _scopeFactory = scopeFactory;
-            _context = _scopeFactory.CreateScope().ServiceProvider.GetRequiredService<CsvContext>();
+            //_scopeFactory = scopeFactory;
+            _context = context;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
