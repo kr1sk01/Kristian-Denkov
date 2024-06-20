@@ -49,21 +49,22 @@ namespace TermisWorkerService
         public string ToEmail { get; set; } = default!;
     }
 
+    [UniqueIndexes]
     public class ColumnIndexSettings
     {
-        [Range(0, int.MaxValue)]
+        [Range(0, 4)]
         public int MonthColumnIndex { get; set; }
 
-        [Range(0, int.MaxValue)]
+        [Range(0, 4)]
         public int DayColumnIndex { get; set; }
 
-        [Range(0, int.MaxValue)]
+        [Range(0, 4)]
         public int HourColumnIndex { get; set; }
 
-        [Range(0, int.MaxValue)]
+        [Range(0, 4)]
         public int TempColumnIndex { get; set; }
 
-        [Range(0, int.MaxValue)]
+        [Range(0, 4)]
         public int SoilTempColumnIndex { get; set; }
 
         public bool HasSoilTempColumn { get; set; }
@@ -86,6 +87,33 @@ namespace TermisWorkerService
             {
                 return ValidationResult.Success;
             }
+        }
+    }
+
+    public class UniqueIndexesAttribute : ValidationAttribute
+    {
+        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+        {
+            var settings = (ColumnIndexSettings)validationContext.ObjectInstance;
+            var indexes = new List<int>
+            {
+                settings.MonthColumnIndex,
+                settings.DayColumnIndex,
+                settings.HourColumnIndex,
+                settings.TempColumnIndex
+            };
+
+            if (settings.HasSoilTempColumn)
+            {
+                indexes.Add(settings.SoilTempColumnIndex);
+            }
+
+            if (indexes.Count != indexes.Distinct().Count())
+            {
+                return new ValidationResult("All column indexes must be unique.");
+            }
+
+            return ValidationResult.Success;
         }
     }
 }
