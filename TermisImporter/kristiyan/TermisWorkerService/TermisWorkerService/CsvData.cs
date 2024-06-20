@@ -13,8 +13,8 @@ public class CsvData
     public string Day { get; set; } = default!;
     [Required]
     public string Hour { get; set; } = default!;
-    public double EarthTemperature { get; set; } = default!;
-    public double AirTemperature { get; set; } = default!;
+    public double? EarthTemperature { get; set; }
+    public double? AirTemperature { get; set; }
     public int MasterId { get; set; } = default!;
     public Master Master { get; set; } = default!;
 }

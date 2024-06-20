@@ -184,8 +184,8 @@ namespace TermisWorkerService
                         Month = columns[_columnIndexes.MonthColumnIndex],
                         Day = columns[_columnIndexes.DateColumnIndex],
                         Hour = columns[_columnIndexes.HourColumnIndex],
-                        EarthTemperature = _columnIndexes.EarthTempColumnIndex > -1 && columns[_columnIndexes.EarthTempColumnIndex]  != null ? double.Parse(columns[_columnIndexes.EarthTempColumnIndex], NumberStyles.Any, CultureInfo.InvariantCulture):0,
-                        AirTemperature = _columnIndexes.AirTempColumnIndex > -1 && columns[_columnIndexes.AirTempColumnIndex] != null ? double.Parse(columns[_columnIndexes.AirTempColumnIndex], NumberStyles.Any, CultureInfo.InvariantCulture):0,
+                        EarthTemperature = _columnIndexes.EarthTempColumnIndex > -1 && columns[_columnIndexes.EarthTempColumnIndex]  != null ? double.Parse(columns[_columnIndexes.EarthTempColumnIndex], NumberStyles.Any, CultureInfo.InvariantCulture):null,
+                        AirTemperature = _columnIndexes.AirTempColumnIndex > -1 && columns[_columnIndexes.AirTempColumnIndex] != null ? double.Parse(columns[_columnIndexes.AirTempColumnIndex], NumberStyles.Any, CultureInfo.InvariantCulture):null,
                         Master = masterToAdd
                     };
                     InsertDataToDatabase(columns[_columnIndexes.MonthColumnIndex], columns[_columnIndexes.DateColumnIndex], columns[_columnIndexes.HourColumnIndex], csvData);
