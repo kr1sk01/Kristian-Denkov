@@ -13,6 +13,8 @@ using MimeKit;
 using Microsoft.Extensions.Options;
 using static System.Net.Mime.MediaTypeNames;
 using static System.Formats.Asn1.AsnWriter;
+using System.Buffers;
+using System.Net.NetworkInformation;
 
 namespace TermisWorkerService
 {
@@ -25,21 +27,29 @@ namespace TermisWorkerService
         private FileSystemWatcher watcher;
         private static readonly string logDirectory = AppDomain.CurrentDomain.BaseDirectory;
         private static CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-        private static Master masterToAdd = new Master();
+        private Master masterToAdd = new Master();
         private static bool first = true;
         private static List<CsvData> data = new();
         private CsvContext _context;
         private string importFileName = "";
+        int date, month;
 
+        private enum Status
+        {
+            Partial,
+            Failed,
+            Success
+        }
 
+        private static Status operationStatus;
 
-        public Worker(IOptions<AppSettings> appSettings, IOptions<EmailSettings> emailSettings, IOptions<ColumnIndexes> columnIndexes, IServiceScopeFactory scopeFactory)
+        public Worker(IOptions<AppSettings> appSettings, IOptions<EmailSettings> emailSettings, IOptions<ColumnIndexes> columnIndexes, CsvContext context)
         {
             _appSettings = appSettings.Value;
             _emailSettings = emailSettings.Value;
             _columnIndexes = columnIndexes.Value;
-            _scopeFactory = scopeFactory;
-            _context = _scopeFactory.CreateScope().ServiceProvider.GetRequiredService<CsvContext>();
+            //_scopeFactory = scopeFactory;
+            _context = context;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -66,11 +76,11 @@ namespace TermisWorkerService
             _context.Database.EnsureCreated();
             Console.WriteLine("Database created successfully.");
         }
-
         private void OnFileCreated(object sender, FileSystemEventArgs e)
         {
             try
             {
+                
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
 
@@ -100,12 +110,21 @@ namespace TermisWorkerService
             }
             catch (Exception ex)
             {
+                _context.ChangeTracker.Clear();
+                var masterToAdd = new Master
+                {
+                    ImportDate = DateTime.Now,
+                    Status = "Failed"
+                };
+                _context.Masters.Add(masterToAdd);
+                _context.SaveChanges();
+                MoveFileToFolder(e.FullPath, _appSettings.FailedFolderPath);
                 WriteLog($"" + ex, Path.Combine(logDirectory, $"{DateTime.UtcNow.ToString("dd_MM_yyyy")}.log"));
             }
         }
-
         private bool ReadCsvAndInsertToDatabase(string filePath)
         {
+            operationStatus = Status.Success;
             int lineCounter = 0;
 
             bool isSuccess = true;
@@ -119,7 +138,7 @@ namespace TermisWorkerService
                     _columnIndexes.AirTempColumnIndex,
                 };
             if (HasDuplicates(indexes))
-            {
+            {             
                 WriteLog("You have setup 2 different properies in 1 colums, check the config file!", Path.Combine(logDirectory, $"{DateTime.UtcNow.ToString("dd_MM_yyyy")}.log"));
                 return false;
             }
@@ -131,6 +150,7 @@ namespace TermisWorkerService
             data = _context.CsvData.ToList();
             using (StreamReader reader = new StreamReader(filePath))
             {
+                operationStatus = Status.Success;
                 string line;
                 while ((line = reader.ReadLine()) != null)
                 {
@@ -142,13 +162,15 @@ namespace TermisWorkerService
                         string.IsNullOrWhiteSpace(columns[2]) ||
                         string.IsNullOrWhiteSpace(columns[3]))
                     {
+
+                        operationStatus = Status.Failed;
                         WriteLog($"Invalid line format or missing values on line {lineCounter}: {line}", Path.Combine(logDirectory, importFileName));
                         isSuccess = false;
                         continue;
                     }
 
                     if (first)
-                    {
+                    {                      
                         masterToAdd = new Master
                         {
                             ImportDate = DateTime.Now,
@@ -162,16 +184,38 @@ namespace TermisWorkerService
                         Month = columns[_columnIndexes.MonthColumnIndex],
                         Day = columns[_columnIndexes.DateColumnIndex],
                         Hour = columns[_columnIndexes.HourColumnIndex],
-                        EarthTemperature = _columnIndexes.EarthTempColumnIndex > -1 ? double.Parse(columns[_columnIndexes.EarthTempColumnIndex], NumberStyles.Any, CultureInfo.InvariantCulture) : 0,
-                        AirTemperature = _columnIndexes.AirTempColumnIndex > -1 ? double.Parse(columns[_columnIndexes.AirTempColumnIndex], NumberStyles.Any, CultureInfo.InvariantCulture) : 0,
+                        EarthTemperature = _columnIndexes.EarthTempColumnIndex > -1 && columns[_columnIndexes.EarthTempColumnIndex]  != null ? double.Parse(columns[_columnIndexes.EarthTempColumnIndex], NumberStyles.Any, CultureInfo.InvariantCulture):null,
+                        AirTemperature = _columnIndexes.AirTempColumnIndex > -1 && columns[_columnIndexes.AirTempColumnIndex] != null ? double.Parse(columns[_columnIndexes.AirTempColumnIndex], NumberStyles.Any, CultureInfo.InvariantCulture):null,
                         Master = masterToAdd
                     };
-
                     InsertDataToDatabase(columns[_columnIndexes.MonthColumnIndex], columns[_columnIndexes.DateColumnIndex], columns[_columnIndexes.HourColumnIndex], csvData);
+                    if (operationStatus == Status.Failed)
+                    {
+                        operationStatus = Status.Partial;
+                    }
+                }
+                switch (operationStatus)
+                {
+                    case Status.Partial:
+                        masterToAdd.Status = "Partial";
+                        break;
+                    case Status.Failed:
+                        masterToAdd = new Master
+                        {
+                            ImportDate = DateTime.Now,
+                            
+                        };
+                        masterToAdd.Status = "Failed";
+                        _context.Masters.Add(masterToAdd);
+                        break;
+                    case Status.Success:
+                        masterToAdd.Status = "Success";
+                        break;
                 }
                 _context.SaveChanges();
+                return isSuccess;
             }
-            return isSuccess;
+
         }
         private void SendEmail(string filePath, bool succeeded)
         {
@@ -228,6 +272,8 @@ namespace TermisWorkerService
 
             // Add the CsvData entry to the context
             WriteLog($"Data inserted to database: {month}, {day}, {hour}, {csvData.EarthTemperature},{csvData.AirTemperature}", Path.Combine(logDirectory, $"{DateTime.UtcNow.ToString("dd_MM_yyyy")}.log"));
+
+            
             return true;
 
         }

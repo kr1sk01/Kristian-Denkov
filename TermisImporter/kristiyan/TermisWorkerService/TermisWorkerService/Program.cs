@@ -26,7 +26,6 @@ builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("Emai
 builder.Services.Configure<ColumnIndexes>(builder.Configuration.GetSection("ColumnIndexes"));
 
 // Register the Worker as a singleton service
-builder.Services.AddSingleton<Worker>();
 builder.Services.AddHostedService<Worker>();
 var host = builder.Build();
 host.Run();

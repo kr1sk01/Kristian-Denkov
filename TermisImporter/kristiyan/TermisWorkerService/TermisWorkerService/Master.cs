@@ -12,5 +12,7 @@ public class Master
 
     [Required]
     public DateTime ForecastDate { get; set; } = DateTime.UtcNow;
+    [Required]
+    public string Status { get; set; } = default!;
     public virtual List<CsvData> CsvData { get; set; } = new List<CsvData>();
 }
