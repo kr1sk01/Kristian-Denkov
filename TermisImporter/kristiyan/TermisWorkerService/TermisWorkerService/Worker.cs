@@ -33,6 +33,7 @@ namespace TermisWorkerService
         private CsvContext _context;
         private string importFileName = "";
         int date, month;
+
         private enum Status
         {
             Partial,
@@ -109,13 +110,15 @@ namespace TermisWorkerService
             }
             catch (Exception ex)
             {
-                masterToAdd = new Master
+                _context.ChangeTracker.Clear();
+                var masterToAdd = new Master
                 {
                     ImportDate = DateTime.Now,
                     Status = "Failed"
                 };
                 _context.Masters.Add(masterToAdd);
                 _context.SaveChanges();
+                MoveFileToFolder(e.FullPath, _appSettings.FailedFolderPath);
                 WriteLog($"" + ex, Path.Combine(logDirectory, $"{DateTime.UtcNow.ToString("dd_MM_yyyy")}.log"));
             }
         }
@@ -181,8 +184,8 @@ namespace TermisWorkerService
                         Month = columns[_columnIndexes.MonthColumnIndex],
                         Day = columns[_columnIndexes.DateColumnIndex],
                         Hour = columns[_columnIndexes.HourColumnIndex],
-                        EarthTemperature = _columnIndexes.EarthTempColumnIndex > -1 ? double.Parse(columns[_columnIndexes.EarthTempColumnIndex], NumberStyles.Any, CultureInfo.InvariantCulture):0,
-                        AirTemperature = _columnIndexes.AirTempColumnIndex > -1 ? double.Parse(columns[_columnIndexes.AirTempColumnIndex], NumberStyles.Any, CultureInfo.InvariantCulture):0,
+                        EarthTemperature = _columnIndexes.EarthTempColumnIndex > -1 && columns[_columnIndexes.EarthTempColumnIndex]  != null ? double.Parse(columns[_columnIndexes.EarthTempColumnIndex], NumberStyles.Any, CultureInfo.InvariantCulture):0,
+                        AirTemperature = _columnIndexes.AirTempColumnIndex > -1 && columns[_columnIndexes.AirTempColumnIndex] != null ? double.Parse(columns[_columnIndexes.AirTempColumnIndex], NumberStyles.Any, CultureInfo.InvariantCulture):0,
                         Master = masterToAdd
                     };
                     InsertDataToDatabase(columns[_columnIndexes.MonthColumnIndex], columns[_columnIndexes.DateColumnIndex], columns[_columnIndexes.HourColumnIndex], csvData);
@@ -199,10 +202,11 @@ namespace TermisWorkerService
                     case Status.Failed:
                         masterToAdd = new Master
                         {
-                            ImportDate = DateTime.Now,                          
+                            ImportDate = DateTime.Now,
+                            
                         };
-                        _context.Masters.Add(masterToAdd);
                         masterToAdd.Status = "Failed";
+                        _context.Masters.Add(masterToAdd);
                         break;
                     case Status.Success:
                         masterToAdd.Status = "Success";
