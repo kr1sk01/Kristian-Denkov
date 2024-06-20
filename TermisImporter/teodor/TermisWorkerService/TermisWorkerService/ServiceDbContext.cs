@@ -28,6 +28,10 @@ namespace TermisWorkerService
             modelBuilder.Entity<Master>()
                 .Property(x => x.Id)
                 .ValueGeneratedOnAdd();
+
+            modelBuilder.Entity<Master>()
+            .Property(t => t.Status)
+            .HasConversion<string>();  // Store enum as string
         }
     }
 }

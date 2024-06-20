@@ -37,13 +37,16 @@ namespace TermisWorkerService.Services
             {
                 var master = new Master
                 {
-                    Date = DateTime.Now
+                    Date = DateTime.Now,
+                    Status = CompletionStatus.Success
                 };
 
                 _context.Masters.Add(master);
-                _context.SaveChanges();
 
                 var lines = File.ReadAllLines(filePath);
+
+                if (lines.Length == 0)
+                    throw new Exception($"File [{filePath}] is empty");
 
                 foreach (var line in lines)
                 {
@@ -76,10 +79,14 @@ namespace TermisWorkerService.Services
                     }
                     else
                     {
+                        master.Status = CompletionStatus.Failed;
                         isSuccess = false;
                         errorList.Add(parsingResponse.ErrorMessage!);
                     }
                 }
+
+                if (!isSuccess && master.ForecastDate != null)
+                    master.Status = CompletionStatus.Partial;
 
                 _context.SaveChanges();
             }

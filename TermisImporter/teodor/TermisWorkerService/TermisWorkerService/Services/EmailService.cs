@@ -37,16 +37,21 @@ namespace TermisWorkerService.Services
             string body = template.Replace("[Csv File]", csvFile)
                 .Replace("{{errors}}", errors.ToString());
 
-            SendEmail(_emailSettings.ToEmail, "Error in NIMH .csv file", body);
+            var task = Task.Run(async () =>
+            {
+                await SendEmail(_emailSettings.ToEmail, "Error in NIMH .csv file", body);
+            });
+
+            task.Wait();
 
             _logger.LogInformation($"Error email sent successfully to {_emailSettings.ToEmail} for file [{csvFile}]");
         }
 
-        private void SendEmail(string toEmail, string subject, string body)
+        private async Task SendEmail(string toEmail, string subject, string body)
         {
             using var client = new SmtpClient();
             //Enable SSL/TLS for secure connection
-            client.Connect(_emailSettings.Username, _emailSettings.Port, _emailSettings.EnableSsl);
+            await client.ConnectAsync(_emailSettings.Host, _emailSettings.Port, _emailSettings.EnableSsl);
 
             //Authenticate if using a password-protected email account
             client.Authenticate(_emailSettings.Username, _emailSettings.Password);
@@ -59,7 +64,7 @@ namespace TermisWorkerService.Services
             //Set the message body (can be plain text or HTML)
             message.Body = new TextPart("html") { Text = body };  //Assuming HTML template
 
-            client.Send(message);
+            await client.SendAsync(message);
         }
     }
 }
