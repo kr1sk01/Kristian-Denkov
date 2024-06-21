@@ -221,7 +221,7 @@ namespace ChampionshipMaster.API.Services.ControllerServices
             {
                 user.Active = true;
                 await _context.SaveChangesAsync();
-                return Redirect("https://localhost:56665/login");
+                return Redirect((_configuration["CustomEnvironment"] == "Development") ? "https://localhost:56665/login" : "http://10.244.44.38:8090/login");
             }
 
             return BadRequest(result.Errors);
