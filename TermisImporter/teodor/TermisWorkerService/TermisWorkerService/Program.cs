@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration.UserSecrets;
 using Microsoft.Extensions.Options;
 using Serilog;
 using System.ComponentModel.DataAnnotations;
+using TermisWorkerService.Helper;
 using TermisWorkerService.Services;
 
 namespace TermisWorkerService
@@ -57,10 +58,10 @@ namespace TermisWorkerService
                 services.Configure<ServiceSettings>(options =>
                 {
                     hostContext.Configuration.GetSection("ServiceSettings").Bind(options);
-                    options.CsvDirectory = PathHelper.CorrectPath(options.CsvDirectory);
-                    options.ProcessedDirectory = PathHelper.CorrectPath(options.ProcessedDirectory);
-                    options.ErrorDirectory = PathHelper.CorrectPath(options.ErrorDirectory);
-                    options.LogDirectory = PathHelper.CorrectPath(options.LogDirectory);
+                    options.CsvDirectory = Helper.PathHelper.CorrectPath(options.CsvDirectory);
+                    options.ProcessedDirectory = Helper.PathHelper.CorrectPath(options.ProcessedDirectory);
+                    options.ErrorDirectory = Helper.PathHelper.CorrectPath(options.ErrorDirectory);
+                    options.LogDirectory = Helper.PathHelper.CorrectPath(options.LogDirectory);
                 });
 
                 services.Configure<EmailSettings>(hostContext.Configuration.GetSection("EmailSettings"));
