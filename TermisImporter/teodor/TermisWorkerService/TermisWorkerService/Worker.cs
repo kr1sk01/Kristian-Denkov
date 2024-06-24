@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Options;
+using System.Diagnostics;
 using TermisWorkerService.Services;
 
 namespace TermisWorkerService
@@ -43,7 +44,13 @@ namespace TermisWorkerService
                     var csvProcessingService = scope.ServiceProvider.GetRequiredService<ICsvService>();
                     try
                     {
+                        Stopwatch stopwatch = new();
+                        stopwatch.Start();
+
                         csvProcessingService.ProcessCsvFile(e.FullPath);
+
+                        stopwatch.Stop();
+                        _logger.LogInformation($"Processing of file [{e.Name}] took {stopwatch.ElapsedMilliseconds}ms.");
                     }
                     catch (Exception ex)
                     {

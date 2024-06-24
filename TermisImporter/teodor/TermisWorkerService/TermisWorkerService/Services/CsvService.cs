@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TermisWorkerService.Helper;
 using TermisWorkerService.Models;
 
 namespace TermisWorkerService.Services
@@ -46,7 +47,7 @@ namespace TermisWorkerService.Services
                 var lines = File.ReadAllLines(filePath);
 
                 if (lines.Length == 0)
-                    throw new Exception($"File [{filePath}] is empty");
+                    throw new Exception($"File [{PathHelper.CorrectPath(filePath)}] is empty");
 
                 foreach (var line in lines)
                 {
@@ -123,10 +124,10 @@ namespace TermisWorkerService.Services
             if (File.Exists(destinationFilePath))
             {
                 File.Delete(destinationFilePath);
-                _logger.LogInformation($"File [{destinationFilePath}] has been overwritten");
+                _logger.LogInformation($"File [{PathHelper.CorrectPath(destinationFilePath)}] has been overwritten");
             }
             File.Move(sourceFilePath, destinationFilePath);
-            _logger.LogInformation($"File [{sourceFilePath}] moved successfully to [{Path.GetDirectoryName(destinationFilePath)}]");
+            _logger.LogInformation($"File [{PathHelper.CorrectPath(sourceFilePath)}] moved successfully to [{Path.GetDirectoryName(destinationFilePath)}]");
         }
 
         private DetailParseResponse ParseDetail(string[] values, int row, out Detail? detail)
@@ -140,7 +141,7 @@ namespace TermisWorkerService.Services
 
             try
             {
-                if (_columnIndexSettings.HasSoilTempColumn && values.Length != 5 || !_columnIndexSettings.HasSoilTempColumn && values.Length != 4)
+                if ((_columnIndexSettings.HasSoilTempColumn && values.Length != 5) || (!_columnIndexSettings.HasSoilTempColumn && values.Length != 4))
                 {
                     string errorMessage = $"Invalid data format in row [{row}]. This row does not contain the necessary amount of columns.";
                     response.IsSuccess = false;
