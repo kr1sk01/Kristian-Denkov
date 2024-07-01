@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ScadaMobileMaui.Pages.LoginPage"
+             Title="LoginPage">
+    <StackLayout Padding="30" VerticalOptions="Center">
+        <Entry x:Name="Email" Placeholder="Email" Keyboard="Email" />
+        <Entry x:Name="Password" Placeholder="Password" IsPassword="True" />
+        <Button Text="Login" Clicked="OnLoginButtonClicked" BackgroundColor="#da2127" TextColor="White" />
+        <Label x:Name="ErrorLabel" TextColor="Red" IsVisible="False" />
+    </StackLayout>
+</ContentPage>

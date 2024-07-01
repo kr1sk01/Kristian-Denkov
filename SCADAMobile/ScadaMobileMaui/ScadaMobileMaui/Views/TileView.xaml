@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ScadaMobileMaui.TileView">
+    <Frame Style="{StaticResource TileStyle}">
+        <StackLayout>
+            <Label x:Name="TitleLabel" Style="{StaticResource TitleLabelStyle}" />
+            <StackLayout Orientation="Horizontal">
+                <Image Source="radiator.png" WidthRequest="20" HeightRequest="20" />
+                <Label Text="Температура отопление" Style="{StaticResource PropertyLabelStyle}" />
+                <Label x:Name="heatingMeasuredTemperature" HorizontalOptions="EndAndExpand" Style="{StaticResource PropertyLabelStyle}" />
+            </StackLayout>
+            <StackLayout Orientation="Horizontal">
+                <Image Source="water.svg" WidthRequest="20" HeightRequest="20" />
+                <Label Text="Температура гореща вода" Style="{StaticResource PropertyLabelStyle}" />
+                <Label x:Name="domesticHotWaterMeasuredTemperature" HorizontalOptions="EndAndExpand" Style="{StaticResource PropertyLabelStyle}" />
+            </StackLayout>
+            <StackLayout Orientation="Horizontal">
+                <Image Source="heatmeter.png" WidthRequest="20" HeightRequest="20" />
+                <Label Text="Топломет енергия" Style="{StaticResource PropertyLabelStyle}" />
+                <Label x:Name="heatmeterEnergy" HorizontalOptions="EndAndExpand" Style="{StaticResource PropertyLabelStyle}" />
+            </StackLayout>
+            <StackLayout Orientation="Horizontal">
+                <Image Source="flow.png" WidthRequest="20" HeightRequest="20" />
+                <Label Text="Топломет дебит" Style="{StaticResource PropertyLabelStyle}" />
+                <Label x:Name="heatmeterDebit" HorizontalOptions="EndAndExpand" Style="{StaticResource PropertyLabelStyle}" />
+            </StackLayout>
+            <StackLayout Orientation="Horizontal">
+                <Image Source="lightning.png" WidthRequest="20" HeightRequest="20" />
+                <Label Text="Топломер мощност" Style="{StaticResource PropertyLabelStyle}" />
+                <Label x:Name="heatmeterPower" HorizontalOptions="EndAndExpand" Style="{StaticResource PropertyLabelStyle}" />
+            </StackLayout>
+            <Label x:Name="DateLabel" Style="{StaticResource DateLabelStyle}" />
+        </StackLayout>
+    </Frame>
+</ContentView>
