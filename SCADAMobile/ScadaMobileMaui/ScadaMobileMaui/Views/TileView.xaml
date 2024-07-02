@@ -6,29 +6,29 @@
         <StackLayout>
             <Label x:Name="TitleLabel" Style="{StaticResource TitleLabelStyle}" />
             <StackLayout Orientation="Horizontal">
-                <Image Source="radiator.png" WidthRequest="20" HeightRequest="20" />
+                <Image Source="radiator.png" WidthRequest="20" HeightRequest="20" Style="{StaticResource PropertyIconStyle}" />
                 <Label Text="Температура отопление" Style="{StaticResource PropertyLabelStyle}" />
-                <Label x:Name="heatingMeasuredTemperature" HorizontalOptions="EndAndExpand" Style="{StaticResource PropertyLabelStyle}" />
+                <Label x:Name="heatingMeasuredTemperature" HorizontalOptions="EndAndExpand" Style="{StaticResource PropertyValueStyle}" />
             </StackLayout>
             <StackLayout Orientation="Horizontal">
-                <Image Source="water.svg" WidthRequest="20" HeightRequest="20" />
+                <Image Source="water.svg" WidthRequest="20" HeightRequest="20" Style="{StaticResource PropertyIconStyle}" />
                 <Label Text="Температура гореща вода" Style="{StaticResource PropertyLabelStyle}" />
-                <Label x:Name="domesticHotWaterMeasuredTemperature" HorizontalOptions="EndAndExpand" Style="{StaticResource PropertyLabelStyle}" />
+                <Label x:Name="domesticHotWaterMeasuredTemperature" HorizontalOptions="EndAndExpand" Style="{StaticResource PropertyValueStyle}" />
             </StackLayout>
             <StackLayout Orientation="Horizontal">
-                <Image Source="heatmeter.png" WidthRequest="20" HeightRequest="20" />
-                <Label Text="Топломет енергия" Style="{StaticResource PropertyLabelStyle}" />
-                <Label x:Name="heatmeterEnergy" HorizontalOptions="EndAndExpand" Style="{StaticResource PropertyLabelStyle}" />
+                <Image Source="heatmeter.png" WidthRequest="20" HeightRequest="20" Style="{StaticResource PropertyIconStyle}" />
+                <Label Text="Топломер енергия" Style="{StaticResource PropertyLabelStyle}" />
+                <Label x:Name="heatmeterEnergy" HorizontalOptions="EndAndExpand" Style="{StaticResource PropertyValueStyle}" />
             </StackLayout>
             <StackLayout Orientation="Horizontal">
-                <Image Source="flow.png" WidthRequest="20" HeightRequest="20" />
-                <Label Text="Топломет дебит" Style="{StaticResource PropertyLabelStyle}" />
-                <Label x:Name="heatmeterDebit" HorizontalOptions="EndAndExpand" Style="{StaticResource PropertyLabelStyle}" />
+                <Image Source="flow.png" WidthRequest="20" HeightRequest="20" Style="{StaticResource PropertyIconStyle}" />
+                <Label Text="Топломер дебит" Style="{StaticResource PropertyLabelStyle}" />
+                <Label x:Name="heatmeterDebit" HorizontalOptions="EndAndExpand" Style="{StaticResource PropertyValueStyle}" />
             </StackLayout>
             <StackLayout Orientation="Horizontal">
-                <Image Source="lightning.png" WidthRequest="20" HeightRequest="20" />
+                <Image Source="lightning.png" WidthRequest="20" HeightRequest="20" Style="{StaticResource PropertyIconStyle}" />
                 <Label Text="Топломер мощност" Style="{StaticResource PropertyLabelStyle}" />
-                <Label x:Name="heatmeterPower" HorizontalOptions="EndAndExpand" Style="{StaticResource PropertyLabelStyle}" />
+                <Label x:Name="heatmeterPower" HorizontalOptions="EndAndExpand" Style="{StaticResource PropertyValueStyle}" />
             </StackLayout>
             <Label x:Name="DateLabel" Style="{StaticResource DateLabelStyle}" />
         </StackLayout>

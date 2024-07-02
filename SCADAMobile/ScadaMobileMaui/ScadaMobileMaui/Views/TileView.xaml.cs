@@ -13,11 +13,11 @@ public partial class TileView : ContentView
     {
         Dictionary<string, object> kv = JsonSerializer.Deserialize<Dictionary<string, object>>(obj);
         TitleLabel.Text = kv["name"].ToString();
-        heatingMeasuredTemperature.Text = kv["heatingMeasuredTemperature"].ToString();
-        domesticHotWaterMeasuredTemperature.Text = kv["domesticHotWaterMeasuredTemperature"].ToString();
-        heatmeterEnergy.Text = kv["heatmeterEnergy"].ToString();
-        heatmeterDebit.Text = kv["heatmeterDebit"].ToString();
-        heatmeterPower.Text = kv["heatmeterPower"].ToString();
-        DateLabel.Text = DateTime.Parse(kv["measuredDate"].ToString()!).ToString("dd/MM/yyyy HH:mm");
+        heatingMeasuredTemperature.Text = kv["heatingMeasuredTemperature"].ToString() + " °C";
+        domesticHotWaterMeasuredTemperature.Text = kv["domesticHotWaterMeasuredTemperature"].ToString() + " °C";
+        heatmeterEnergy.Text = kv["heatmeterEnergy"].ToString() + " MWh";
+        heatmeterDebit.Text = kv["heatmeterDebit"].ToString() + " l/h";
+        heatmeterPower.Text = kv["heatmeterPower"].ToString() + " kW";
+        DateLabel.Text = DateTime.Parse(kv["measuredDate"].ToString()!).ToString("dd.MM.yyyy HH:mm");
     }
 }
