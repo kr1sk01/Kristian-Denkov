@@ -1,4 +1,5 @@
 ﻿using Android.Service.QuickSettings;
+using ScadaMobileMaui.Pages;
 using System.Text.Json;
 
 namespace ScadaMobileMaui
@@ -30,6 +31,12 @@ namespace ScadaMobileMaui
                 tile.SetData(obj);
                 TileStack.Children.Add(tile);
             }
+        }
+
+        private void OnLogoutButtonClicked(object sender, EventArgs e)
+        {
+            // Navigate back to the login page and clear the navigation stack
+            Application.Current.MainPage = new NavigationPage(new LoginPage());
         }
     }
 

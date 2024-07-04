@@ -4,6 +4,21 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
+    <Style x:Key="CustomEntry" TargetType="Entry">
+        <Setter Property="VisualStateManager.VisualStateGroups">
+            <VisualStateGroupList>
+                <VisualStateGroup>
+                    <VisualState x:Name="Normal" />
+                    <VisualState x:Name="Focused">
+                        <VisualState.Setters>
+                            <Setter Property="PlaceholderColor" Value="#da2127" />
+                        </VisualState.Setters>
+                    </VisualState>
+                </VisualStateGroup>
+            </VisualStateGroupList>
+        </Setter>
+    </Style>
+
     <Style x:Key="TileStyle" TargetType="Frame">
         <Setter Property="BackgroundColor" Value="White" />
         <Setter Property="BorderColor" Value="#e6e6e6" />
@@ -11,7 +26,7 @@
         <Setter Property="Margin" Value="0,0,0,10" />
         <Setter Property="HasShadow" Value="True"/>
         <Setter Property="Shadow">
-            <Shadow Offset="0,0" Radius="20" Brush="Black" Opacity="0.6"/>
+            <Shadow Offset="10,10" Radius="10" Brush="Black" Opacity="0.2" />
         </Setter>
     </Style>
 
@@ -21,6 +36,7 @@
         <Setter Property="BackgroundColor" Value="{StaticResource SecondaryColor}" />
         <Setter Property="HorizontalTextAlignment" Value="Center" />
         <Setter Property="Padding" Value="0,2,0,2" />
+        <Setter Property="Margin" Value="0,0,0,2"/>
     </Style>
 
     <Style x:Key="PropertyLabelStyle" TargetType="Label">
@@ -44,6 +60,8 @@
         <Setter Property="BackgroundColor" Value="{StaticResource SecondaryColor}" />
         <Setter Property="HorizontalTextAlignment" Value="Center" />
         <Setter Property="Padding" Value="0,2,0,2" />
+        <Setter Property="Margin" Value="0,2,0,0"/>
+        <Setter Property="VerticalOptions" Value="FillAndExpand"/>
     </Style>
 
     <Style TargetType="ActivityIndicator">

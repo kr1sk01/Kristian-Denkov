@@ -5,6 +5,21 @@
              x:Class="ScadaMobileMaui.MainPage"
              BackgroundColor="{StaticResource BackgroundColor}">
 
+    <NavigationPage.TitleView>
+        <Grid BackgroundColor="White" Padding="0" HorizontalOptions="FillAndExpand">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Image Source="logo_panetone_light.svg" HorizontalOptions="Start" VerticalOptions="Center" Grid.Column="0" WidthRequest="120" />
+
+            <ImageButton Source="power_button.svg" VerticalOptions="Center" HorizontalOptions="End"
+                         WidthRequest="70" Aspect="AspectFit"
+                         Grid.Column="1" Clicked="OnLogoutButtonClicked" />
+        </Grid>
+    </NavigationPage.TitleView>
+
     <ScrollView>
         <StackLayout x:Name="TileStack" Padding="10">
             <!-- Tiles will be added here dynamically -->
