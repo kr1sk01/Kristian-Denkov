@@ -1,4 +1,4 @@
-﻿using Android.Service.QuickSettings;
+﻿//using Android.Service.QuickSettings;
 using ScadaMobileMaui.Pages;
 using System.Text.Json;
 
