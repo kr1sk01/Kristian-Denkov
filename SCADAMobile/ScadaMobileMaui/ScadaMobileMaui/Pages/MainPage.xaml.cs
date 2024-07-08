@@ -1,5 +1,4 @@
-﻿using Android.Service.QuickSettings;
-using ScadaMobileMaui.Pages;
+﻿using ScadaMobileMaui.Pages;
 using System.Text.Json;
 
 namespace ScadaMobileMaui

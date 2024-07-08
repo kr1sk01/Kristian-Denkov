@@ -38,6 +38,11 @@ public partial class LoginPage : ContentPage
             // Navigate to the main page and replace the navigation stack
             Application.Current.MainPage = new NavigationPage(new MainPage(token!));
         }
+        else if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
+        {
+            ErrorLabel.Text = "An error occurred during login";
+            ErrorLabel.IsVisible = true;
+        }
         else
         {
             var errors = jsonResponse.GetProperty("errors");
