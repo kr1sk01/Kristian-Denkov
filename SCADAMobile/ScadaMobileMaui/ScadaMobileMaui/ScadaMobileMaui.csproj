@@ -67,6 +67,7 @@
 	  <None Remove="Resources\Images\heatmeter.png" />
 	  <None Remove="Resources\Images\lightning.png" />
 	  <None Remove="Resources\Images\radiator.png" />
+	  <None Remove="Resources\Images\toplo_logo_cropped.svg" />
 	  <None Remove="Resources\Images\water.svg" />
 	</ItemGroup>
 

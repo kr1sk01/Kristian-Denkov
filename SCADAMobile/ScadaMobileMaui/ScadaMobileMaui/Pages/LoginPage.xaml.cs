@@ -17,14 +17,6 @@ public partial class LoginPage : ContentPage
         var email = Email.Text;
         var password = Password.Text;
 
-        // Client-side validation for email format
-        if (!IsValidEmail(email))
-        {
-            ErrorLabel.Text = "Invalid email address format";
-            ErrorLabel.IsVisible = true;
-            return;
-        }
-
         var client = new HttpClient();
         var response = await client.PostAsync("https://api.toplo.test.stemo.bg/Api/Auth/Login", new StringContent(
             JsonSerializer.Serialize(new { email, password }), Encoding.UTF8, "application/json"));
@@ -65,37 +57,6 @@ public partial class LoginPage : ContentPage
 
             ErrorLabel.Text = errorValues;
             ErrorLabel.IsVisible = true;
-        }
-
-        //if (jsonResponse.GetProperty("isSuccess").GetBoolean())
-        //{
-        //    var token = jsonResponse.GetProperty("token").GetString();
-        //    // Navigate to the main page and replace the navigation stack
-        //    Application.Current.MainPage = new NavigationPage(new MainPage(token!));
-        //}
-        //else
-        //{
-        //    var errors = jsonResponse.GetProperty("errors").GetProperty("$values").EnumerateArray()
-        //        .Select(e => e.GetString()).ToArray();
-        //    ErrorLabel.Text = string.Join("\n", errors);
-        //    ErrorLabel.IsVisible = true;
-        //}
-    }
-
-    private bool IsValidEmail(string email)
-    {
-        if (string.IsNullOrWhiteSpace(email))
-            return false;
-
-        try
-        {
-            // Regular expression for validating email format
-            var emailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
-            return Regex.IsMatch(email, emailPattern);
-        }
-        catch (RegexMatchTimeoutException)
-        {
-            return false;
         }
     }
 }
